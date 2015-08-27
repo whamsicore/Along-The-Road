@@ -1,0 +1,22 @@
+{
+  "name": "along-the-road",
+  "version": "0.0.0",
+  "description": "Easy way to find restaurants on your road trip",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Diaphanous-Hamburger/Along-The-Road.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Diaphanous-Hamburger/Along-The-Road/issues"
+  },
+  "homepage": "https://github.com/Diaphanous-Hamburger/Along-The-Road#readme",
+  "dependencies": {
+    "express": "^4.13.3"
+  }
+}
