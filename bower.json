@@ -1,0 +1,20 @@
+{
+  "name": "Along-The-Road",
+  "version": "0.0.0",
+  "homepage": "https://github.com/janhellmich/Along-The-Road",
+  "authors": [
+    "jan <jlhellmich@gmail.com>"
+  ],
+  "description": "Easy way to find restaurants on your road trip",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "react": "~0.13.3"
+  }
+}
