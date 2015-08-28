@@ -4,13 +4,18 @@ This component is the map view. It shows the user the possible routes he/she can
 
 var React = require('react');
 
-var Router = require('react-router');
-
 var MapView = React.createClass({
+  // adds access to the router context. the getCurrentParams method can then be used to get the properties from the route
+  contextTypes: {
+    router: React.PropTypes.func
+  },
+
   render () {
+    var {origin, destination} = this.context.router.getCurrentParams();
+
     return (
       <div>
-        Welcome to the MapView
+        Welcome to the MapView: You requested to go from {origin} to {destination}!
       </div>
     )
   }
