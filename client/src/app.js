@@ -13,11 +13,25 @@ var Router = require('react-router');
 var { Route, DefaultRoute, NotFoundRoute, RouteHandler, Link } = Router;
 
 // Import Views
-var HomeView = require('./HomeView');
-var MapView = require('./MapView');
+var HomeView = require('./homeView');
+var MapView = require('./mapView');
 
 // This component includes the navigation between pages and the routehandler
 var App = React.createClass({
+  getInitialState () {
+    return {
+      origin: 'san francisco',
+      destination: ''
+    };
+  },
+
+  setPath (origin, destination) {
+    this.setState({
+      origin,
+      destination
+    });
+  },
+
   render () {
     return (
       <div className="app">
@@ -25,7 +39,11 @@ var App = React.createClass({
           <Link to="home">Choose Route</Link>
         </div>
         <div className="content">
-          <RouteHandler/>
+          <RouteHandler
+            setPath={this.setPath}
+            origin={this.state.origin}
+            destination={this.state.destination}
+          />
         </div>
       </div>
     )
