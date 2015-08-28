@@ -14,7 +14,7 @@ var HomeView = React.createClass({
    It has no effect on the execution of the program
   */
   propTypes: {
-    origin: React.PropTypes.string.isRequired,
+    origin: React.PropTypes.object.isRequired,
     destination: React.PropTypes.object.isRequired,
     setOrigin: React.PropTypes.func.isRequired,
     setDestination: React.PropTypes.func.isRequired,
