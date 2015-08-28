@@ -8,10 +8,37 @@ var Router = require('react-router');
 var Link = Router.Link;
 
 var HomeView = React.createClass({
+  /*
+   proptypes provide a way of checking the passed in properties.
+   They throw a warning in the console if not provided correctly.
+   It has no effect on the execution of the program
+  */
   propTypes: {
     origin: React.PropTypes.string.isRequired,
-    destination: React.PropTypes.string.isRequired,
-    setPath: React.PropTypes.func.isRequired,
+    destination: React.PropTypes.object.isRequired,
+    setOrigin: React.PropTypes.func.isRequired,
+    setDestination: React.PropTypes.func.isRequired,
+  },
+
+  // Componenet lifecycle method that get's called after the first render
+  componentDidMount () {
+    // allows access of the props inside setOrigin and setDestination
+    var props = this.props;
+
+    var setOrigin = function() {
+      props.setOrigin(this.getPlace());
+    };
+
+    var setDestination = function() {
+      props.setDestination(this.getPlace());
+    };
+
+    // creates google maps autocomplete field and attaches it to the input specified
+    var originAutoComplete = new google.maps.places.Autocomplete(document.getElementById('origin'));
+    originAutoComplete.addListener('place_changed', setOrigin);
+
+    var destinationAutoComplete = new google.maps.places.Autocomplete(document.getElementById('destination'));
+    destinationAutoComplete.addListener('place_changed', setDestination);
   },
 
   render () {
@@ -19,9 +46,9 @@ var HomeView = React.createClass({
       <div>
         Pick your Route
         <form>
-          <input type="text" name="origin" placeholder="origin" />
-          <input type="text" name="destination" placeholder="destination" />
-          <button onClick={this.props.setPath.bind(null, 'SF', 'LA')}>
+          <input id="origin" type="text" name="origin" placeholder="origin" />
+          <input id="destination" type="text" name="destination" placeholder="destination" />
+          <button>
             <Link to="map" >Submit</Link>
           </button>
         </form>
