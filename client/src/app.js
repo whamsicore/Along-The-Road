@@ -4,7 +4,6 @@ This file contains the entry point and router for the client side app
 All files are transpiled using webpack's babel loader. It handles JSX and ES6 syntax.
 
 If any of the syntax looks weird to you, check out the new ES6 features here: https://github.com/lukehoban/es6features
-
 */
 
 var React = require('react');
@@ -20,15 +19,22 @@ var MapView = require('./mapView');
 var App = React.createClass({
   getInitialState () {
     return {
-      origin: 'san francisco',
-      destination: ''
+      origin: {},
+      destination: {}
     };
   },
 
-  setPath (origin, destination) {
+  // method to set the origin state
+  setOrigin (origin) {
     this.setState({
       origin,
-      destination
+    });
+  },
+
+  // method to set the destination state
+  setDestination (destination) {
+    this.setState({
+      destination,
     });
   },
 
@@ -40,7 +46,8 @@ var App = React.createClass({
         </div>
         <div className="content">
           <RouteHandler
-            setPath={this.setPath}
+            setOrigin={this.setOrigin}
+            setDestination={this.setDestination}
             origin={this.state.origin}
             destination={this.state.destination}
           />
