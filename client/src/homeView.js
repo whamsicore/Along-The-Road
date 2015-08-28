@@ -8,18 +8,6 @@ var Router = require('react-router');
 var Link = Router.Link;
 
 var HomeView = React.createClass({
-  /*
-   proptypes provide a way of checking the passed in properties.
-   They throw a warning in the console if not provided correctly.
-   It has no effect on the execution of the program
-  */
-  propTypes: {
-    origin: React.PropTypes.object.isRequired,
-    destination: React.PropTypes.object.isRequired,
-    setOrigin: React.PropTypes.func.isRequired,
-    setDestination: React.PropTypes.func.isRequired,
-  },
-
   getInitialState () {
     return {
       origin: '',
@@ -30,24 +18,17 @@ var HomeView = React.createClass({
   // Componenet lifecycle method that get's called after the first render
   componentDidMount () {
     // allows access of the props inside setOrigin and setDestination
-    var props = this.props;
     var component = this;
 
     var setOrigin = function() {
-      props.setOrigin(this.getPlace());
-
       var origin = this.getPlace().geometry.location.G + ',' + this.getPlace().geometry.location.K;;
-
       component.setState({
         origin
       });
     };
 
     var setDestination = function() {
-      props.setDestination(this.getPlace());
-
       var destination = this.getPlace().geometry.location.G + ',' + this.getPlace().geometry.location.K;
-
       component.setState({
         destination
       });
@@ -70,6 +51,7 @@ var HomeView = React.createClass({
         <button>
           <Link to="map"  params={{origin: this.state.origin, destination: this.state.destination }} >Submit</Link>
         </button>
+        {this.state.origin}
       </div>
     )
   }

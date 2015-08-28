@@ -17,27 +17,6 @@ var MapView = require('./mapView');
 
 // This component includes the navigation between pages and the routehandler
 var App = React.createClass({
-  getInitialState () {
-    return {
-      origin: {},
-      destination: {}
-    };
-  },
-
-  // method to set the origin state
-  setOrigin (origin) {
-    this.setState({
-      origin,
-    });
-  },
-
-  // method to set the destination state
-  setDestination (destination) {
-    this.setState({
-      destination,
-    });
-  },
-
   render () {
     return (
       <div className="app">
@@ -45,12 +24,7 @@ var App = React.createClass({
           <Link to="home">Choose Route</Link>
         </div>
         <div className="content">
-          <RouteHandler
-            setOrigin={this.setOrigin}
-            setDestination={this.setDestination}
-            origin={this.state.origin}
-            destination={this.state.destination}
-          />
+          <RouteHandler />
         </div>
       </div>
     )
