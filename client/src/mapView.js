@@ -17,10 +17,16 @@ var MapView = React.createClass({
     setDestination: React.PropTypes.func.isRequired,
   },
 
+  contextTypes: {
+    router: React.PropTypes.func
+  },
+
   render () {
+    var {origin, destination} = this.context.router.getCurrentParams();
+
     return (
       <div>
-        Welcome to the MapView: You requested to go from {this.props.origin.formatted_address} to {this.props.destination.formatted_address}!
+        Welcome to the MapView: You requested to go from {origin} to {destination}!
       </div>
     )
   }

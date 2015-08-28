@@ -20,17 +20,37 @@ var HomeView = React.createClass({
     setDestination: React.PropTypes.func.isRequired,
   },
 
+  getInitialState () {
+    return {
+      origin: '',
+      destination: ''
+    }
+  },
+
   // Componenet lifecycle method that get's called after the first render
   componentDidMount () {
     // allows access of the props inside setOrigin and setDestination
     var props = this.props;
+    var component = this;
 
     var setOrigin = function() {
       props.setOrigin(this.getPlace());
+
+      var origin = this.getPlace().geometry.location.G + ',' + this.getPlace().geometry.location.K;;
+
+      component.setState({
+        origin
+      });
     };
 
     var setDestination = function() {
       props.setDestination(this.getPlace());
+
+      var destination = this.getPlace().geometry.location.G + ',' + this.getPlace().geometry.location.K;
+
+      component.setState({
+        destination
+      });
     };
 
     // creates google maps autocomplete field and attaches it to the input specified
@@ -44,14 +64,12 @@ var HomeView = React.createClass({
   render () {
     return (
       <div>
-        Pick your Route
-        <form>
-          <input id="origin" type="text" name="origin" placeholder="origin" />
-          <input id="destination" type="text" name="destination" placeholder="destination" />
-          <button>
-            <Link to="map" >Submit</Link>
-          </button>
-        </form>
+        <p>Plan your Trip</p>
+        <input id="origin" type="text" name="origin" placeholder="origin" />
+        <input id="destination" type="text" name="destination" placeholder="destination" />
+        <button>
+          <Link to="map"  params={{origin: this.state.origin, destination: this.state.destination }} >Submit</Link>
+        </button>
       </div>
     )
   }
