@@ -13,7 +13,7 @@ var App = React.createClass({
   render () {
     return (
       <div>
-        Hello World
+        Hello World!
       </div>
     )
   }
