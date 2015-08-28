@@ -43,6 +43,7 @@ var routes = (
     <DefaultRoute handler={HomeView}/>
     <Route name="home" path="home" handler={HomeView}/>
     <Route name="map" path="map" handler={MapView}/>
+    <NotFoundRoute handler={HomeView}/>
   </Route>
 )
 
