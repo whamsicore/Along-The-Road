@@ -3,16 +3,20 @@ var gulp = require('gulp');
 var webpack = require('gulp-webpack');
 var shell = require('gulp-shell');
 var open = require('gulp-open');
+var livereload = require('gulp-livereload');
 
 // Bundles all files and runs the webpack loaders specified in webpack.config.js
 gulp.task('build', function() {
   return gulp.src('client/src/app.js')
     .pipe(webpack( require('./webpack.config.js') ))
-    .pipe(gulp.dest('client/dist/'));
+    .pipe(gulp.dest('client/dist/'))
+    .pipe(livereload());
 });
 
 // Watches for file changes and rebuilds
 gulp.task('watch', function() {
+  livereload.listen();
+
   gulp.watch('client/src/*.js', ['build'])
 });
 
