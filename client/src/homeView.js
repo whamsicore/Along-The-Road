@@ -51,7 +51,6 @@ var HomeView = React.createClass({
         <button>
           <Link to="map"  params={{origin: this.state.origin, destination: this.state.destination }} >Submit</Link>
         </button>
-        {this.state.origin}
       </div>
     )
   }
