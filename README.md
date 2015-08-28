@@ -6,3 +6,5 @@ After cloning the repository, get started by running the following commands from
 npm install
 npm run dev
 ```
+
+For live reloads on file changes install this [chrome extension](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei).
