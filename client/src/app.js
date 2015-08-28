@@ -10,19 +10,13 @@ If any of the syntax looks weird to you, check out the new ES6 features here: ht
 var React = require('react');
 
 var Router = require('react-router');
-var {
-  Route,
-  DefaultRoute,
-  NotFoundRoute,
-  RouteHandler,
-  Link
-} = Router;
+var { Route, DefaultRoute, NotFoundRoute, RouteHandler, Link } = Router;
 
-var Link = Router.Link;
-
+// Import Views
 var HomeView = require('./HomeView');
 var MapView = require('./MapView');
 
+// This component includes the navigation between pages and the routehandler
 var App = React.createClass({
   render () {
     return (
@@ -38,6 +32,7 @@ var App = React.createClass({
   }
 });
 
+// define all routes for router
 var routes = (
   <Route handler={App}>
     <DefaultRoute handler={HomeView}/>
