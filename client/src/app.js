@@ -15,23 +15,6 @@ var { Route, DefaultRoute, NotFoundRoute, RouteHandler, Link } = Router;
 var HomeView = require('./homeView');
 var MapView = require('./mapView');
 
-// Import MUI components (material-ui)
-var mui = require('material-ui');
-var ThemeManager = new mui.Styles.ThemeManager();
-var AppBar = mui.AppBar,
-    LeftNav = mui.LeftNav,
-    List = mui.List,
-    ListItem = mui.ListItem,
-    FlatButton = mui.FlatButton,
-    TextField = mui.TextField,
-    RaisedButton = mui.RaisedButton,
-    IconButton = mui.IconButton,
-    IconMenu = mui.IconMenu;
-    FontIcon = mui.FontIcon;
-
-var Menu = require('material-ui/lib/menus/menu'),
-    MenuItem = require('material-ui/lib/menus/menu-item');
-
 // This component includes the navigation between pages and the routehandler
 var App = React.createClass({
   render () {
