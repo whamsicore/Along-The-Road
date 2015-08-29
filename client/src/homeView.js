@@ -10,18 +10,14 @@ var Link = Router.Link;
 // Import MUI components (material-ui)
 var mui = require('material-ui');
 var ThemeManager = new mui.Styles.ThemeManager();
-var TextField = mui.TextField,
-    RaisedButton = mui.RaisedButton;
-    // IconButton = mui.IconButton,
-    // IconMenu = mui.IconMenu;
-    // FontIcon = mui.FontIcon;
+var {TextField, RaisedButton} = mui;
 
 
 var HomeView = React.createClass({
   childContextTypes: {
     muiTheme: React.PropTypes.object //connect MUI
   },
-  getChildContext: function() {
+  getChildContext () {
     return {
       muiTheme: ThemeManager.getCurrentTheme() //set MUI theme to default
     };
@@ -65,10 +61,10 @@ var HomeView = React.createClass({
       <div>
         <p>Plan your Trip</p>
         <div className = 'row'>
-          <TextField id="origin" /> {/* right now these MUI props do not go well with googlefloatingLabelText="Starting Location" hintText="Enter starting address" */}
+          <TextField id="origin" placeholder='' floatingLabelText="Starting Location" hintText="Enter starting address"/> {/* right now these MUI props do not go well with google. floatingLabelText="Starting Location" hintText="Enter starting address" */}
         </div>
         <div className = 'row'>
-          <TextField id="destination" />
+          <TextField id="destination" placeholder='' floatingLabelText="Destination" hintText="Enter destination address"/>
         </div>
 
         <div className = 'row'>
