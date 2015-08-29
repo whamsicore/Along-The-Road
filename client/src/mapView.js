@@ -37,18 +37,23 @@ var MapView = React.createClass({
 
   // this creates a directions route from the start point to the end point
   calcRoute (start, end, map) {
-    var directionsDisplay = new google.maps.DirectionsRenderer();
-    directionsDisplay.setMap(map);
     var directionsService = new google.maps.DirectionsService();
 
     var request = {
       origin:start,
       destination:end,
-      travelMode: google.maps.TravelMode.DRIVING
+      travelMode: google.maps.TravelMode.DRIVING,
+      provideRouteAlternatives: true
     };
-    directionsService.route(request, function(result, status) {
+    directionsService.route(request, function (response, status) {
       if (status == google.maps.DirectionsStatus.OK) {
-        directionsDisplay.setDirections(result);
+          for (var i = 0, len = response.routes.length; i < len; i++) {
+              new google.maps.DirectionsRenderer({
+                  map: map,
+                  directions: response,
+                  routeIndex: i
+              });
+          }
       }
     });
   },
