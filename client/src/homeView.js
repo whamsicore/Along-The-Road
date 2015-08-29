@@ -7,7 +7,21 @@ var React = require('react');
 var Router = require('react-router');
 var Link = Router.Link;
 
+// Import MUI components (material-ui)
+var mui = require('material-ui');
+var ThemeManager = new mui.Styles.ThemeManager();
+var {TextField, RaisedButton} = mui; 
+
+
 var HomeView = React.createClass({
+  childContextTypes: {
+    muiTheme: React.PropTypes.object //connect MUI
+  },
+  getChildContext () {
+    return {
+      muiTheme: ThemeManager.getCurrentTheme() //set MUI theme to default
+    };
+  },
   getInitialState () {
     return {
       origin: '',
@@ -46,11 +60,17 @@ var HomeView = React.createClass({
     return (
       <div>
         <p>Plan your Trip</p>
-        <input id="origin" type="text" name="origin" placeholder="origin" />
-        <input id="destination" type="text" name="destination" placeholder="destination" />
-        <button>
-          <Link to="map"  params={{origin: this.state.origin, destination: this.state.destination }} >Submit</Link>
-        </button>
+        <div className = 'row'>
+          <TextField id="origin" placeholder='' floatingLabelText="Starting Location" hintText="Enter starting address"/> {/* right now these MUI props do not go well with google. floatingLabelText="Starting Location" hintText="Enter starting address" */}
+        </div>
+        <div className = 'row'>
+          <TextField id="destination" placeholder='' floatingLabelText="Destination" hintText="Enter destination address"/>
+        </div>
+
+        <div className = 'row'>
+          <RaisedButton label="Submit" linkButton="true" params={{origin: this.state.origin, destination: this.state.destination }} containerElement={<Link to="map"/>}/>
+
+        </div>
       </div>
     )
   }
