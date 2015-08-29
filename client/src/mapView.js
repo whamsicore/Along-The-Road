@@ -28,7 +28,6 @@ var MapView = React.createClass({
     var map = this.initializeMap(start);
     this.calcRoute(start, end, map);
   },
-
   // turns a lat/long string into a google maps LatLong Object
   getLatLong (location) {
     return new google.maps.LatLng(location.split(',')[0], location.split(',')[1]);
