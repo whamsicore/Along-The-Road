@@ -54,6 +54,18 @@ var MapView = React.createClass({
     var directionsService = new google.maps.DirectionsService();
     var component = this;
 
+    // create markers
+    new google.maps.Marker({
+      position: start,
+      map,
+      label: 'A'
+    });
+    new google.maps.Marker({
+      position: end,
+      map,
+      label: 'B'
+    });
+
     var request = {
       origin:start,
       destination:end,
