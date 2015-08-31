@@ -10,6 +10,12 @@ var MapView = React.createClass({
     router: React.PropTypes.func
   },
 
+  getInitialState () {
+    return {
+      routes: []
+    }
+  },
+
   // this is called after the first reder of the component
   componentDidMount () {
     var {origin, destination} = this.context.router.getCurrentParams();
@@ -38,31 +44,68 @@ var MapView = React.createClass({
   // this creates a directions route from the start point to the end point
   calcRoute (start, end, map) {
     var directionsService = new google.maps.DirectionsService();
+    var component = this;
 
     var request = {
       origin:start,
       destination:end,
       travelMode: google.maps.TravelMode.DRIVING,
-      provideRouteAlternatives: true
+      provideRouteAlternatives: true,
     };
     directionsService.route(request, function (response, status) {
       if (status == google.maps.DirectionsStatus.OK) {
-          for (var i = 0, len = response.routes.length; i < len; i++) {
-              new google.maps.DirectionsRenderer({
-                  map: map,
-                  directions: response,
-                  routeIndex: i
-              });
-          }
+        console.log(response);
+        var routes = [];
+        var colors = ['blue', 'red', 'green'];
+
+        for (var i = 0, len = response.routes.length; i < len; i++) {
+
+          // apply special properties to first route
+          var zIndex = i? 1 : 2;
+          // var strokeWeight = i? 5 : 3;
+          var strokeOpacity = i? 0.5 : 1;
+
+          new google.maps.DirectionsRenderer({
+              map: map,
+              directions: response,
+              routeIndex: i,
+              polylineOptions: {
+                strokeColor: colors[i],
+                zIndex,
+                // strokeWeight,
+                strokeOpacity
+              },
+          });
+
+          routes.push({
+            index: i,
+            distance: response.routes[i].legs[0].distance.text,
+            duration: response.routes[i].legs[0].duration.text,
+          });
+        }
+
+        component.setState({
+          routes
+        });
       }
     });
   },
 
   render () {
+    var routeDetails = this.state.routes.map(function(route) {
+      return (
+        <div>
+          {route.distance} -> {route.duration}
+        </div>
+      )
+    });
+    console.dir(routeDetails)
+
     return (
       <div>
         Welcome to the MapView!
         <div id="map"></div>
+        {routeDetails}
       </div>
     )
   }
