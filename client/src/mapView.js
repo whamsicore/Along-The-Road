@@ -12,7 +12,8 @@ var MapView = React.createClass({
 
   getInitialState () {
     return {
-      routes: []
+      routes: [],
+      currentRoute: null
     }
   },
 
@@ -35,10 +36,17 @@ var MapView = React.createClass({
   // initializes a map and attaches it to the map div
   initializeMap (center) {
     var mapOptions = {
-      zoom: 8,
+      zoom: 10,
       center,
     };
     return new google.maps.Map(document.getElementById('map'), mapOptions);
+  },
+
+  // this function adds a click listener to each route
+  addPolygonClickListener (polygon) {
+    // revert style of currently active route
+    // update style of new route
+    alert('hello')
   },
 
   // this creates a directions route from the start point to the end point
@@ -52,33 +60,51 @@ var MapView = React.createClass({
       travelMode: google.maps.TravelMode.DRIVING,
       provideRouteAlternatives: true,
     };
+
+    // make a directios request to the maps API
     directionsService.route(request, function (response, status) {
       if (status == google.maps.DirectionsStatus.OK) {
         console.log(response);
         var routes = [];
         var colors = ['blue', 'red', 'green'];
 
+        // default polyline options
+        var defaultOptions = {
+          zIndex: 1,
+          strokeOpacity: 0.5,
+          strokeWeight: 4
+        }
+
         for (var i = 0, len = response.routes.length; i < len; i++) {
-
-          // apply special properties to first route
-          var zIndex = i? 1 : 2;
-          // var strokeWeight = i? 5 : 3;
-          var strokeOpacity = i? 0.5 : 1;
-
-          new google.maps.DirectionsRenderer({
-              map: map,
-              directions: response,
-              routeIndex: i,
-              polylineOptions: {
-                strokeColor: colors[i],
-                zIndex,
-                // strokeWeight,
-                strokeOpacity
-              },
+          // create a polyline for each suggested route
+          var polyLine = new google.maps.Polyline({
+            path: response.routes[i].overview_path,
+            strokeColor: colors[i],
+            map
           });
 
+          polyLine.setOptions(defaultOptions);
+
+          // on the initial load make the first suggestion active
+          if (i === 0) {
+            component.setState({
+              currentRoute: polyLine
+            });
+          }
+
+          polyLine.addListener('click', function() {
+            // revert active route
+            if (component.state.currentRoute) {
+              component.state.currentRoute.setOptions(defaultOptions);
+            }
+            // update new route
+            component.setState({ currentRoute: this })
+          });
+
+          // save the distance and duration of each route for display
           routes.push({
             index: i,
+            color: colors[i],
             distance: response.routes[i].legs[0].distance.text,
             duration: response.routes[i].legs[0].duration.text,
           });
@@ -92,6 +118,14 @@ var MapView = React.createClass({
   },
 
   render () {
+    // update display of acitve route
+    if (this.state.currentRoute) {
+      this.state.currentRoute.setOptions({
+        zIndex: 2,
+        strokeOpacity: 1,
+      });
+    };
+
     var routeDetails = this.state.routes.map(function(route) {
       return (
         <div>
