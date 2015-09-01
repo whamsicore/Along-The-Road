@@ -33,6 +33,7 @@ var MapView = React.createClass({
     });
     this.calcRoute(start, end, map);
   },
+
   // turns a lat/long string into a google maps LatLong Object
   getLatLong (location) {
     return new google.maps.LatLng(location.split(',')[0], location.split(',')[1]);
@@ -47,10 +48,25 @@ var MapView = React.createClass({
     return new google.maps.Map(document.getElementById('map'), mapOptions);
   },
 
+  // set the current selected route
   setCurrentRoute (index) {
+    // clear previously active route
+    if (this.state.currentRoute) {
+      this.state.currentRoute.setOptions(this.defaultOptions);
+    }
+
     this.setState({
       currentRoute: this.state.routes[index]
     });
+
+    // update new routeingBoxes
+    this.updateRoutingBoxes();
+  },
+
+  defaultOptions: {
+    zIndex: 1,
+    strokeOpacity: 0.4,
+    strokeWeight: 4
   },
 
   // this creates a directions route from the start point to the end point
@@ -85,11 +101,7 @@ var MapView = React.createClass({
         var colors = ['blue', 'red', 'green'];
 
         // default polyline options
-        var defaultOptions = {
-          zIndex: 1,
-          strokeOpacity: 0.5,
-          strokeWeight: 4
-        }
+
 
         for (var i = 0, len = response.routes.length; i < len; i++) {
           // create a polyline for each suggested route
@@ -105,7 +117,7 @@ var MapView = React.createClass({
           polyLine.distance = response.routes[i].legs[0].distance.text;
           polyLine.duration = response.routes[i].legs[0].duration.text;
 
-          polyLine.setOptions(defaultOptions);
+          polyLine.setOptions(component.defaultOptions);
           // save polylines for later use
           routes.push(polyLine);
 
@@ -117,18 +129,8 @@ var MapView = React.createClass({
             });
           } //if
 
-          polyLine.addListener('click', function() {
-            // revert active route
-            if (component.state.currentRoute) {
-              component.state.currentRoute.setOptions(defaultOptions);
-            }
-            // update new route to be the clicked polyline
-            component.setState({
-              currentRoute: this
-            });
-
-            component.updateRoutingBoxes();
-          });
+          // add event listener to update the route on click
+          polyLine.addListener('click', component.setCurrentRoute.bind(component, i));
 
         } //for(each route)
 
