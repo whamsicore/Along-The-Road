@@ -4,6 +4,7 @@ This component is the map view. It shows the user the possible routes he/she can
 
 var React = require('react');
 var RouteDetailView = require('./routeDetailView')
+var ListView = require('./listView')
 
 var MapView = React.createClass({
   // adds access to the router context. the getCurrentParams method can then be used to get the properties from the route
@@ -14,7 +15,8 @@ var MapView = React.createClass({
   getInitialState () {
     return {
       routes: [],
-      currentRoute: null
+      currentRoute: null,
+      routingBoxes: []
     }
   },
 
@@ -26,6 +28,9 @@ var MapView = React.createClass({
     var end = this.getLatLong(destination);
 
     var map = this.initializeMap(start);
+    this.setState({
+      map: map
+    });
     this.calcRoute(start, end, map);
   },
 
@@ -41,6 +46,27 @@ var MapView = React.createClass({
       center,
     };
     return new google.maps.Map(document.getElementById('map'), mapOptions);
+  },
+
+  // set the current selected route
+  setCurrentRoute (index) {
+    // clear previously active route
+    if (this.state.currentRoute) {
+      this.state.currentRoute.setOptions(this.defaultOptions);
+    }
+
+    this.setState({
+      currentRoute: this.state.routes[index]
+    });
+
+    // update new routeingBoxes
+    this.updateRoutingBoxes();
+  },
+
+  defaultOptions: {
+    zIndex: 1,
+    strokeOpacity: 0.4,
+    strokeWeight: 4
   },
 
   // this creates a directions route from the start point to the end point
@@ -65,21 +91,17 @@ var MapView = React.createClass({
       destination:end,
       travelMode: google.maps.TravelMode.DRIVING,
       provideRouteAlternatives: true,
-    };
+    }; //request
 
     // make a directios request to the maps API
     directionsService.route(request, function (response, status) {
-      if (status == google.maps.DirectionsStatus.OK) {
+      if (status == google.maps.DirectionsStatus.OK) { //.OK indicates the response contains a valid DirectionsResult.
         console.log(response);
         var routes = [];
         var colors = ['blue', 'red', 'green'];
 
         // default polyline options
-        var defaultOptions = {
-          zIndex: 1,
-          strokeOpacity: 0.5,
-          strokeWeight: 4
-        }
+
 
         for (var i = 0, len = response.routes.length; i < len; i++) {
           // create a polyline for each suggested route
@@ -89,42 +111,83 @@ var MapView = React.createClass({
             map
           });
 
-          polyLine.setOptions(defaultOptions);
+          // add properties to each polyline          
+          polyLine.path = response.routes[i].overview_path;
+          polyLine.color = colors[i];
+          polyLine.distance = response.routes[i].legs[0].distance.text;
+          polyLine.duration = response.routes[i].legs[0].duration.text;
 
+          polyLine.setOptions(component.defaultOptions);
+          // save polylines for later use
+          routes.push(polyLine);
+          
           // on the initial load make the first suggestion active
           if (i === 0) {
             component.setState({
-              currentRoute: polyLine
+              currentRoute: polyLine, 
+              // currentPath: response.routes[i].overview_path //test
             });
-          }
+          } //if
 
-          polyLine.addListener('click', function() {
-            // revert active route
-            if (component.state.currentRoute) {
-              component.state.currentRoute.setOptions(defaultOptions);
-            }
-            // update new route to be the clicked polyline
-            component.setState({ currentRoute: this })
-          });
+          // add event listener to update the route on click
+          polyLine.addListener('click', component.setCurrentRoute.bind(component, i));
 
-          // save the distance and duration of each route for display
-          routes.push({
-            index: i,
-            color: colors[i],
-            distance: response.routes[i].legs[0].distance.text,
-            duration: response.routes[i].legs[0].duration.text,
-          });
-        }
+        } //for(each route)
 
         component.setState({
           routes
         });
-      }
+
+        /**** Routing Box ****/
+        component.updateRoutingBoxes();
+      } // if
+    }); //directionsService.route callback
+  }, //calcRoutes()
+  updateRoutingBoxes () {
+    // get routing box info from good api
+    console.log("TEST inside updateRoutingBoxes() currentRoute = ", this.state.currentRoute.path);
+
+    var routeBoxer = new RouteBoxer();
+    var distance = 5; // km
+
+    var routingBoxes = routeBoxer.box(this.state.currentRoute.path, distance);
+    this.setState({
+      routingBoxes
     });
+
+    console.log("ROUTINGBOX", routingBoxes)
+    // this.drawBoxes(boxes);
+
   },
+  // // Draw the array of boxes as polylines on the map
+  // drawBoxes (boxes) {
+  //   var boxpolys = [];
+    
+  //   for (var i = 0; i < boxes.length; i++) {
+  //     boxpolys.push(new google.maps.Rectangle({
+  //       bounds: boxes[i],
+  //       fillOpacity: 0,
+  //       strokeOpacity: 1.0,
+  //       strokeColor: '#000000',
+  //       strokeWeight: 1,
+  //       map: this.state.map
+  //     }));
+  //   } //for
+
+  // }, // drawBoxes()
+
+  // // Clear boxes currently on the map
+  // clearBoxes () {
+  //   if (boxpolys != null) {
+  //     for (var i = 0; i < boxpolys.length; i++) {
+  //       boxpolys[i].setMap(null);
+  //     }
+  //   }
+  //   boxpolys = null;
+  // }, // clearBoxes()
 
   render () {
-    // update display of acitve route
+    // update display of active route
     if (this.state.currentRoute) {
       this.state.currentRoute.setOptions({
         zIndex: 2,
@@ -136,7 +199,10 @@ var MapView = React.createClass({
       <div>
         Welcome to the MapView!
         <div id="map"></div>
-        <RouteDetailView routes={this.state.routes} />
+        <RouteDetailView 
+          routes={this.state.routes}
+          setCurrentRoute={this.setCurrentRoute} />
+        <ListView routingBoxes={this.state.routingBoxes} />
       </div>
     )
   }
