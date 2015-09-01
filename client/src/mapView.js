@@ -3,6 +3,7 @@ This component is the map view. It shows the user the possible routes he/she can
 */
 
 var React = require('react');
+var RouteDetailView = require('./routeDetailView')
 
 var MapView = React.createClass({
   // adds access to the router context. the getCurrentParams method can then be used to get the properties from the route
@@ -131,23 +132,14 @@ var MapView = React.createClass({
       });
     };
 
-    var routeDetails = this.state.routes.map(function(route) {
-      return (
-        <div>
-          {route.distance} -> {route.duration}
-        </div>
-      )
-    });
-    console.dir(routeDetails)
-
     return (
       <div>
         Welcome to the MapView!
         <div id="map"></div>
-        {routeDetails}
+        <RouteDetailView routes={this.state.routes} />
       </div>
     )
   }
-})
+});
 
 module.exports = MapView;
