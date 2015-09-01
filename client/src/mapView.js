@@ -4,6 +4,7 @@ This component is the map view. It shows the user the possible routes he/she can
 
 var React = require('react');
 var RouteDetailView = require('./routeDetailView')
+var ListView = require('./listView')
 
 var MapView = React.createClass({
   // adds access to the router context. the getCurrentParams method can then be used to get the properties from the route
@@ -14,7 +15,8 @@ var MapView = React.createClass({
   getInitialState () {
     return {
       routes: [],
-      currentRoute: null
+      currentRoute: null,
+      routingBoxes: []
     }
   },
 
@@ -84,7 +86,6 @@ var MapView = React.createClass({
         }
 
         for (var i = 0, len = response.routes.length; i < len; i++) {
-          console.log("Showing path info: Route"+i, response.routes[i].overview_path);
           // create a polyline for each suggested route
           var polyLine = new google.maps.Polyline({
             path: response.routes[i].overview_path,
@@ -92,8 +93,17 @@ var MapView = React.createClass({
             map
           });
 
-          polyLine.path = response.routes[i].overview_path; //save path info for use with routing boxes, used in this.updateRoutingBoxes()
+          // add properties to each polyline          
+          polyLine.path = response.routes[i].overview_path;
+          polyLine.color = colors[i];
+          polyLine.distance = response.routes[i].legs[0].distance.text;
+          polyLine.duration = response.routes[i].legs[0].duration.text;
+
+          // save polylines for later use
+          routes.push(polyLine);
           
+          console.log(polyLine);
+
           polyLine.setOptions(defaultOptions);
 
 
@@ -114,15 +124,10 @@ var MapView = React.createClass({
             component.setState({ 
               currentRoute: this 
             }); 
+
+            component.updateRoutingBoxes();
           });
 
-          // save the distance and duration of each route for display
-          routes.push({
-            index: i,
-            color: colors[i],
-            distance: response.routes[i].legs[0].distance.text,
-            duration: response.routes[i].legs[0].duration.text,
-          });
         } //for(each route)
 
         component.setState({
@@ -138,34 +143,37 @@ var MapView = React.createClass({
     // get routing box info from good api
     console.log("TEST inside updateRoutingBoxes() currentRoute = ", this.state.currentRoute.path);
 
-    var directionService = new google.maps.DirectionsService();
     var routeBoxer = new RouteBoxer();
     var distance = 5; // km
 
-    var currentRoute = this.state.currentRoute;
+    var routingBoxes = routeBoxer.box(this.state.currentRoute.path, distance);
+    this.setState({
+      routingBoxes
+    });
 
-    var boxes = routeBoxer.box(currentRoute.path, distance);
-    this.drawBoxes(boxes);
+    console.log("ROUTINGBOX", routingBoxes)
+    // this.drawBoxes(boxes);
 
   },
-  // Draw the array of boxes as polylines on the map
-  drawBoxes (boxes) {
-    var boxpolys = new Array(boxes.length);
+  // // Draw the array of boxes as polylines on the map
+  // drawBoxes (boxes) {
+  //   var boxpolys = [];
     
-    for (var i = 0; i < boxes.length; i++) {
-      boxpolys[i] = new google.maps.Rectangle({
-        bounds: boxes[i],
-        fillOpacity: 0,
-        strokeOpacity: 1.0,
-        strokeColor: '#000000',
-        strokeWeight: 1,
-        map: this.state.map
-      });
-    } //for
+  //   for (var i = 0; i < boxes.length; i++) {
+  //     boxpolys.push(new google.maps.Rectangle({
+  //       bounds: boxes[i],
+  //       fillOpacity: 0,
+  //       strokeOpacity: 1.0,
+  //       strokeColor: '#000000',
+  //       strokeWeight: 1,
+  //       map: this.state.map
+  //     }));
+  //   } //for
 
-  }, // drawBoxes()
-  // Clear boxes currently on the map
-  // function clearBoxes() {
+  // }, // drawBoxes()
+
+  // // Clear boxes currently on the map
+  // clearBoxes () {
   //   if (boxpolys != null) {
   //     for (var i = 0; i < boxpolys.length; i++) {
   //       boxpolys[i].setMap(null);
@@ -173,6 +181,7 @@ var MapView = React.createClass({
   //   }
   //   boxpolys = null;
   // }, // clearBoxes()
+
   render () {
     // update display of active route
     if (this.state.currentRoute) {
@@ -187,6 +196,7 @@ var MapView = React.createClass({
         Welcome to the MapView!
         <div id="map"></div>
         <RouteDetailView routes={this.state.routes} />
+        <ListView routingBoxes={this.state.routingBoxes} />
       </div>
     )
   }
