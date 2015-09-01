@@ -42,13 +42,6 @@ var MapView = React.createClass({
     return new google.maps.Map(document.getElementById('map'), mapOptions);
   },
 
-  // this function adds a click listener to each route
-  addPolygonClickListener (polygon) {
-    // revert style of currently active route
-    // update style of new route
-    alert('hello')
-  },
-
   // this creates a directions route from the start point to the end point
   calcRoute (start, end, map) {
     var directionsService = new google.maps.DirectionsService();
