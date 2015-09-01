@@ -47,6 +47,12 @@ var MapView = React.createClass({
     return new google.maps.Map(document.getElementById('map'), mapOptions);
   },
 
+  setCurrentRoute (index) {
+    this.setState({
+      currentRoute: this.state.routes[index]
+    });
+  },
+
   // this creates a directions route from the start point to the end point
   calcRoute (start, end, map) {
     var directionsService = new google.maps.DirectionsService();
@@ -99,14 +105,10 @@ var MapView = React.createClass({
           polyLine.distance = response.routes[i].legs[0].distance.text;
           polyLine.duration = response.routes[i].legs[0].duration.text;
 
+          polyLine.setOptions(defaultOptions);
           // save polylines for later use
           routes.push(polyLine);
           
-          console.log(polyLine);
-
-          polyLine.setOptions(defaultOptions);
-
-
           // on the initial load make the first suggestion active
           if (i === 0) {
             component.setState({
@@ -195,7 +197,9 @@ var MapView = React.createClass({
       <div>
         Welcome to the MapView!
         <div id="map"></div>
-        <RouteDetailView routes={this.state.routes} />
+        <RouteDetailView 
+          routes={this.state.routes}
+          setCurrentRoute={this.setCurrentRoute} />
         <ListView routingBoxes={this.state.routingBoxes} />
       </div>
     )

@@ -6,13 +6,15 @@ var React = require('react');
 
 var RouteDetailView = React.createClass({
   propTypes: {
-    routes: React.PropTypes.array.isRequired
+    routes: React.PropTypes.array.isRequired,
+    setCurrentRoute: React.PropTypes.func.isRequired
   },
 
   render () {
+    var component = this;
     var routeDetails = this.props.routes.map(function(route, index) {
       return (
-        <div key={index}>
+        <div onClick={component.props.setCurrentRoute.bind(null, index)} key={index}>
           {route.distance} -> {route.duration}
         </div>
       )
