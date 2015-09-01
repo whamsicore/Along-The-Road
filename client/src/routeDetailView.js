@@ -10,9 +10,9 @@ var RouteDetailView = React.createClass({
   },
 
   render () {
-    var routeDetails = this.props.routes.map(function(route) {
+    var routeDetails = this.props.routes.map(function(route, index) {
       return (
-        <div key={route.index}>
+        <div key={index}>
           {route.distance} -> {route.duration}
         </div>
       )
