@@ -103,7 +103,7 @@ var MapView = React.createClass({
             if (component.state.currentRoute) {
               component.state.currentRoute.setOptions(defaultOptions);
             }
-            // update new route
+            // update new route to be the clicked polyline
             component.setState({ currentRoute: this })
           });
 
