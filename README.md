@@ -9,9 +9,13 @@ npm run dev
 
 For live reloads on file changes install this [chrome extension](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei).
 
-### Review Pull Request Live Demo
+### Deployed versions of the App
 
-You can review a live demo of the current pull request to the development branch [here](http://alongtheroad-review.herokuapp.com/)
+You can review a live demo of the current pull request to the development branch here: [http://alongtheroad-review.herokuapp.com/](http://alongtheroad-review.herokuapp.com/)
+
+The current development branch is deployed here: [http://alongtheroad-development.herokuapp.com/](http://alongtheroad-development.herokuapp.com/)
+
+The deployed funtional app is deployed here: [http://alongtheroad.herokuapp.com/](http://alongtheroad.herokuapp.com/)
 
 ### Contribution Workflow
 
