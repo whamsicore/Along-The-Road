@@ -54,13 +54,15 @@ var MapView = React.createClass({
     if (this.state.currentRoute) {
       this.state.currentRoute.setOptions(this.defaultOptions.routes);
     }
-
+    
+    var wayPoints = this.updateWayPoints(this.state.routes[index]);
+    console.log(wayPoints)
     this.setState({
+      wayPoints,
       currentRoute: this.state.routes[index]
     });
 
     // update new wayPoints
-    this.updateWayPoints();
     // this.createWayPoints();
 
   },
@@ -141,31 +143,28 @@ var MapView = React.createClass({
         });
 
         /**** Routing Box ****/
-        component.updateWayPoints();
+        component.updateWayPoints(component.state.currentRoute);
         // component.createWayPoints();
       } // if
     }); //directionsService.route callback
   }, //calcRoutes()
 
   // updates wayPoints if available, create wayPoints if not
-  updateWayPoints (){
-    var currentRoute = this.state.currentRoute;
+  updateWayPoints (newRoute){
     
     //lazy-load currentRoute wayPoints, and save it to currentRoute object when complete
-    var wayPoints =  currentRoute.wayPoints || this.createWayPoints(); 
-    
-    this.setState({
-      wayPoints
-    });
+    var wayPoints =  newRoute.wayPoints || this.createWayPoints(newRoute); 
 
-    this.displayWayPoints();
+    this.displayWayPoints(wayPoints);
+
+    return wayPoints;
   },
-  createWayPoints (radius) {
-  
+
+  createWayPoints (newRoute) {
     // console.log("TEST inside createWayPoints()");
 
-    radius = this.defaultOptions.radius;
-    var path = this.state.currentRoute.path;
+    var radius = this.defaultOptions.radius;
+    var path = newRoute.path;
     var map = this.state.map;
 
     var wayPoints = [];
@@ -203,7 +202,7 @@ var MapView = React.createClass({
     // this.setState({
     //   wayPoints
     // });//temp
-    this.state.currentRoute.wayPoints = wayPoints; //save to the currentRoute object
+    newRoute.wayPoints = wayPoints; //save to the currentRoute object
 
     // this.setState({
     //   currentRoute: this.
@@ -214,8 +213,9 @@ var MapView = React.createClass({
     console.log("wayPoints", wayPoints);
     console.log("Path", path);
   }, //createWayPoints()
-  displayWayPoints(){
-    this.state.wayPoints.forEach(function(point) {
+
+  displayWayPoints(wayPoints){
+    wayPoints.forEach(function(point) {
       new google.maps.Circle({
         center: point,
         map: this.state.map,

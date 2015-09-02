@@ -10,7 +10,7 @@ var ListView = React.createClass({
   },
   shouldComponentUpdate (nextProps, nextState){
     console.log("TEST inside shouldComponentUpdate() nextProps=", nextProps);
-    console.log("TEST inside shouldComponentUpdate() nextState=", nextState);
+    // console.log("TEST inside shouldComponentUpdate() nextState=", nextState);
     return true;
   }, 
   // componentWillUpdate (){
