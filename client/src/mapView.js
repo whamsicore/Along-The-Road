@@ -16,7 +16,7 @@ var MapView = React.createClass({
     return {
       routes: [],
       currentRoute: null,
-      routingBoxes: []
+      wayPoints: []
     }
   },
 
@@ -59,8 +59,8 @@ var MapView = React.createClass({
       currentRoute: this.state.routes[index]
     });
 
-    // update new routeingBoxes
-    this.updateRoutingBoxes();
+    // update new wayPoints
+    this.createWayPoints();
   },
 
   defaultOptions: {
@@ -100,9 +100,6 @@ var MapView = React.createClass({
         var routes = [];
         var colors = ['blue', 'red', 'green'];
 
-        // default polyline options
-
-
         for (var i = 0, len = response.routes.length; i < len; i++) {
           // create a polyline for each suggested route
           var polyLine = new google.maps.Polyline({
@@ -111,7 +108,7 @@ var MapView = React.createClass({
             map
           });
 
-          // add properties to each polyline          
+          // add properties to each polyline
           polyLine.path = response.routes[i].overview_path;
           polyLine.color = colors[i];
           polyLine.distance = response.routes[i].legs[0].distance.text;
@@ -120,11 +117,11 @@ var MapView = React.createClass({
           polyLine.setOptions(component.defaultOptions);
           // save polylines for later use
           routes.push(polyLine);
-          
+
           // on the initial load make the first suggestion active
           if (i === 0) {
             component.setState({
-              currentRoute: polyLine, 
+              currentRoute: polyLine,
               // currentPath: response.routes[i].overview_path //test
             });
           } //if
@@ -139,52 +136,71 @@ var MapView = React.createClass({
         });
 
         /**** Routing Box ****/
-        component.updateRoutingBoxes();
+        component.createWayPoints();
       } // if
     }); //directionsService.route callback
   }, //calcRoutes()
-  updateRoutingBoxes () {
-    // get routing box info from good api
-    console.log("TEST inside updateRoutingBoxes() currentRoute = ", this.state.currentRoute.path);
 
-    var routeBoxer = new RouteBoxer();
-    var distance = 5; // km
+  // creates evenly spaced waypoints alog the current Path
+  createWayPoints (radius) {
 
-    var routingBoxes = routeBoxer.box(this.state.currentRoute.path, distance);
-    this.setState({
-      routingBoxes
+    radius = radius || 10;
+    var path = this.state.currentRoute.path;
+    var map = this.state.map;
+
+    var wayPoints = [];
+    var lastPoint;
+
+    // calculates the distance in km between two points based on their Latitude and Longitude
+    var getDistanceBetweenPoints = function(a, b) {
+      // G represents the Latitude and K the Longitude of a point
+      var d = Math.sqrt(Math.pow(a.G-b.G, 2) + Math.pow(a.K-b.K, 2));
+      return d * 110;
+    }
+
+    // creates a point inbetween two specified points points
+    var getMiddlePoint = function(a, b) {
+      return new google.maps.LatLng((a.G+b.G)/2, (a.K+b.K)/2);
+    }
+
+    path.forEach(function(point) {
+      // add first point
+      if (!lastPoint) {
+        wayPoints.push(point);
+        lastPoint = point;
+      }
+      // add an inbetween point if the distance is too big
+      if (getDistanceBetweenPoints(lastPoint, point) > 1.5 * radius) {
+        wayPoints.push(getMiddlePoint(lastPoint, point));
+      }
+      // add new point if the distance is larger than the radius
+      if (getDistanceBetweenPoints(lastPoint, point) > radius) {
+        wayPoints.push(point);
+        lastPoint = point;
+      }
     });
 
-    console.log("ROUTINGBOX", routingBoxes)
-    // this.drawBoxes(boxes);
+    this.setState({
+      wayPoints
+    });
 
+    // display points on map
+    wayPoints.forEach(function(point) {
+      new google.maps.Circle({
+        center: point,
+        map: map,
+        radius: radius*1000,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35,
+      });
+    });
+
+    console.log("wayPoints", wayPoints);
+    console.log("Path", path);
   },
-  // // Draw the array of boxes as polylines on the map
-  // drawBoxes (boxes) {
-  //   var boxpolys = [];
-    
-  //   for (var i = 0; i < boxes.length; i++) {
-  //     boxpolys.push(new google.maps.Rectangle({
-  //       bounds: boxes[i],
-  //       fillOpacity: 0,
-  //       strokeOpacity: 1.0,
-  //       strokeColor: '#000000',
-  //       strokeWeight: 1,
-  //       map: this.state.map
-  //     }));
-  //   } //for
-
-  // }, // drawBoxes()
-
-  // // Clear boxes currently on the map
-  // clearBoxes () {
-  //   if (boxpolys != null) {
-  //     for (var i = 0; i < boxpolys.length; i++) {
-  //       boxpolys[i].setMap(null);
-  //     }
-  //   }
-  //   boxpolys = null;
-  // }, // clearBoxes()
 
   render () {
     // update display of active route
@@ -199,10 +215,10 @@ var MapView = React.createClass({
       <div>
         Welcome to the MapView!
         <div id="map"></div>
-        <RouteDetailView 
+        <RouteDetailView
           routes={this.state.routes}
           setCurrentRoute={this.setCurrentRoute} />
-        <ListView routingBoxes={this.state.routingBoxes} />
+        <ListView routingBoxes={this.state.wayPoints} />
       </div>
     )
   }
