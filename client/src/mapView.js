@@ -16,7 +16,6 @@ var MapView = React.createClass({
     return {
       routes: [],
       currentRoute: null,
-      routingBoxes: [],
       wayPoints: []
     }
   },
@@ -61,7 +60,7 @@ var MapView = React.createClass({
     });
 
     // update new wayPoints
-    this.getWayPoints();
+    this.createWayPoints();
   },
 
   defaultOptions: {
@@ -137,12 +136,13 @@ var MapView = React.createClass({
         });
 
         /**** Routing Box ****/
-        component.getWayPoints();
+        component.createWayPoints();
       } // if
     }); //directionsService.route callback
   }, //calcRoutes()
 
-  getWayPoints (map, radius) {
+  // creates evenly spaced waypoints alog the current Path
+  createWayPoints (radius) {
 
     radius = radius || 10;
     var path = this.state.currentRoute.path;
@@ -151,16 +151,20 @@ var MapView = React.createClass({
     var wayPoints = [];
     var lastPoint;
 
+    // calculates the distance in km between two points based on their Latitude and Longitude
     var getDistanceBetweenPoints = function(a, b) {
+      // G represents the Latitude and K the Longitude of a point
       var d = Math.sqrt(Math.pow(a.G-b.G, 2) + Math.pow(a.K-b.K, 2));
       return d * 110;
     }
 
+    // creates a point inbetween two specified points points
     var getMiddlePoint = function(a, b) {
       return new google.maps.LatLng((a.G+b.G)/2, (a.K+b.K)/2);
     }
 
     path.forEach(function(point) {
+      // add first point
       if (!lastPoint) {
         wayPoints.push(point);
         lastPoint = point;
@@ -169,6 +173,7 @@ var MapView = React.createClass({
       if (getDistanceBetweenPoints(lastPoint, point) > 1.5 * radius) {
         wayPoints.push(getMiddlePoint(lastPoint, point));
       }
+      // add new point if the distance is larger than the radius
       if (getDistanceBetweenPoints(lastPoint, point) > radius) {
         wayPoints.push(point);
         lastPoint = point;
@@ -179,7 +184,7 @@ var MapView = React.createClass({
       wayPoints
     });
 
-    // display points
+    // display points on map
     wayPoints.forEach(function(point) {
       new google.maps.Circle({
         center: point,
