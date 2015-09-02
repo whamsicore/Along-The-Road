@@ -6,11 +6,22 @@ var React = require('react');
 
 var ListView = React.createClass({
   propTypes: {
-    routingBoxes: React.PropTypes.array.isRequired
+    wayPoints: React.PropTypes.array.isRequired
   },
+  shouldComponentUpdate (nextProps, nextState){
+    console.log("TEST inside shouldComponentUpdate() nextProps=", nextProps);
+    console.log("TEST inside shouldComponentUpdate() nextState=", nextState);
+    return true;
+  },
+  // componentWillUpdate (){
+  //   console.log("TEST -----> componentWillUpdate");
+  // },
+  // componentDidMount (){
+  //   console.log("TEST inside componentDidMount()");
 
+  // },
   render () {
-    var listDetails = this.props.routingBoxes.map(function(box, index) {
+    var listDetails = this.props.wayPoints.map(function(box, index) {
       return (
         <div key={index}>
           Restaurant {index}
