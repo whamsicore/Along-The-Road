@@ -18,7 +18,15 @@ var MapView = React.createClass({
       currentRoute: { wayPoints: [], results: [] } //default values for currentRoute
     }
   },
-
+  //default options to be used for this view, inclusind route options and radius of search
+  defaultOptions: {
+    polyline: { //configuration for polylines (inactive ones)
+      zIndex: 1,
+      strokeOpacity: 0.4,
+      strokeWeight: 4
+    },
+    radius: 10 // radius used to generate wayPoints, in km.
+  },
   // this is called after the first reder of the component
   componentDidMount () {
     var {origin, destination} = this.context.router.getCurrentParams();
@@ -32,8 +40,17 @@ var MapView = React.createClass({
     });
 
     this.calcRoute(start, end, map);
-  },
+  }, //componentDidMount()
+  // Going to 
+  shouldComponentUpdate (nextProps, nextState) {
+    //update map if results change
+    var results = nextState.currentRoute.results; 
+    if(results){
+      this.updateMapMarkers(results);
+    } //if
 
+    return true;
+  }, //shouldComponentUpdate()
   // turns a lat/long string into a google maps LatLong Object
   getLatLong (location) {
     return new google.maps.LatLng(location.split(',')[0], location.split(',')[1]);
@@ -47,7 +64,31 @@ var MapView = React.createClass({
     };
     return new google.maps.Map(document.getElementById('map'), mapOptions);
   },
+  //
+  updateMapMarkers(results){
+    // console.log("TEST -----> update map pointers. results=", results);
+    var map = this.state.map;
+    
+    results.forEach(function(venue, index){
+      var {lng, lat} = venue.location;
+      console.log("TEST -----> New Marker. position="+lng+", "+lat);
 
+      var position = new google.maps.LatLng(lat, lng); 
+      // create markers
+      // new google.maps.Marker({
+      //   position: position, 
+      //   label: index+'', 
+      // }).click(function(){
+      //   console.log("element clicked");
+      // });
+
+      // create markers
+      // new google.maps.Marker(this.defaultOptions.markers).setPosition(position).setMap(map);;
+
+
+
+    }); //forEach
+  }, 
   // set the current selected route
   setCurrentRoute (index) {
     // clear previously active route
@@ -56,20 +97,10 @@ var MapView = React.createClass({
     } //if
 
     var wayPoints = this.updateWayPoints(this.state.routes[index]);
-    console.log("TEST ---> wayPoints = ", wayPoints)
     this.setState({
       wayPoints,
       currentRoute: this.state.routes[index]
     });
-  },
-  //default options to be used for this view, inclusind route options and radius of search
-  defaultOptions: {
-    polyline: { //configuration for polylines (inactive ones)
-      zIndex: 1,
-      strokeOpacity: 0.4,
-      strokeWeight: 4
-    },
-    radius: 10 // radius used to generate wayPoints, in km.
   },
 
   // this creates a directions route from the start point to the end point
