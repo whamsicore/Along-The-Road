@@ -6,12 +6,14 @@ var React = require('react');
 
 var ListView = React.createClass({
   propTypes: {
-    currentRoute: React.PropTypes.object.isRequired
+    currentRoute: React.PropTypes.object.isRequired,
+    updateResults: React.PropTypes.func.isRequired
   },
   defaultOptions: {
-    fourSquare_url: "https://api.foursquare.com/v2/venues/search?client_id=LFDSJGGT42FEYM4KFGYR2ETFQZDEMTAVN0KQ0NHBLUXJU4UB&client_secret=YVKQEEBYGFUAMSNFRFEB1MJAEYRXHVBWOL35KFA51ITJBWEE&radius=5000&v=20150902",
+    fourSquare_url: "https://api.foursquare.com/v2/venues/explore?client_id=LFDSJGGT42FEYM4KFGYR2ETFQZDEMTAVN0KQ0NHBLUXJU4UB&client_secret=YVKQEEBYGFUAMSNFRFEB1MJAEYRXHVBWOL35KFA51ITJBWEE&radius=5000&v=20150902",
     foodCategory_url: "&categoryId=4d4b7105d754a06374d81259",
-    radius_url: "&radius=5000"
+    radius_url: "&radius=5000",
+    limit_url: "&limit=10"
   },
   // NOTE: nextProps should equal a currentRoute polyLine
   // We should only render when a route which has .results property has been passed in
@@ -34,28 +36,28 @@ var ListView = React.createClass({
   //save results to the current route and updates the parent (mapView)
   //re-render results onto the page by updating state variable.
   queryFourSquare (wayPoints){
-    console.log('TEST---->this.getFourSquare() wayPoints = ', wayPoints);
     var results = {}; //test against duplicates
     var component = this;
 
     for(var i=1; i<wayPoints.length; i++){
       var point = wayPoints[i];
       var ll = "&ll="+point.G+","+point.K;
-      var {fourSquare_url, foodCategory_url, radius_url} = this.defaultOptions;
+      var {fourSquare_url, foodCategory_url, radius_url, limit_url} = this.defaultOptions;
       $.ajax({
-        url: fourSquare_url+ll+foodCategory_url+radius_url,
+        url: fourSquare_url+ll+foodCategory_url+radius_url+limit_url,
         method: "GET",
         success: function(data){
-          console.log("TEST -------> fourSquare success, body=", data);
-          var venues = data.response.venues;
+          console.log("TEST: responses = ", data);
+          var venues = data.response.groups[0].items;
 
           // loops through venues and adds them to results object and also removes duplicates by only saving the duplicate venue with the smallest distance property
           for (var i = 0; i < venues.length; i++) {
-            if (!results[venues[i].id]) { // if
-                results[venues[i].id] = venues[i];
+            var venue = venues[i].venue;
+            if (!results[venue.id]) { // if
+                results[venue.id] = venue;
             } else {
-              if (results[venues[i].id].distance > venues[i].distance) {
-                results[venues[i].id] = venues[i];
+              if (results[venue.id].distance > venue.distance) {
+                results[venue.id] = venue;
               }
             } //if
           } //for
@@ -88,7 +90,6 @@ var ListView = React.createClass({
   // "allowMenuUrlEdit":true,"specials":{"count":0,"items":[]},"hereNow":{"count":0,"summary":"Nobody here","groups":[]},"referralId":"v-1441238271"}
   /************* Sample Venue **********/
   render () {
-    console.log(this.props.currentRoute.results);
     var listDetails = this.props.currentRoute.results.map(function(venue, index) {
       return (
         <div key={index}>
