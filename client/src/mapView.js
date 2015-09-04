@@ -52,7 +52,7 @@ var MapView = React.createClass({
   setCurrentRoute (index) {
     // clear previously active route
     if (this.state.currentRoute) {
-      this.state.currentRoute.setOptions(this.defaultOptions.routes);
+      this.state.currentRoute.setOptions(this.defaultOptions.polyline);
     } //if
 
     var wayPoints = this.updateWayPoints(this.state.routes[index]);
@@ -64,7 +64,7 @@ var MapView = React.createClass({
   },
   //default options to be used for this view, inclusind route options and radius of search
   defaultOptions: {
-    routes: { //route option for desplaying routes on map
+    polyline: { //configuration for polylines (inactive ones)
       zIndex: 1,
       strokeOpacity: 0.4,
       strokeWeight: 4
@@ -118,7 +118,7 @@ var MapView = React.createClass({
           polyLine.duration = response.routes[i].legs[0].duration.text;
           polyLine.wayPoints = [];
 
-          polyLine.setOptions(component.defaultOptions);
+          polyLine.setOptions(component.defaultOptions.polyline);
           // save polylines for later use
           routes.push(polyLine);
 
