@@ -15,8 +15,7 @@ var MapView = React.createClass({
   getInitialState () {
     return {
       routes: [],
-      currentRoute: { wayPoints: [] },
-      wayPoints: []
+      currentRoute: { wayPoints: [], results: [] } //default values for currentRoute
     }
   },
 
@@ -31,6 +30,7 @@ var MapView = React.createClass({
     this.setState({
       map
     });
+
     this.calcRoute(start, end, map);
   },
 
@@ -53,7 +53,7 @@ var MapView = React.createClass({
     // clear previously active route
     if (this.state.currentRoute) {
       this.state.currentRoute.setOptions(this.defaultOptions.routes);
-    }
+    } //if
 
     var wayPoints = this.updateWayPoints(this.state.routes[index]);
     console.log("TEST ---> wayPoints = ", wayPoints)
@@ -61,10 +61,6 @@ var MapView = React.createClass({
       wayPoints,
       currentRoute: this.state.routes[index]
     });
-
-    // update new wayPoints
-    // this.createWayPoints();
-
   },
   //default options to be used for this view, inclusind route options and radius of search
   defaultOptions: {
@@ -131,19 +127,15 @@ var MapView = React.createClass({
 
         } //for(each route)
 
+        var wayPoints = component.updateWayPoints(routes[0]); //initialize with first route
+        routes[0].wayPoints = wayPoints;
 
         component.setState({
           currentRoute: routes[0], // on the initial load make the first suggestion active
           routes
         });
 
-        /**** Routing Box ****/
-        var wayPoints = component.updateWayPoints(routes[0]); //initialize with first route
-        // component.setState({
-        //   wayPoints
-        // });
-
-        component.state.currentRoute.wayPoints = wayPoints;
+        // component.state.currentRoute.wayPoints = wayPoints;
         // component.createWayPoints();
       } // if
     }); //directionsService.route callback
@@ -154,11 +146,11 @@ var MapView = React.createClass({
 
     //lazy-load currentRoute wayPoints, and save it to currentRoute object when complete
     var wayPoints =  newRoute.wayPoints.length>1 ? newRoute.wayPoints : this.createWayPoints(newRoute); //only create new wayPoints if hasn't been done before
-    console.log("TEST inside updateWayPoints(). newRoute = ", newRoute)
     this.displayWayPoints(newRoute.wayPoints);
 
     return wayPoints;
   },
+
   // creates wayPoints for new route. Only executes once per route, and becomes saved.
   createWayPoints (newRoute) {
     // console.log("TEST inside createWayPoints()");
@@ -204,6 +196,7 @@ var MapView = React.createClass({
     return wayPoints;
 
   }, //createWayPoints()
+
   //display wayPoints on the map
   displayWayPoints(wayPoints){
     wayPoints.forEach(function(point) {
@@ -220,8 +213,10 @@ var MapView = React.createClass({
     }.bind(this));
   }, //displayWayPoints()
 
-  updateResults (pureResults) {
-    // take in purified results from ListView and do something
+  // prop for ListView. Allows it to add results to the currentRoute
+  updateResults (results) {
+    this.state.currentRoute.results = results;
+    this.setState({}); //forces re-render (e.g. for the listView)
   }, //updateResults()
 
   render () {
