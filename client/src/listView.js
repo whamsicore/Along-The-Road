@@ -9,7 +9,9 @@ var ListView = React.createClass({
     currentRoute: React.PropTypes.object.isRequired
   },
   defaultOptions: {
-    fourSquare_url: "https://api.foursquare.com/v2/venues/search?client_id=LFDSJGGT42FEYM4KFGYR2ETFQZDEMTAVN0KQ0NHBLUXJU4UB&client_secret=YVKQEEBYGFUAMSNFRFEB1MJAEYRXHVBWOL35KFA51ITJBWEE&v=20150902"
+    fourSquare_url: "https://api.foursquare.com/v2/venues/search?client_id=LFDSJGGT42FEYM4KFGYR2ETFQZDEMTAVN0KQ0NHBLUXJU4UB&client_secret=YVKQEEBYGFUAMSNFRFEB1MJAEYRXHVBWOL35KFA51ITJBWEE&radius=5000&v=20150902",
+    foodCategory_url: "&categoryId=4d4b7105d754a06374d81259",
+    radius_url: "&radius=5000"
   },
   // NOTE: nextProps should equal a currentRoute polyLine
   // We should only render when a route which has .results property has been passed in
@@ -36,11 +38,12 @@ var ListView = React.createClass({
     var results = {}; //test against duplicates
     var component = this;
 
-    for(var i=0; i<wayPoints.length; i++){
+    for(var i=1; i<wayPoints.length; i++){
       var point = wayPoints[i];
       var ll = "&ll="+point.G+","+point.K;
+      var {fourSquare_url, foodCategory_url, radius_url} = this.defaultOptions;
       $.ajax({
-        url: this.defaultOptions.fourSquare_url+ll,
+        url: fourSquare_url+ll+foodCategory_url+radius_url,
         method: "GET",
         success: function(data){
           console.log("TEST -------> fourSquare success, body=", data);
