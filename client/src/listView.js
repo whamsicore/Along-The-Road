@@ -3,6 +3,7 @@ This view shows the details of the possible routes from origin to destination
 */
 
 var React = require('react');
+var VenueView = require('./venueView')
 
 var ListView = React.createClass({
   propTypes: {
@@ -94,9 +95,7 @@ var ListView = React.createClass({
   render () {
     var listDetails = this.props.currentRoute.results.map(function(venue, index) {
       return (
-        <div key={index}>
-          Restaurant {venue.name}
-        </div>
+        <VenueView venue={venue} />
       )
     });
 
