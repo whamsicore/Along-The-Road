@@ -15,8 +15,7 @@ var MapView = React.createClass({
   getInitialState () {
     return {
       routes: [],
-      currentRoute: null,
-      wayPoints: []
+      currentRoute: { wayPoints: [], results: [] } //default values for currentRoute
     }
   },
 
@@ -29,8 +28,9 @@ var MapView = React.createClass({
 
     var map = this.initializeMap(start);
     this.setState({
-      map: map
+      map
     });
+
     this.calcRoute(start, end, map);
   },
 
@@ -52,21 +52,24 @@ var MapView = React.createClass({
   setCurrentRoute (index) {
     // clear previously active route
     if (this.state.currentRoute) {
-      this.state.currentRoute.setOptions(this.defaultOptions);
-    }
+      this.state.currentRoute.setOptions(this.defaultOptions.polyline);
+    } //if
 
+    var wayPoints = this.updateWayPoints(this.state.routes[index]);
+    console.log("TEST ---> wayPoints = ", wayPoints)
     this.setState({
+      wayPoints,
       currentRoute: this.state.routes[index]
     });
-
-    // update new wayPoints
-    this.createWayPoints();
   },
-
+  //default options to be used for this view, inclusind route options and radius of search
   defaultOptions: {
-    zIndex: 1,
-    strokeOpacity: 0.4,
-    strokeWeight: 4
+    polyline: { //configuration for polylines (inactive ones)
+      zIndex: 1,
+      strokeOpacity: 0.4,
+      strokeWeight: 4
+    },
+    radius: 10 // radius used to generate wayPoints, in km.
   },
 
   // this creates a directions route from the start point to the end point
@@ -113,40 +116,48 @@ var MapView = React.createClass({
           polyLine.color = colors[i];
           polyLine.distance = response.routes[i].legs[0].distance.text;
           polyLine.duration = response.routes[i].legs[0].duration.text;
+          polyLine.wayPoints = [];
 
-          polyLine.setOptions(component.defaultOptions);
+          polyLine.setOptions(component.defaultOptions.polyline);
           // save polylines for later use
           routes.push(polyLine);
-
-          // on the initial load make the first suggestion active
-          if (i === 0) {
-            component.setState({
-              currentRoute: polyLine,
-              // currentPath: response.routes[i].overview_path //test
-            });
-          } //if
 
           // add event listener to update the route on click
           polyLine.addListener('click', component.setCurrentRoute.bind(component, i));
 
         } //for(each route)
 
+        var wayPoints = component.updateWayPoints(routes[0]); //initialize with first route
+        routes[0].wayPoints = wayPoints;
+
         component.setState({
+          currentRoute: routes[0], // on the initial load make the first suggestion active
           routes
         });
 
-        /**** Routing Box ****/
-        component.createWayPoints();
+        // component.state.currentRoute.wayPoints = wayPoints;
+        // component.createWayPoints();
       } // if
     }); //directionsService.route callback
   }, //calcRoutes()
 
-  // creates evenly spaced waypoints alog the current Path
-  createWayPoints (radius) {
+  // updates wayPoints if available, create wayPoints if not
+  updateWayPoints (newRoute){
 
-    radius = radius || 10;
-    var path = this.state.currentRoute.path;
-    var map = this.state.map;
+    //lazy-load currentRoute wayPoints, and save it to currentRoute object when complete
+    var wayPoints =  newRoute.wayPoints.length>1 ? newRoute.wayPoints : this.createWayPoints(newRoute); //only create new wayPoints if hasn't been done before
+    this.displayWayPoints(newRoute.wayPoints);
+
+    return wayPoints;
+  },
+
+  // creates wayPoints for new route. Only executes once per route, and becomes saved.
+  createWayPoints (newRoute) {
+    // console.log("TEST inside createWayPoints()");
+
+    var radius = this.defaultOptions.radius; //default radius
+    var path = newRoute.path; // get path from target route
+    var map = this.state.map; // note: map is a state of this view
 
     var wayPoints = [];
     var lastPoint;
@@ -155,7 +166,7 @@ var MapView = React.createClass({
     var getDistanceBetweenPoints = function(a, b) {
       // G represents the Latitude and K the Longitude of a point
       var d = Math.sqrt(Math.pow(a.G-b.G, 2) + Math.pow(a.K-b.K, 2));
-      return d * 110;
+      return d * 95;
     }
 
     // creates a point inbetween two specified points points
@@ -180,31 +191,37 @@ var MapView = React.createClass({
       }
     });
 
-    this.setState({
-      wayPoints
-    });
+    newRoute.wayPoints = wayPoints; //save to the currentRoute object
 
-    // display points on map
+    return wayPoints;
+
+  }, //createWayPoints()
+
+  //display wayPoints on the map
+  displayWayPoints(wayPoints){
     wayPoints.forEach(function(point) {
       new google.maps.Circle({
         center: point,
-        map: map,
-        radius: radius*1000,
+        map: this.state.map,
+        radius: this.defaultOptions.radius*1000,
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,
         fillColor: '#FF0000',
         fillOpacity: 0.35,
       });
-    });
+    }.bind(this));
+  }, //displayWayPoints()
 
-    console.log("wayPoints", wayPoints);
-    console.log("Path", path);
-  },
+  // prop for ListView. Allows it to add results to the currentRoute
+  updateResults (results) {
+    this.state.currentRoute.results = results;
+    this.setState({}); //forces re-render (e.g. for the listView)
+  }, //updateResults()
 
   render () {
     // update display of active route
-    if (this.state.currentRoute) {
+    if (this.state.currentRoute.setOptions) {
       this.state.currentRoute.setOptions({
         zIndex: 2,
         strokeOpacity: 1,
@@ -218,7 +235,7 @@ var MapView = React.createClass({
         <RouteDetailView
           routes={this.state.routes}
           setCurrentRoute={this.setCurrentRoute} />
-        <ListView routingBoxes={this.state.wayPoints} />
+        <ListView currentRoute={this.state.currentRoute} updateResults={this.updateResults} />
       </div>
     )
   }
