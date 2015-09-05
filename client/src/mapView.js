@@ -15,7 +15,9 @@ var MapView = React.createClass({
   getInitialState () {
     return {
       routes: [],
-      currentRoute: { wayPoints: [], results: [] } //default values for currentRoute
+      markers: {},
+      currentRoute: { wayPoints: [], results: [] }, //default values for currentRoute
+      searchRadius: this.defaultOptions.radius
     }
   },
   //default options to be used for this view, inclusind route options and radius of search
@@ -25,7 +27,7 @@ var MapView = React.createClass({
       strokeOpacity: 0.4,
       strokeWeight: 4
     },
-    radius: 10 // radius used to generate wayPoints, in km.
+    radius: 5 // radius used to generate wayPoints, in km.
   },
   // this is called after the first reder of the component
   componentDidMount () {
@@ -64,37 +66,74 @@ var MapView = React.createClass({
     };
     return new google.maps.Map(document.getElementById('map'), mapOptions);
   },
-  //
+  // Print new markers
   updateMapMarkers(results){
-    // console.log("TEST -----> update map pointers. results=", results);
-    var map = this.state.map;
+    console.log("TEST -----> update map pointers. results=", results);
     
+    var map = this.state.map;
+    var markers = this.state.markers; //array of
+    var component = this;
+
     results.forEach(function(venue, index){
       var {lng, lat} = venue.location;
-      console.log("TEST -----> New Marker. position="+lng+", "+lat);
 
-      var position = new google.maps.LatLng(lat, lng); 
-      // create markers
-      // new google.maps.Marker({
-      //   position: position, 
-      //   label: index+'', 
-      // }).click(function(){
-      //   console.log("element clicked");
-      // });
+      //create new marker
+      if(!markers[venue.id]){ //
+        var position = new google.maps.LatLng(lat, lng);
 
-      // create markers
-      // new google.maps.Marker(this.defaultOptions.markers).setPosition(position).setMap(map);;
+        var marker = new google.maps.Marker({
+          position: position,
+        });
 
+        // create custom infowindow
+        // NOTE: we can also add rating color to decorate marker
+        var infowindow = new google.maps.InfoWindow({
+          content: venue.name + "<br> Rating: "+venue.rating
+        });
 
+        //create event listener to open info window
+        google.maps.event.addListener(marker, 'mouseover', function() {
+          infowindow.open(map, this);
+        }); //mouseover
 
+        // create event listener to close info window
+        google.maps.event.addListener(marker, 'mouseout', function() {
+          infowindow.close();
+        }); //mouseout
+
+        //show map marker
+        marker.setMap(map);
+        // add current marker to state
+        component.state.markers[venue.id] = marker;
+        // component.state.markers.push(marker);
+      } //if
+
+      //display markers
     }); //forEach
-  }, 
+  }, //updateMapMarkers()
+
+  // clear map markers
+  clearMapMarkers (markers){
+    this.setState({ //reset markers state
+      markers: []
+    });
+
+    for(var key in markers){
+      var marker = markers[key];
+      marker.setMap(null);
+    } //for
+  }, //clearMapMarkers
+
   // set the current selected route
   setCurrentRoute (index) {
+    console.log("TEST ---> setCurrentRoute()");
     // clear previously active route
     if (this.state.currentRoute) {
       this.state.currentRoute.setOptions(this.defaultOptions.polyline);
     } //if
+
+    //clear previously displayed map markers
+    this.clearMapMarkers(this.state.markers);
 
     var wayPoints = this.updateWayPoints(this.state.routes[index]);
     this.setState({
@@ -132,7 +171,7 @@ var MapView = React.createClass({
       if (status == google.maps.DirectionsStatus.OK) { //.OK indicates the response contains a valid DirectionsResult.
         console.log(response);
         var routes = [];
-        var colors = ['blue', 'red', 'green'];
+        var colors = ['blue', 'red', 'green', 'purple'];
 
         for (var i = 0, len = response.routes.length; i < len; i++) {
           // create a polyline for each suggested route
@@ -180,12 +219,10 @@ var MapView = React.createClass({
     this.displayWayPoints(newRoute.wayPoints);
 
     return wayPoints;
-  },
+  }, // updateWayPoints()
 
   // creates wayPoints for new route. Only executes once per route, and becomes saved.
   createWayPoints (newRoute) {
-    // console.log("TEST inside createWayPoints()");
-
     var radius = this.defaultOptions.radius; //default radius
     var path = newRoute.path; // get path from target route
     var map = this.state.map; // note: map is a state of this view
@@ -266,7 +303,7 @@ var MapView = React.createClass({
         <RouteDetailView
           routes={this.state.routes}
           setCurrentRoute={this.setCurrentRoute} />
-        <ListView currentRoute={this.state.currentRoute} updateResults={this.updateResults} />
+        <ListView searchRadius={this.state.searchRadius} currentRoute={this.state.currentRoute} updateResults={this.updateResults} />
       </div>
     )
   }
