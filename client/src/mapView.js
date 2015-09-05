@@ -68,7 +68,7 @@ var MapView = React.createClass({
   },
   // Print new markers
   updateMapMarkers(results){
-    // console.log("TEST -----> update map pointers. results=", results);
+    console.log("TEST -----> update map pointers. results=", results);
     
     var map = this.state.map;
     var markers = this.state.markers; //array of
@@ -83,13 +83,12 @@ var MapView = React.createClass({
 
         var marker = new google.maps.Marker({
           position: position,
-          label: index+'',
         });
 
         // create custom infowindow
         // NOTE: we can also add rating color to decorate marker
         var infowindow = new google.maps.InfoWindow({
-          content: venue.name + "\n"+venue.rating
+          content: venue.name + "<br> Rating: "+venue.rating
         });
 
         //create event listener to open info window
