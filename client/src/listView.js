@@ -12,18 +12,17 @@ var ListView = React.createClass({
   },
   defaultOptions: {
     fourSquare_url: "https://api.foursquare.com/v2/venues/explore?client_id=LFDSJGGT42FEYM4KFGYR2ETFQZDEMTAVN0KQ0NHBLUXJU4UB&client_secret=YVKQEEBYGFUAMSNFRFEB1MJAEYRXHVBWOL35KFA51ITJBWEE&radius=5000&v=20150902",
-    foodCategory_url: "&categoryId=4d4b7105d754a06374d81259",
-    radius_url: "&radius=5000",
+    // foodCategory_url: "&categoryId=4d4b7105d754a06374d81259",
     limit_url: "&limit=10",
-    photos_url: "&venuePhotos=1"
-
+    photos_url: "&venuePhotos=1",
+    category_url: "&section=food",
+    distance_url: "&sortByDistance=0"
   },
   // NOTE: nextProps should equal a currentRoute polyLine
   // We should only render when a route which has .results property has been passed in
   shouldComponentUpdate (nextProps, nextState){
     var currentRoute = nextProps.currentRoute;
     var wayPoints = currentRoute.wayPoints;
-
     if(wayPoints.length > 0){ // only continue if waypoints have been set
       if(currentRoute.results){ // render the results if they have been obtained
         return true;
@@ -45,12 +44,13 @@ var ListView = React.createClass({
     for(var i=1; i<wayPoints.length; i++){
       var point = wayPoints[i];
       var ll = "&ll="+point.G+","+point.K;
-      var {fourSquare_url, foodCategory_url, radius_url, limit_url, photos_url} = this.defaultOptions;
+      var radius_url = this.props.searchRadius*1000;
+
+      var {fourSquare_url, category_url, limit_url, photos_url, distance_url} = this.defaultOptions;
       $.ajax({
-        url: fourSquare_url+ll+foodCategory_url+radius_url+limit_url+photos_url,
+        url: fourSquare_url+ll+category_url+radius_url+limit_url+photos_url+distance_url,
         method: "GET",
         success: function(data){
-          console.log("TEST: responses = ", data);
           var venues = data.response.groups[0].items;
 
           // loops through venues and adds them to results object and also removes duplicates by only saving the duplicate venue with the smallest distance property
