@@ -16,7 +16,8 @@ var MapView = React.createClass({
     return {
       routes: [],
       markers: {},
-      currentRoute: { wayPoints: [], results: [] } //default values for currentRoute
+      currentRoute: { wayPoints: [], results: [] }, //default values for currentRoute
+      searchRadius: this.defaultOptions.radius
     }
   },
   //default options to be used for this view, inclusind route options and radius of search
@@ -65,7 +66,7 @@ var MapView = React.createClass({
     };
     return new google.maps.Map(document.getElementById('map'), mapOptions);
   },
-  //
+  // Print new markers
   updateMapMarkers(results){
     // console.log("TEST -----> update map pointers. results=", results);
 
@@ -75,8 +76,6 @@ var MapView = React.createClass({
 
     results.forEach(function(venue, index){
       var {lng, lat} = venue.location;
-
-      console.log("TEST -----> New Marker. position="+lng+", "+lat);
 
       //create new marker
       if(!markers[venue.id]){ //
@@ -128,6 +127,7 @@ var MapView = React.createClass({
 
   // set the current selected route
   setCurrentRoute (index) {
+    console.log("TEST ---> setCurrentRoute()");
     // clear previously active route
     if (this.state.currentRoute) {
       this.state.currentRoute.setOptions(this.defaultOptions.polyline);
@@ -172,7 +172,7 @@ var MapView = React.createClass({
       if (status == google.maps.DirectionsStatus.OK) { //.OK indicates the response contains a valid DirectionsResult.
         console.log(response);
         var routes = [];
-        var colors = ['blue', 'red', 'green'];
+        var colors = ['blue', 'red', 'green', 'purple'];
 
         for (var i = 0, len = response.routes.length; i < len; i++) {
           // create a polyline for each suggested route
@@ -304,7 +304,7 @@ var MapView = React.createClass({
         <RouteDetailView
           routes={this.state.routes}
           setCurrentRoute={this.setCurrentRoute} />
-        <ListView currentRoute={this.state.currentRoute} updateResults={this.updateResults} />
+        <ListView searchRadius={this.state.searchRadius} currentRoute={this.state.currentRoute} updateResults={this.updateResults} />
       </div>
     )
   }
