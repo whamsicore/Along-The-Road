@@ -74,7 +74,7 @@ var MapView = React.createClass({
   },
   // Print new markers
   updateMapMarkers(results){
-    console.log("TEST -----> update map pointers. results=", results);
+    // console.log("TEST -----> update map pointers. results=", results);
 
     var map = this.state.map;
     var markers = this.state.markers; //array of
@@ -309,7 +309,6 @@ var MapView = React.createClass({
 
     return (
       <div>
-        Welcome to the MapView!
         <div id="map"></div>
         <RouteDetailView
           routes={this.state.routes}
