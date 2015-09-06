@@ -58,61 +58,49 @@ var HomeView = React.createClass({
 
   render () {
     return (
-      <div className='container'>
+      <div className='container-fluid'>
+        <div className = 'row centered'>
+          <div className = 'col-sm-12'>
+            <h2>Plan a new Trip</h2>
+          </div>
+        </div>
+
+        <div className = 'row centered'>
+          <div className = 'col-sm-12'>
+            <TextField className= 'center-block' id="origin" placeholder='' floatingLabelText="Start Location" hintText="Enter a starting location"/>
+          </div> {/* col */}
+        </div>{/* row */}
+
+        <div className = 'row centered'>
+          <div className = 'col-sm-12'>
+            <TextField id="destination" placeholder='' floatingLabelText="End Location" hintText="Enter a destination"/>
+          </div> {/* col */}
+        </div>{/* row */}
+
+        <div className = 'row centered'>
+          <div className = 'col-sm-12'>
+            <RaisedButton label="Submit" linkButton="true" params={{origin: this.state.origin, destination: this.state.destination }} containerElement={<Link to="map"/>}/>
+          </div> {/* col */}
+        </div>{/* row */}
+
+        <br/><br/>
+
         <div className='jumbotron'>
-          <div className='container panel'>
-            <div className = 'row'>
-              <div className = 'col-sm-12'>
-                <h2>Plan your Trip</h2>
-              </div>
-            </div>
+          <div className = 'row centered'>
+            <div className = 'col-sm-12'>
+              <h2> Get The App (coming soon...) </h2>
+            </div> {/* col */}
+          </div> {/* row */}
 
-            <div className = 'row'>
-              <div className = 'col-sm-6'>
-                <div className = 'container'>
-                  <div className = 'row'>
-                    <div className = 'col-sm-12'>
-                      <TextField className= 'center-block' id="origin" placeholder='' floatingLabelText="Start Location" hintText="Enter a starting location"/>
-                    </div>
-                  </div>
-                  <div className = 'row'>
-                    <div className = 'col-sm-12'>
-                      <TextField id="destination" placeholder='' floatingLabelText="End Location" hintText="Enter a destination"/>
-                    </div>
-                  </div>
-                  <div className = 'row'>
-                    <div className = 'col-sm-12'>
-                      <RaisedButton label="Submit" linkButton="true" params={{origin: this.state.origin, destination: this.state.destination }} containerElement={<Link to="map"/>}/>
-                    </div>
-                  </div>
-
-                </div> {/* container */}
-
-              </div> {/* col-sm-6 */}
-
-              <div className = 'col-sm-6'>
-                <div className = 'row'>
-                  <div className = 'col-sm-12'>
-                    <p>
-                      {"Enter a route and find all the best places to eat along the way!"}
-                    </p>
-                  </div>
-                </div> {/* row */}
-              </div> {/* col-sm-6 */}
-            </div> {/* row */}
-          </div> {/* container */}
-        </div> {/* jumbotron */}
-        <div className='container'>
           <div className = 'row'>
             <div className = 'col-sm-12'>
-              <h1> Get The App (coming soon...) </h1>
-
               <h3>
                 {"Along the Road is awesome! Stumptown butcher four loko trust fund banh mi, mlkshk ugh 8-bit cred. Fanny pack cornhole bitters jean shorts, drinking vinegar fap Intelligentsia disrupt freegan Thundercats sartorial lumbersexual brunch beard blog. Shoreditch Austin health goth wolf stumptown, fashion axe vinyl photo booth hashtag cronut. Selvage plaid Williamsburg iPhone, umami hashtag blog stumptown fap. Cred Schlitz pork belly, kogi gastropub crucifix lomo McSweeney's actually disrupt aesthetic narwhal. Try-hard tote bag scenester butcher, keytar."}
               </h3>
-            </div>
-          </div>
+            </div> {/* col */}
+          </div> {/* row */}
         </div> {/* jumbotron */}
+
       </div>
     )
   }

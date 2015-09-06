@@ -3,7 +3,34 @@
   height: 400px;
 }
 
+#title{
+  background-color: #FFFF99;
+  position: relative;
+  padding: 110px;
+}
 
+#title div{
+  /*width: 400px;*/
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  padding:0;
+  margin:0;
+  transform: translate(-50%, -50%);
+  /*height: 100px;*/
+  /*padding: 20px;*/
+  text-align: center;
+}
+#title div h1{
+  font-size:55px;
+}
+#title div h4{
+  font-size:12px;
+}
+
+.centered{
+  text-align: center;
+}
 /*
 .vertical-align {
   display: flex;
