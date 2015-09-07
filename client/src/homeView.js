@@ -10,14 +10,14 @@ var Link = Router.Link;
 // Import MUI components (material-ui)
 var mui = require('material-ui');
 var ThemeManager = new mui.Styles.ThemeManager();
-var {TextField, RaisedButton, Paper} = mui;
+var {RaisedButton, Paper} = mui;
 
 
 var HomeView = React.createClass({
-  childContextTypes: {
+  childContextTypes: { // MUI: init
     muiTheme: React.PropTypes.object //connect MUI
   },
-  getChildContext () {
+  getChildContext () { // MUI: set theme
     return {
       muiTheme: ThemeManager.getCurrentTheme() //set MUI theme to default
     };
@@ -76,7 +76,7 @@ var HomeView = React.createClass({
           <div className = 'col-sm-12 centered'>
             {/*<TextField className= 'center-block' id="origin" placeholder='' floatingLabelText="Start Location" hintText="Enter a starting location"/>*/}
             <div className="input-group">
-              <input className="form-control" id="origin" placeholder="Where are we leaving from?" />
+              <input className="form-control" id="origin" placeholder="Starting Location" />
             </div> {/*input-group*/}
           </div> {/* col */}
         </div>{/* row */}
@@ -85,7 +85,7 @@ var HomeView = React.createClass({
           <div className = 'col-sm-12'>
             {/*<TextField id="destination" placeholder='' floatingLabelText="End Location" hintText="Enter a destination"/>*/}
             <div className="input-group">
-              <input className="form-control" id="destination" placeholder="Where are we going?" />
+              <input className="form-control" id="destination" placeholder="Destination" />
             </div> {/*input-group*/}
           </div> {/* col */}
         </div>{/* row */}
@@ -98,21 +98,25 @@ var HomeView = React.createClass({
 
         <br/><br/>
 
-        <Paper className="app-info">
+        <Paper className="app-info" style={{'backgroundColor':"rgba(256, 256, 256, 0.7)", 'borderRadius':'10px'}}>
+            <div className = 'row centered'>
+              <div className = 'col-sm-12'>
+                <h2> Get The App (coming soon...) </h2>
+              </div> {/* col */}
+            </div> {/* row */}
 
-          <div className = 'row centered'>
-            <div className = 'col-sm-12'>
-              <h2> Get The App (coming soon...) </h2>
-            </div> {/* col */}
-          </div> {/* row */}
-
-          <div className = 'row'>
-            <div className = 'col-sm-12'>
-              <h3>
-                {"Along the Road is awesome! Stumptown butcher four loko trust fund banh mi, mlkshk ugh 8-bit cred. Fanny pack cornhole bitters jean shorts, drinking vinegar fap Intelligentsia disrupt freegan Thundercats sartorial lumbersexual brunch beard blog. Shoreditch Austin health goth wolf stumptown, fashion axe vinyl photo booth hashtag cronut. Selvage plaid Williamsburg iPhone, umami hashtag blog stumptown fap. Cred Schlitz pork belly, kogi gastropub crucifix lomo McSweeney's actually disrupt aesthetic narwhal. Try-hard tote bag scenester butcher, keytar."}
-              </h3>
-            </div> {/* col */}
-          </div> {/* row */}
+            <div className = 'row'>
+              <div className = 'col-sm-12'>
+                <h3>
+                  {"Have you ever wanted to find  \
+                  fund banh mi, mlkshk ugh 8-bit cred. Fanny pack cornhole bitters \
+                  jean shorts, drinking vinegar fap Intelligentsia disrupt freegan \
+                  Thundercats sartorial lumbersexual brunch beard blog. Shoreditch \
+                  Austin health goth wolf stumptown, fashion axe vinyl photo booth \
+                   hashtag cronut. Selvage plaid Williamsburg iPhone, umami hashtag blog stumptown fap. Cred Schlitz pork belly, kogi gastropub crucifix lomo McSweeney's actually disrupt aesthetic narwhal. Try-hard tote bag scenester butcher, keytar."}
+                </h3>
+              </div> {/* col */}
+            </div> {/* row */}
         </Paper> {/* jumbotron */}
 
       </div>

@@ -15,28 +15,15 @@ var { Route, DefaultRoute, NotFoundRoute, RouteHandler, Link } = Router;
 var HomeView = require('./homeView');
 var MapView = require('./mapView');
 
-// // Import MUI components (material-ui)
-var mui = require('material-ui');
-var ThemeManager = new mui.Styles.ThemeManager();
-var {AppBar} = mui;
-
 // This component includes the navigation between pages and the routehandler
 var App = React.createClass({
-  childContextTypes: { // MUI: init
-    muiTheme: React.PropTypes.object //connect MUI
-  },
-  getChildContext () { // MUI: set theme
-    return {
-      muiTheme: ThemeManager.getCurrentTheme() //set MUI theme to default
-    };
-  },
   render () {
     return (
       <div className="app">
         <div id="title">
           <div>
             <h1>
-              <Link to='home'>
+              <Link to='home'> {/* Clicking logo will now lead back to homeView */}
                 <img src="./img/logo(thick).gif" href="home"/>
               </Link>
             </h1>
