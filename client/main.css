@@ -1,7 +1,6 @@
-#map {
-  width: 600px;
-  height: 400px;
-}
+/******
+** Appview
+*******/
 
 #title{
   background-color: #FFFF99;
@@ -24,14 +23,20 @@
 #title div h1{
   font-size:55px;
 }
-#title div h4{
-  font-size:12px;
-}
 
 .centered{
   text-align: center;
 }
 
+.content{
+  background-image: url("/img/roadtrip.jpg");
+  background-repeat: none;
+  background-size: 100% 100%;
+}
+
+/********
+** Homeview: Custom forms for homepage
+********/
 .input-group{
   display: inline-block;
   width: 33%;
@@ -39,19 +44,40 @@
 
 .form-control{
   text-align: center;
+  font-size: 22px;
+  height: 44px;
+  border-width: 3px;
 }
 
 .submit_button{
   width: 30%;
 }
 
+.input-group .form-control:last-child, .input-group-addon:last-child, .input-group-btn:first-child>.btn-group:not(:first-child)>.btn, .input-group-btn:first-child>.btn:not(:first-child), .input-group-btn:last-child>.btn, .input-group-btn:last-child>.btn-group>.btn, .input-group-btn:last-child>.dropdown-toggle{
+  border-radius: 10px;
+}
+
+/*google autocomplete. Ref: https://google-developers.appspot.com/maps/documentation/javascript/places-autocomplete#style_autocomplete*/
+.pac-item, .pac-item-matched{
+  /*font-size:18px;*/
+  /*color:blue;*/
+}
+/*******
+** Homeview: Custom bottom
+********/
 .app-info{
   padding:50px;
-  margin:0 10%;
+  margin:0 10% 50px;
+  background-color:rgba(256, 256, 256, 0.5);
 }
-/*
-.vertical-align {
-  display: flex;
-  flex-direction: row;
+
+.no-bg{
+  background-color:none;
 }
-*/
+/*******
+** Mapview
+********/
+#map {
+  width: 600px;
+  height: 400px;
+}
