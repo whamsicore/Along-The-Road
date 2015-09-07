@@ -308,12 +308,34 @@ var MapView = React.createClass({
     };
 
     return (
-      <div>
-        <div id="map"></div>
-        <RouteDetailView
-          routes={this.state.routes}
-          setCurrentRoute={this.setCurrentRoute} />
-        <ListView searchRadius={this.state.searchRadius} currentRoute={this.state.currentRoute} updateResults={this.updateResults} />
+      <div className='container-fluid'>
+        <div className='row'>
+          <div className='col-sm-6 list-container'>
+
+            <ListView
+              searchRadius={this.state.searchRadius}
+              currentRoute={this.state.currentRoute}
+              updateResults={this.updateResults}
+            /> {/* ListView*/}
+
+          </div> {/* col-sm-4 */}
+
+          <div className='col-sm-6'>
+
+            <div className='row map-container'>
+              <div id="map"></div>
+            </div> {/* row */}
+
+            <div className='row route-container'>
+              <RouteDetailView
+                routes={this.state.routes}
+                setCurrentRoute={this.setCurrentRoute}
+              /> {/* RouteDetailView */}
+            </div> {/* row */}
+
+          </div> {/* col-sm-8 */}
+
+        </div> {/* row */}
       </div>
     )
   }
