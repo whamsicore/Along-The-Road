@@ -3,8 +3,9 @@ This component is the map view. It shows the user the possible routes he/she can
 */
 
 var React = require('react');
-var RouteDetailView = require('./routeDetailView')
-var ListView = require('./listView')
+var RouteDetailView = require('./routeDetailView');
+var ListView = require('./listView');
+var MapHelpers = require('./mapHelpers');
 
 var MapView = React.createClass({
   // adds access to the router context. the getCurrentParams method can then be used to get the properties from the route
@@ -148,12 +149,12 @@ var MapView = React.createClass({
     var component = this;
 
     // create markers
-    new google.maps.Marker({
+    var startMarker = new google.maps.Marker({
       position: start,
       map,
       label: 'A'
     });
-    new google.maps.Marker({
+    var endMarker = new google.maps.Marker({
       position: end,
       map,
       label: 'B'
@@ -209,6 +210,13 @@ var MapView = React.createClass({
         // component.createWayPoints();
       } // if
     }); //directionsService.route callback
+  
+    // create and extend a LatLngBounds object
+    var bounds = new google.maps.LatLngBounds();
+    bounds.extend(startMarker.position);
+    bounds.extend(endMarker.position);
+    map.fitBounds(bounds);
+
   }, //calcRoutes()
 
   // updates wayPoints if available, create wayPoints if not
@@ -230,18 +238,6 @@ var MapView = React.createClass({
     var wayPoints = [];
     var lastPoint;
 
-    // calculates the distance in km between two points based on their Latitude and Longitude
-    var getDistanceBetweenPoints = function(a, b) {
-      // G represents the Latitude and K the Longitude of a point
-      var d = Math.sqrt(Math.pow(a.G-b.G, 2) + Math.pow(a.K-b.K, 2));
-      return d * 95;
-    }
-
-    // creates a point inbetween two specified points points
-    var getMiddlePoint = function(a, b) {
-      return new google.maps.LatLng((a.G+b.G)/2, (a.K+b.K)/2);
-    }
-
     path.forEach(function(point) {
       // add first point
       if (!lastPoint) {
@@ -249,11 +245,11 @@ var MapView = React.createClass({
         lastPoint = point;
       }
       // add an inbetween point if the distance is too big
-      if (getDistanceBetweenPoints(lastPoint, point) > 1.5 * radius) {
-        wayPoints.push(getMiddlePoint(lastPoint, point));
+      if (MapHelpers.getDistanceBetweenPoints(lastPoint, point) > 1.5 * radius) {
+        wayPoints.push(MapHelpers.getMiddlePoint(lastPoint, point));
       }
       // add new point if the distance is larger than the radius
-      if (getDistanceBetweenPoints(lastPoint, point) > radius) {
+      if (MapHelpers.getDistanceBetweenPoints(lastPoint, point) > radius) {
         wayPoints.push(point);
         lastPoint = point;
       }
