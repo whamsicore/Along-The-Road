@@ -43,6 +43,11 @@ var MapView = React.createClass({
     });
 
     this.calcRoute(start, end, map);
+
+    var bounds = new google.maps.LatLngBounds();
+    bounds.extend(start);
+    bounds.extend(end);
+    map.fitBounds(bounds);
   }, //componentDidMount()
   // Going to 
   shouldComponentUpdate (nextProps, nextState) {
@@ -149,12 +154,12 @@ var MapView = React.createClass({
     var component = this;
 
     // create markers
-    var startMarker = new google.maps.Marker({
+    new google.maps.Marker({
       position: start,
       map,
       label: 'A'
     });
-    var endMarker = new google.maps.Marker({
+    new google.maps.Marker({
       position: end,
       map,
       label: 'B'
@@ -210,12 +215,6 @@ var MapView = React.createClass({
         // component.createWayPoints();
       } // if
     }); //directionsService.route callback
-  
-    // create and extend a LatLngBounds object
-    var bounds = new google.maps.LatLngBounds();
-    bounds.extend(startMarker.position);
-    bounds.extend(endMarker.position);
-    map.fitBounds(bounds);
 
   }, //calcRoutes()
 
