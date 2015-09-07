@@ -14,7 +14,7 @@ var RouteDetailView = React.createClass({
     var component = this;
     var routeDetails = this.props.routes.map(function(route, index) {
       return (
-        <div onClick={component.props.setCurrentRoute.bind(null, index)} key={index}>
+        <div onClick={function(){component.props.setCurrentRoute(index)}} key={index}>
           {route.distance} -> {route.duration}
         </div>
       )

@@ -51,7 +51,8 @@ var MapView = React.createClass({
   }, //componentDidMount()
   // Going to
   shouldComponentUpdate (nextProps, nextState) {
-    //update map if results change
+    console.log("/**********shouldComponentUpdate************/");
+    //update map if results change (asyncronously when results are coming in from FourSquare)
     var results = nextState.currentRoute.results;
     if(results){
       this.updateMapMarkers(results);
@@ -74,7 +75,7 @@ var MapView = React.createClass({
   },
   // Print new markers
   updateMapMarkers(results){
-    // console.log("TEST -----> update map pointers. results=", results);
+    console.log("TEST -----> update map markers. results=");
 
     var map = this.state.map;
     var markers = this.state.markers; //array of
@@ -120,10 +121,11 @@ var MapView = React.createClass({
 
   // clear map markers
   clearMapMarkers (markers){
-    console.log('TEST ----> clearMapMarkers=', markers);
-    this.setState({ //reset markers state
-      markers: []
-    });
+    console.log('TEST ---> inside clearMapMarkers. markers=', markers)
+    // this.setState({ //reset markers state
+    //   markers: {} //empty object
+    // });
+    this.state.markers = {};
 
     for(var key in markers){
       var marker = markers[key];
@@ -133,7 +135,8 @@ var MapView = React.createClass({
 
   // set the current selected route
   setCurrentRoute (index) {
-    console.log("TEST ---> setCurrentRoute(), route index: ",index);
+    var newRoute = this.state.routes[index];
+
     // clear previously active route
     if (this.state.currentRoute) {
       this.state.currentRoute.setOptions(this.defaultOptions.polyline);
@@ -142,10 +145,11 @@ var MapView = React.createClass({
     //clear previously displayed map markers
     this.clearMapMarkers(this.state.markers);
 
-    var wayPoints = this.updateWayPoints(this.state.routes[index]);
+    var wayPoints = this.updateWayPoints(newRoute);
+    console.log(' &&&&&&&&& before this.setState');
     this.setState({
       wayPoints,
-      currentRoute: this.state.routes[index]
+      currentRoute: newRoute
     });
   },
 
