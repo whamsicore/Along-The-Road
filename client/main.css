@@ -6,7 +6,7 @@
 #title{
   background-color: #FFFF99;
   position: relative;
-  padding: 110px;
+  padding: 90px;
 }
 
 #title div{
@@ -30,6 +30,24 @@
 
 .centered{
   text-align: center;
+}
+
+.input-group{
+  display: inline-block;
+  width: 33%;
+}
+
+.form-control{
+  text-align: center;
+}
+
+.submit_button{
+  width: 30%;
+}
+
+.app-info{
+  padding:50px;
+  margin:0 10%;
 }
 /*
 .vertical-align {

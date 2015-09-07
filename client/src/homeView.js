@@ -57,35 +57,49 @@ var HomeView = React.createClass({
   },
 
   render () {
+    var slider_options = {
+      dots: true,
+      // infinite: true,
+      speed: 500,
+      // slidesToShow: 1,
+      // slidesToScroll: 1,
+      arrows: true,
+      centerMode: true,
+      // autoplay: true,
+      draggable: true,
+    };
+
     return (
       <div className='container-fluid'>
+        <br/><br/>
         <div className = 'row centered'>
-          <div className = 'col-sm-12'>
-            <h2>Plan a new Trip</h2>
-          </div>
-        </div>
-
-        <div className = 'row centered'>
-          <div className = 'col-sm-12'>
-            <TextField className= 'center-block' id="origin" placeholder='' floatingLabelText="Start Location" hintText="Enter a starting location"/>
+          <div className = 'col-sm-12 centered'>
+            {/*<TextField className= 'center-block' id="origin" placeholder='' floatingLabelText="Start Location" hintText="Enter a starting location"/>*/}
+            <div className="input-group">
+              <input className="form-control" id="origin" placeholder="Where are we leaving from?" />
+            </div> {/*input-group*/}
           </div> {/* col */}
         </div>{/* row */}
 
         <div className = 'row centered'>
           <div className = 'col-sm-12'>
-            <TextField id="destination" placeholder='' floatingLabelText="End Location" hintText="Enter a destination"/>
+            {/*<TextField id="destination" placeholder='' floatingLabelText="End Location" hintText="Enter a destination"/>*/}
+            <div className="input-group">
+              <input className="form-control" id="destination" placeholder="Where are we going?" />
+            </div> {/*input-group*/}
           </div> {/* col */}
         </div>{/* row */}
 
         <div className = 'row centered'>
           <div className = 'col-sm-12'>
-            <RaisedButton label="Submit" linkButton="true" params={{origin: this.state.origin, destination: this.state.destination }} containerElement={<Link to="map"/>}/>
+            <RaisedButton label="Submit" className="submit_button" secondary={true} linkButton="true" params={{origin: this.state.origin, destination: this.state.destination }} containerElement={<Link to="map"/>}/>
           </div> {/* col */}
         </div>{/* row */}
 
         <br/><br/>
 
-        <div className='jumbotron'>
+        <Paper className="app-info">
+
           <div className = 'row centered'>
             <div className = 'col-sm-12'>
               <h2> Get The App (coming soon...) </h2>
@@ -99,7 +113,7 @@ var HomeView = React.createClass({
               </h3>
             </div> {/* col */}
           </div> {/* row */}
-        </div> {/* jumbotron */}
+        </Paper> {/* jumbotron */}
 
       </div>
     )

@@ -35,8 +35,11 @@ var App = React.createClass({
       <div className="app">
         <div id="title">
           <div>
-            <h1>Along The Road </h1>
-            <h4> Find cool places to stop on your road trip... </h4>
+            <h1>
+              <Link to='home'>
+                <img src="./img/logo(thick).gif" href="home"/>
+              </Link>
+            </h1>
           </div>
         </div>
 
