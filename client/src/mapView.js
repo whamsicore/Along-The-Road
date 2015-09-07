@@ -30,7 +30,7 @@ var MapView = React.createClass({
     },
     radius: 5 // radius used to generate wayPoints, in km.
   },
-  // this is called after the first reder of the component
+  // this is called after the first render of the component
   componentDidMount () {
     var {origin, destination} = this.context.router.getCurrentParams();
 
@@ -120,6 +120,7 @@ var MapView = React.createClass({
 
   // clear map markers
   clearMapMarkers (markers){
+    console.log('TEST ----> clearMapMarkers=', markers);
     this.setState({ //reset markers state
       markers: []
     });
@@ -132,7 +133,7 @@ var MapView = React.createClass({
 
   // set the current selected route
   setCurrentRoute (index) {
-    console.log("TEST ---> setCurrentRoute()");
+    console.log("TEST ---> setCurrentRoute(), route index: ",index);
     // clear previously active route
     if (this.state.currentRoute) {
       this.state.currentRoute.setOptions(this.defaultOptions.polyline);
@@ -177,7 +178,7 @@ var MapView = React.createClass({
       if (status == google.maps.DirectionsStatus.OK) { //.OK indicates the response contains a valid DirectionsResult.
         console.log(response);
         var routes = [];
-        var colors = ['blue', 'red', 'green', 'purple'];
+        var colors = ['blue', 'black', 'green', 'pink'];
 
         for (var i = 0, len = response.routes.length; i < len; i++) {
           // create a polyline for each suggested route
@@ -191,6 +192,7 @@ var MapView = React.createClass({
           polyLine.path = response.routes[i].overview_path;
           polyLine.color = colors[i];
           polyLine.distance = response.routes[i].legs[0].distance.text;
+          polyLine.distanceMeters = response.routes[i].legs[0].distance.value;
           polyLine.duration = response.routes[i].legs[0].duration.text;
           polyLine.wayPoints = [];
 
@@ -220,7 +222,7 @@ var MapView = React.createClass({
 
   // updates wayPoints if available, create wayPoints if not
   updateWayPoints (newRoute){
-
+    console.log("TEST -----> inside updateWayPoints newRoute = ", newRoute);
     //lazy-load currentRoute wayPoints, and save it to currentRoute object when complete
     var wayPoints =  newRoute.wayPoints.length>1 ? newRoute.wayPoints : this.createWayPoints(newRoute); //only create new wayPoints if hasn't been done before
     this.displayWayPoints(newRoute.wayPoints);
@@ -230,7 +232,18 @@ var MapView = React.createClass({
 
   // creates wayPoints for new route. Only executes once per route, and becomes saved.
   createWayPoints (newRoute) {
+
+
     var radius = this.defaultOptions.radius; //default radius
+    var minRadiusToDistanceFactor = 5;
+
+    var distance = newRoute.distanceMeters/1000;
+    if (distance < minRadiusToDistanceFactor*radius) {
+      radius = distance/minRadiusToDistanceFactor;
+
+      this.state.searchRadius = radius; // do not set off re-render
+    }
+
     var path = newRoute.path; // get path from target route
     var map = this.state.map; // note: map is a state of this view
 
@@ -247,6 +260,9 @@ var MapView = React.createClass({
       if (MapHelpers.getDistanceBetweenPoints(lastPoint, point) > 1.5 * radius) {
         wayPoints.push(MapHelpers.getMiddlePoint(lastPoint, point));
       }
+      // TODO: might have to add more inbetween points in the case of smaller distances
+
+
       // add new point if the distance is larger than the radius
       if (MapHelpers.getDistanceBetweenPoints(lastPoint, point) > radius) {
         wayPoints.push(point);
@@ -266,7 +282,7 @@ var MapView = React.createClass({
       new google.maps.Circle({
         center: point,
         map: this.state.map,
-        radius: this.defaultOptions.radius*1000,
+        radius: this.state.searchRadius*1000,
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,

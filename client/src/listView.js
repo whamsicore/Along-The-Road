@@ -11,7 +11,7 @@ var ListView = React.createClass({
     updateResults: React.PropTypes.func.isRequired
   },
   defaultOptions: {
-    fourSquare_url: "https://api.foursquare.com/v2/venues/explore?client_id=LFDSJGGT42FEYM4KFGYR2ETFQZDEMTAVN0KQ0NHBLUXJU4UB&client_secret=YVKQEEBYGFUAMSNFRFEB1MJAEYRXHVBWOL35KFA51ITJBWEE&radius=5000&v=20150902",
+    fourSquare_url: "https://api.foursquare.com/v2/venues/explore?client_id=LFDSJGGT42FEYM4KFGYR2ETFQZDEMTAVN0KQ0NHBLUXJU4UB&client_secret=YVKQEEBYGFUAMSNFRFEB1MJAEYRXHVBWOL35KFA51ITJBWEE&v=20150902",
     foodCategory_url: "&categoryId=4d4b7105d754a06374d81259",
     limit_url: "&limit=10",
     photos_url: "&venuePhotos=1",
@@ -45,6 +45,7 @@ var ListView = React.createClass({
       var point = wayPoints[i];
       var ll = "&ll="+point.G+","+point.K;
       var radius_url = "&radius="+this.props.searchRadius*1000;
+      console.log("PRINTING SEARCH RADIUS FROM LISTVIEW!!!!!", radius_url);
 
       var {fourSquare_url, foodCategory_url, category_url, limit_url, photos_url, distance_url} = this.defaultOptions;
       $.ajax({
