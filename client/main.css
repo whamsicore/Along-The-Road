@@ -1,6 +1,8 @@
 
 /**********************
+***********************
 ******* Overall *******
+***********************
 ***********************/
 
 
@@ -13,11 +15,20 @@ html, body{
   position:relative;
 }
 
+.container-fluid{
+  margin:0;
+  padding:0;
+}
 
+.row{
+  /*width:100%;*/
+}
 
 
 /**********************
+***********************
 ******* Appview *******
+***********************
 ***********************/
 
 #title{
@@ -58,7 +69,9 @@ html, body{
 }
 
 /**********************
-******* HomeView *******
+***********************
+******* HomeView ******
+***********************
 ***********************/
 
 /********
@@ -100,7 +113,9 @@ html, body{
 
 
 /**********************
+***********************
 ******* MapView *******
+***********************
 ***********************/
 
 .left-container, .right-container{
@@ -148,10 +163,28 @@ html, body{
 .route-container{
   position: absolute;
   background-color: white;
-  height:100px;
-  width: 300px;
-  bottom: 0px;
-  left: 0px;
+  bottom: 20px;
+  right: 20px;
   background-color: #fff;
   z-index: 999;
+}
+
+.list-item{
+  height: 38px;
+}
+
+/**********************
+***********************
+******* RouteDetailView
+***********************
+***********************/
+
+/*.list-item:parent{
+  margin:0;
+  padding:0;
+  background-color: red;
+}*/
+
+.route-list{
+  background-color: #FFFF99;
 }
