@@ -6,10 +6,13 @@ var React = require('react');
 var VenueView = require('./venueView')
 
 var ListView = React.createClass({
+
   propTypes: {
     currentRoute: React.PropTypes.object.isRequired,
-    updateResults: React.PropTypes.func.isRequired
+    updateResults: React.PropTypes.func.isRequired,
+    searchRadius: React.PropTypes.number.isRequired
   },
+
   defaultOptions: {
     fourSquare_url: "https://api.foursquare.com/v2/venues/explore?client_id=LFDSJGGT42FEYM4KFGYR2ETFQZDEMTAVN0KQ0NHBLUXJU4UB&client_secret=YVKQEEBYGFUAMSNFRFEB1MJAEYRXHVBWOL35KFA51ITJBWEE&v=20150902",
     foodCategory_url: "&categoryId=4d4b7105d754a06374d81259",
@@ -18,34 +21,28 @@ var ListView = React.createClass({
     category_url: "&section=food",
     distance_url: "&sortByDistance=0"
   },
-  // NOTE: nextProps should equal a currentRoute polyLine
-  // We should only render when a route which has .results property has been passed in
-  shouldComponentUpdate (nextProps, nextState){
-    var currentRoute = nextProps.currentRoute;
-    var wayPoints = currentRoute.wayPoints;
-    if(wayPoints.length > 0){ // only continue if waypoints have been set
-      if(currentRoute.results){ // render the results if they have been obtained
-        return true;
-      }else{ // query for new results only if currentRoute doesn't have them yet
-        this.queryFourSquare(wayPoints);
-        return false;
-      } //if
-    }else{  //don't render anything
-      return false;
-    } //if
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length) {
+      this.queryFourSquare();
+    }
   },
+
   //queries fourSquare api to get new results.
   //save results to the current route and updates the parent (mapView)
   //re-render results onto the page by updating state variable.
-  queryFourSquare (wayPoints){
+  queryFourSquare (){
     var results = {}; //test against duplicates
     var component = this;
 
-    for(var i=1; i<wayPoints.length; i++){
+    var wayPoints = this.props.currentRoute.wayPoints;
+
+    for(var i = 1; i < wayPoints.length; i++) {
       var point = wayPoints[i];
+      console.log("point.distance in km -------------------------->", point.distance/1000," for i = ",i);
       var ll = "&ll="+point.G+","+point.K;
       var radius_url = "&radius="+this.props.searchRadius*1000;
-      console.log("PRINTING SEARCH RADIUS FROM LISTVIEW!!!!!", radius_url);
+
 
       var {fourSquare_url, foodCategory_url, category_url, limit_url, photos_url, distance_url} = this.defaultOptions;
       $.ajax({
@@ -54,13 +51,18 @@ var ListView = React.createClass({
         success: function(data){
           var venues = data.response.groups[0].items;
 
+          var point = this;
+
           // loops through venues and adds them to results object and also removes duplicates by only saving the duplicate venue with the smallest distance property
           for (var i = 0; i < venues.length; i++) {
             var venue = venues[i].venue;
+            venue.point = point;
+
+            venue.totalDistance = venue.location.distance + venue.point.distance; // in meters
             if (!results[venue.id]) { // if
                 results[venue.id] = venue;
             } else {
-              if (results[venue.id].distance > venue.distance) {
+              if (results[venue.id].location.distance > venue.location.distance) {
                 results[venue.id] = venue;
               }
             } //if
@@ -72,10 +74,9 @@ var ListView = React.createClass({
           }
           component.props.updateResults(resultsArray);
 
-        }, //success()
+        }.bind(point), //success()
         error: function(error){
           console.log("TEST -------> fourSquare error, error=", error);
-
         }
         // dataType: dataType
       }); //ajax()
