@@ -1,10 +1,24 @@
+
 /**********************
-******* Appview *******
+******* Overall *******
 ***********************/
+
 
 html, body{
   height:100%;
 }
+
+.map-container{
+  height:100%;
+  position:relative;
+}
+
+
+
+
+/**********************
+******* Appview *******
+***********************/
 
 #title{
   background-color: #FFFF99;
@@ -84,6 +98,10 @@ html, body{
   background-color:rgba(256, 256, 256, 0.5);
 }
 
+.list-container{
+  overflow: scroll;
+  height:inherit;
+}
 
 /**********************
 ******* MapView *******
@@ -91,11 +109,12 @@ html, body{
 
 
 #map-container {
-  width: 600px;
-  height: 400px;
+  padding:10px;
 }
 
 #map {
-  width: 600px;
+  position:absolute;
+  left:5%;
+  width: 90%;
   height: 400px;
 }
