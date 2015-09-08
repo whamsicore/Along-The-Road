@@ -10,14 +10,14 @@ var Link = Router.Link;
 // Import MUI components (material-ui)
 var mui = require('material-ui');
 var ThemeManager = new mui.Styles.ThemeManager();
-var {TextField, RaisedButton, Paper} = mui;
+var {RaisedButton, Paper} = mui;
 
 
 var HomeView = React.createClass({
-  childContextTypes: {
+  childContextTypes: { // MUI: init
     muiTheme: React.PropTypes.object //connect MUI
   },
-  getChildContext () {
+  getChildContext () { // MUI: set theme
     return {
       muiTheme: ThemeManager.getCurrentTheme() //set MUI theme to default
     };
@@ -57,62 +57,82 @@ var HomeView = React.createClass({
   },
 
   render () {
+    var slider_options = {
+      dots: true,
+      // infinite: true,
+      speed: 500,
+      // slidesToShow: 1,
+      // slidesToScroll: 1,
+      arrows: true,
+      centerMode: true,
+      // autoplay: true,
+      draggable: true,
+    };
+
     return (
-      <div className='container'>
-        <div className='jumbotron'>
-          <div className='container panel'>
+      <div className='container-fluid'>
+        <br/><br/>
+        <div className = 'row centered'>
+          <div className = 'col-sm-12 centered'>
+            {/*<TextField className= 'center-block' id="origin" placeholder='' floatingLabelText="Start Location" hintText="Enter a starting location"/>*/}
+            <div className="input-group">
+              <input className="form-control" id="origin" placeholder="Starting Location" />
+            </div> {/*input-group*/}
+          </div> {/* col */}
+        </div>{/* row */}
+
+        <div className = 'row centered'>
+          <div className = 'col-sm-12'>
+            {/*<TextField id="destination" placeholder='' floatingLabelText="End Location" hintText="Enter a destination"/>*/}
+            <div className="input-group">
+              <input className="form-control" id="destination" placeholder="Destination" />
+            </div> {/*input-group*/}
+          </div> {/* col */}
+        </div>{/* row */}
+
+        <div className = 'row centered'>
+          <div className = 'col-sm-12'>
+            <RaisedButton
+              label="Submit"
+              className="submit_button"
+              secondary={true}
+              linkButton="true"
+              params={{
+                origin: this.state.origin,
+                destination: this.state.destination
+              }}
+              containerElement={<Link to="map"/>}
+              style={{
+                'width':'180px',
+                'borderRadius': '5px'
+              }}
+            /> {/* RaisedButton */}
+          </div> {/* col */}
+        </div>{/* row */}
+
+        <br/><br/>
+
+        <Paper className="app-info" style={{'backgroundColor':"rgba(256, 256, 256, 0.7)", 'borderRadius':'10px'}}>
+            <div className = 'row centered'>
+              <div className = 'col-sm-12'>
+                <h2> Get The App (coming soon...) </h2>
+              </div> {/* col */}
+            </div> {/* row */}
+
             <div className = 'row'>
               <div className = 'col-sm-12'>
-                <h2>Plan your Trip</h2>
-              </div>
-            </div>
-
-            <div className = 'row'>
-              <div className = 'col-sm-6'>
-                <div className = 'container'>
-                  <div className = 'row'>
-                    <div className = 'col-sm-12'>
-                      <TextField className= 'center-block' id="origin" placeholder='' floatingLabelText="Start Location" hintText="Enter a starting location"/>
-                    </div>
-                  </div>
-                  <div className = 'row'>
-                    <div className = 'col-sm-12'>
-                      <TextField id="destination" placeholder='' floatingLabelText="End Location" hintText="Enter a destination"/>
-                    </div>
-                  </div>
-                  <div className = 'row'>
-                    <div className = 'col-sm-12'>
-                      <RaisedButton label="Submit" linkButton="true" params={{origin: this.state.origin, destination: this.state.destination }} containerElement={<Link to="map"/>}/>
-                    </div>
-                  </div>
-
-                </div> {/* container */}
-
-              </div> {/* col-sm-6 */}
-
-              <div className = 'col-sm-6'>
-                <div className = 'row'>
-                  <div className = 'col-sm-12'>
-                    <p>
-                      {"Enter a route and find all the best places to eat along the way!"}
-                    </p>
-                  </div>
-                </div> {/* row */}
-              </div> {/* col-sm-6 */}
+                <h3>
+                  {"Planning to go somewhere? Find out all the best places to \
+                  stop at with Along the road. Simply enter a starting location \
+                  and a destination, and we will help you DISCOVER all the \
+                  best places to stop at along the road! Fanny pack cornhole bitters \
+                  Thundercats sartorial lumbersexual brunch beard blog. Shoreditch \
+                   hashtag cronut. Selvage plaid Williamsburg iPhone, umami hashtag blog stumptown fap. Cred Schlitz pork belly, kogi gastropub crucifix lomo McSweeney's actually disrupt aesthetic narwhal. Try-hard tote bag scenester butcher, keytar."}
+                </h3>
+              </div> {/* col */}
             </div> {/* row */}
-          </div> {/* container */}
-        </div> {/* jumbotron */}
-        <div className='container'>
-          <div className = 'row'>
-            <div className = 'col-sm-12'>
-              <h1> Get The App (coming soon...) </h1>
+        </Paper> {/* jumbotron */}
 
-              <h3>
-                {"Along the Road is awesome! Stumptown butcher four loko trust fund banh mi, mlkshk ugh 8-bit cred. Fanny pack cornhole bitters jean shorts, drinking vinegar fap Intelligentsia disrupt freegan Thundercats sartorial lumbersexual brunch beard blog. Shoreditch Austin health goth wolf stumptown, fashion axe vinyl photo booth hashtag cronut. Selvage plaid Williamsburg iPhone, umami hashtag blog stumptown fap. Cred Schlitz pork belly, kogi gastropub crucifix lomo McSweeney's actually disrupt aesthetic narwhal. Try-hard tote bag scenester butcher, keytar."}
-              </h3>
-            </div>
-          </div>
-        </div> {/* jumbotron */}
       </div>
     )
   }
