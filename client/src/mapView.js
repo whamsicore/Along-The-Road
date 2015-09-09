@@ -52,7 +52,7 @@ var MapView = React.createClass({
   // Going to
   shouldComponentUpdate (nextProps, nextState) {
     console.log("/**********shouldComponentUpdate************/");
-    //update map if results change (asyncronously when results are coming in from FourSquare)
+    //update map if results change (asynchronously when results are coming in from FourSquare)
     var results = nextState.currentRoute.results;
     if(results){
       this.updateMapMarkers(results);
