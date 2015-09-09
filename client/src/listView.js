@@ -72,6 +72,19 @@ var ListView = React.createClass({
           for (var id in results) {
             resultsArray.push(results[id]);
           }
+
+          // sort resultsArray by totalDistance (closest first)
+          var compare = function(a, b) {
+            if (a.totalDistance < b.totalDistance) {
+              return -1;
+            } else if (a.totalDistance === b.totalDistance) {
+              return 0;
+            } else {
+              return 1;
+            }
+          }
+          resultsArray.sort(compare);
+
           component.props.updateResults(resultsArray);
 
         }.bind(point), //success()
