@@ -24,7 +24,6 @@ html, body{
   /*width:100%;*/
 }
 
-
 /**********************
 ***********************
 ******* Appview *******
@@ -127,28 +126,21 @@ html, body{
   /*overflow: scroll;*/
 }
 .list-container{
-  height:100%;
+  height:90%;
   width:100%;
   overflow:scroll;
   z-index: 999;
   overflow-y: scroll;
 }
+
+.tool-bar-container{
+  width:100%;
+  height:10%;
+}
+
 .right-container{
   position:relative;
 }
-
-/*.left-container::-webkit-scrollbar {
-    width: 1em;
-}
-
-.left-container::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-}
-
-.left-container::-webkit-scrollbar-thumb {
-  background-color: darkgrey;
-  outline: 1px solid slategrey;
-}*/
 
 #map-container {
   padding:10px;
@@ -175,16 +167,49 @@ html, body{
 
 /**********************
 ***********************
+<<<<<<< HEAD
 ******* RouteDetailView
+=======
+*** RouteDetailView ***
+>>>>>>> (feat) markers and listview now opens new tab in foursquare
 ***********************
 ***********************/
 
-/*.list-item:parent{
-  margin:0;
-  padding:0;
-  background-color: red;
-}*/
-
 .route-list{
   background-color: #FFFF99;
+}
+
+/**********************
+***********************
+******* ToolView *******
+***********************
+***********************/
+
+.tool-bar-container{
+  margin:0;
+  padding-left:10px;
+  background-color: brown;
+}
+
+.drop-down{
+  margin-left:28px;
+  padding-top: 10px;
+}
+/**********************
+***********************
+******* ListView *******
+***********************
+***********************/
+
+
+
+/**********************
+***********************
+******* VenueView *******
+***********************
+***********************/
+
+.card-item:hover{
+  background-color: orange;
+  cursor:pointer;
 }

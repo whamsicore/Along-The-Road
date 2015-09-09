@@ -4,6 +4,9 @@ This view shows the details of each venue
 
 var React = require('react');
 
+/***************
+****** MUI *****
+****************/
 var mui = require('material-ui');
 var ThemeManager = new mui.Styles.ThemeManager();
 var {Card, CardHeader, CardMedia, CardActions, CardText, Avatar, CardTitle} = mui;
@@ -24,6 +27,9 @@ var VenueView = React.createClass({
     };
   },
   
+  test (){
+    console.log('testing');
+  },
   render () {
     var {featuredPhotos, name, contact, hours, categories, location, menu, price, rating, ratingColor, stats, url, totalDistance} = this.props.venue;
 
@@ -60,7 +66,7 @@ var VenueView = React.createClass({
     var subtitleInfo = [categoryText, priceText, ratingText, totalDistanceText];
 
     return (
-      <Card>
+      <Card className='card-item' onClick={this.props.onClick}>
         <div className="col-xs-1" >
           {avatar}
         </div>
