@@ -93,15 +93,16 @@ var ListView = React.createClass({
         }
         // dataType: dataType
       }); //ajax()
-
     } //for
 
   }, // queryFourSquare()
 
   render () {
+    var component = this;
+
     var listDetails = this.props.currentRoute.results.map(function(venue, index) {
       return (
-        <VenueView venue={venue} />
+        <VenueView venue={venue} onClick={component.props.openFourSquare.bind(null, venue)}/>
       )
     });
 
