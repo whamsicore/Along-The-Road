@@ -35,9 +35,10 @@ var MapView = React.createClass({
     polyline: { //configuration for polylines (inactive ones)
       zIndex: 1,
       strokeOpacity: 0.4,
-      strokeWeight: 4
+      strokeWeight: 6
     },
-    radius: 5 // radius used to generate wayPoints, in km.
+    radius: 5, // radius used to generate wayPoints, in km.
+    routePalette: ['blue', 'black', 'green', 'pink']
   },
   // this is called after the first render of the component
   componentDidMount () {
@@ -187,7 +188,7 @@ var MapView = React.createClass({
       if (status == google.maps.DirectionsStatus.OK) { //.OK indicates the response contains a valid DirectionsResult.
         console.log(response);
         var routes = [];
-        var colors = ['blue', 'black', 'green', 'pink'];
+        var colors = component.defaultOptions.routePalette;
 
         for (var i = 0, len = response.routes.length; i < len; i++) {
           // create a polyline for each suggested route
