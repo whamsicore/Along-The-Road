@@ -6,6 +6,15 @@ var React = require('react');
 var RouteDetailView = require('./routeDetailView');
 var ListView = require('./listView');
 var MapHelpers = require('./mapHelpers');
+var ToolView = require('./toolView');
+
+/***************
+****** MUI *****
+****************/
+var mui = require('material-ui');
+var ThemeManager = new mui.Styles.ThemeManager();
+var {Card, CardHeader, CardMedia, CardActions, CardText, Avatar, CardTitle} = mui;
+
 
 var MapView = React.createClass({
   // adds access to the router context. the getCurrentParams method can then be used to get the properties from the route
@@ -26,9 +35,10 @@ var MapView = React.createClass({
     polyline: { //configuration for polylines (inactive ones)
       zIndex: 1,
       strokeOpacity: 0.4,
-      strokeWeight: 4
+      strokeWeight: 6
     },
-    radius: 5 // radius used to generate wayPoints, in km.
+    radius: 5, // radius used to generate wayPoints, in km.
+    routePalette: ['blue', 'black', 'green', 'pink']
   },
   // this is called after the first render of the component
   componentDidMount () {
@@ -51,8 +61,6 @@ var MapView = React.createClass({
   }, //componentDidMount()
   // Going to 
   shouldComponentUpdate (nextProps, nextState) {
-    console.log("/**********shouldComponentUpdate************/");
-    //update map if results change (asynchronously when results are coming in from FourSquare)
     var results = nextState.currentRoute.results; 
     if(results){
       this.updateMapMarkers(results);
@@ -104,6 +112,11 @@ var MapView = React.createClass({
         // create event listener to close info window
         google.maps.event.addListener(marker, 'mouseout', function() {
           infowindow.close();
+        }); //mouseout
+
+        // create event listener to close info window
+        google.maps.event.addListener(marker, 'click', function() {
+          component.openFourSquare(venue);
         }); //mouseout
 
         //show map marker
@@ -175,7 +188,7 @@ var MapView = React.createClass({
       if (status == google.maps.DirectionsStatus.OK) { //.OK indicates the response contains a valid DirectionsResult.
         console.log(response);
         var routes = [];
-        var colors = ['blue', 'black', 'green', 'pink'];
+        var colors = component.defaultOptions.routePalette; 
 
         for (var i = 0, len = response.routes.length; i < len; i++) {
           // create a polyline for each suggested route
@@ -297,6 +310,17 @@ var MapView = React.createClass({
     this.setState({}); //forces re-render (e.g. for the listView)
   }, //updateResults()
 
+  // have left-container switch to detailView
+  routeToHome(){
+    window.reactRouter.transitionTo('home');
+  },
+
+  openFourSquare (venue){
+    var url = "https://foursquare.com/v/"+escape(venue.name)+"/"+venue.id;
+    console.log("TEST inside openFourSquare. url="+url);
+    window.open(url);
+  },
+
   render () {
     // update display of active route
     if (this.state.currentRoute.setOptions) {
@@ -308,14 +332,23 @@ var MapView = React.createClass({
 
     return (
       <div className='container-fluid' style={{'height': '100%'}} >
-        <div className='row' style={{'height': '100%'}}>
+        <div className='row' style={{'height': '100%', 'width': '100%'}}>
           <div className='col-sm-5 left-container'>
+
+            <div className='tool-bar-container'>
+              <ToolView
+                routeToHome={this.routeToHome}
+              /> {/* ToolView */}
+            </div>
+
             <div className='list-container'>
-              <ListView
-                searchRadius={this.state.searchRadius}
-                currentRoute={this.state.currentRoute}
-                updateResults={this.updateResults}
-              /> {/* ListView*/}
+                <ListView
+                  searchRadius={this.state.searchRadius}
+                  currentRoute={this.state.currentRoute}
+                  updateResults={this.updateResults}
+                  openFourSquare = {this.openFourSquare}
+                /> {/* ListView*/}
+
             </div> {/* list-container */}
 
           </div> {/* col-sm-4 */}
