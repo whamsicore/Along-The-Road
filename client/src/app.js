@@ -20,9 +20,16 @@ var App = React.createClass({
   render () {
     return (
       <div className="app">
-        <div className="nav">
-          <Link to="home">Choose Route</Link>
+        <div id="title">
+          <div>
+            <h1>
+              <Link to='home'> {/* Clicking logo will now lead back to homeView */}
+                <img src="./img/logo(thick).gif" href="home"/>
+              </Link>
+            </h1>
+          </div>
         </div>
+
         <div className="content">
           <RouteHandler />
         </div>
