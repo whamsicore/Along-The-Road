@@ -73,12 +73,9 @@ var HomeView = React.createClass({
       <div className='container-fluid'>
         <br/><br/>
         <div className = 'row centered'>
-          <div className = 'col-sm-12 centered'>
-            {/*<TextField className= 'center-block' id="origin" placeholder='' floatingLabelText="Start Location" hintText="Enter a starting location"/>*/}
-            <div className="input-group">
-              <input className="form-control" id="origin" placeholder="Starting Location" />
-            </div> {/*input-group*/}
-          </div> {/* col */}
+          <div className="input-group">
+            <input className="start-location form-control" id="origin" placeholder="Starting Location" />
+          </div> {/*input-group*/}
         </div>{/* row */}
 
         <div className = 'row centered'>
@@ -120,15 +117,8 @@ var HomeView = React.createClass({
             </div> {/* row */}
 
             <div className = 'row'>
-              <div className = 'col-sm-12'>
-                <h3>
-                  {"Planning to go somewhere? Find out all the best places to \
-                  stop at with Along the road. Simply enter a starting location \
-                  and a destination, and we will help you DISCOVER all the \
-                  best places to stop at along the road! Fanny pack cornhole bitters \
-                  Thundercats sartorial lumbersexual brunch beard blog. Shoreditch \
-                   hashtag cronut. Selvage plaid Williamsburg iPhone, umami hashtag blog stumptown fap. Cred Schlitz pork belly, kogi gastropub crucifix lomo McSweeney's actually disrupt aesthetic narwhal. Try-hard tote bag scenester butcher, keytar."}
-                </h3>
+              <div className = 'col-sm-12 text-center'>
+                <img className="app-store" src="../img/app-store-logo.png"/>
               </div> {/* col */}
             </div> {/* row */}
         </Paper> {/* jumbotron */}
