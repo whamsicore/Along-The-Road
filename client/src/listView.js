@@ -102,7 +102,7 @@ var ListView = React.createClass({
 
     var listDetails = this.props.currentRoute.results.map(function(venue, index) {
       return (
-        <VenueView venue={venue} onClick={component.props.openFourSquare.bind(null, venue)}/>
+        <VenueView venue={venue} openFourSquare={component.props.openFourSquare.bind(null, venue)}/>
       )
     });
 
