@@ -310,11 +310,6 @@ var MapView = React.createClass({
     this.setState({}); //forces re-render (e.g. for the listView)
   }, //updateResults()
 
-  // have left-container switch to detailView
-  routeToHome(){
-    window.reactRouter.transitionTo('home');
-  },
-
   openFourSquare (venue){
     var url = "https://foursquare.com/v/"+escape(venue.name)+"/"+venue.id;
     console.log("TEST inside openFourSquare. url="+url);
@@ -336,9 +331,7 @@ var MapView = React.createClass({
           <div className='col-sm-5 left-container'>
 
             <div className='tool-bar-container'>
-              <ToolView
-                routeToHome={this.routeToHome}
-              /> {/* ToolView */}
+              <ToolView/> {/* ToolView */}
             </div>
 
             <div className='list-container'>
