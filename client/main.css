@@ -31,7 +31,7 @@ html, body{
 ***********************/
 
 #title{
-  background-color: #FFFF99;
+  background-color: MediumAquaMarine;
   position: relative;
   padding: 90px;
   height:20%;
@@ -161,6 +161,7 @@ html, body{
   z-index: 999;
 }
 
+<<<<<<< HEAD
 .list-item{
   height: 38px;
 }
@@ -204,12 +205,40 @@ html, body{
 
 
 /**********************
-***********************
 ******* VenueView *******
-***********************
 ***********************/
 
-.card-item:hover{
-  background-color: orange;
-  cursor:pointer;
+.detail-info {
+  text-align: right;
+  color: SlateGray;
 }
+
+.avatar {
+  padding-top: 5px;
+}
+
+.card {
+  padding: 10px;
+}
+.card span {
+  display: block;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.open {
+  color: green;
+}
+
+.category {
+  font-style: italic;
+  color: SlateGray;
+}
+
+.closed {
+  color: red;
+}
+
