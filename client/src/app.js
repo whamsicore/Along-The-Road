@@ -24,7 +24,7 @@ var App = React.createClass({
           <div>
             <h1>
               <Link to='home'> {/* Clicking logo will now lead back to homeView */}
-                <img src="./img/logo(thick).gif" href="home"/>
+                <img className="logo" src="./img/logo(thick).gif" href="home"/>
               </Link>
             </h1>
           </div>
@@ -48,6 +48,6 @@ var routes = (
   </Route>
 )
 
-Router.run(routes, function(Handler) {
+window.reactRouter = Router.run(routes, function(Handler) {
   React.render(<Handler/>, document.getElementById('app'));
 });
