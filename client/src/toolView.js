@@ -25,14 +25,6 @@ var ToolView = React.createClass({
     };
   },
 
-  //event handler for backbutton
-  backHandler (){
-    //either route to home or switch the left-container to show listView,
-    //depending on the state
-
-    this.props.routeToHome();
-  },
-
   render () {
     return (
       <div className="dropdown">
