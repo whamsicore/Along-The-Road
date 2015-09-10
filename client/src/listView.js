@@ -14,7 +14,7 @@ var ListView = React.createClass({
   },
 
   defaultOptions: {
-    fourSquare_url: "https://api.foursquare.com/v2/venues/explore?client_id=LFDSJGGT42FEYM4KFGYR2ETFQZDEMTAVN0KQ0NHBLUXJU4UB&client_secret=YVKQEEBYGFUAMSNFRFEB1MJAEYRXHVBWOL35KFA51ITJBWEE&v=20150902",
+    fourSquare_url: "https://api.foursquare.com/v2/venues/explore?client_id=THM343VWNYYUYSO1WHDTDP0GPKWC4Q3Q3UTFGEUJ10OWEUKE&client_secret=NZWHYIAF5FETD1M3QTIAHELXW5ZFJOWOCCRRGHOPPKBUAXEY&v=20150902",
     foodCategory_url: "&categoryId=4d4b7105d754a06374d81259",
     limit_url: "&limit=10",
     photos_url: "&venuePhotos=1",
@@ -23,6 +23,7 @@ var ListView = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
+    console.log("RESUTLS:", this.props.currentRoute.results)
     if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length) {
       this.queryFourSquare();
     }
@@ -85,7 +86,9 @@ var ListView = React.createClass({
           }
           resultsArray.sort(compare);
 
-          component.props.updateResults(resultsArray);
+          if (resultsArray.length) {
+            component.props.updateResults(resultsArray);
+          }
 
         }.bind(point), //success()
         error: function(error){
