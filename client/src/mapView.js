@@ -59,9 +59,9 @@ var MapView = React.createClass({
     bounds.extend(end);
     map.fitBounds(bounds);
   }, //componentDidMount()
-  // Going to 
+  // Going to
   shouldComponentUpdate (nextProps, nextState) {
-    var results = nextState.currentRoute.results; 
+    var results = nextState.currentRoute.results;
     if(results){
       this.updateMapMarkers(results);
     } //if
@@ -82,7 +82,7 @@ var MapView = React.createClass({
     return new google.maps.Map(document.getElementById('map'), mapOptions);
   },
   // Print new markers
-  updateMapMarkers(results){    
+  updateMapMarkers(results){
     var map = this.state.map;
     var markers = this.state.markers; //array of
     var component = this;
@@ -188,7 +188,7 @@ var MapView = React.createClass({
       if (status == google.maps.DirectionsStatus.OK) { //.OK indicates the response contains a valid DirectionsResult.
         console.log(response);
         var routes = [];
-        var colors = component.defaultOptions.routePalette; 
+        var colors = component.defaultOptions.routePalette;
 
         for (var i = 0, len = response.routes.length; i < len; i++) {
           // create a polyline for each suggested route
