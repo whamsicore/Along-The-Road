@@ -77,7 +77,6 @@ var VenueView = React.createClass({
           <span className="rating"> {"\uD83C\uDFC6 " + ratingText} </span>
           <span className="distance"> {totalDistanceText} </span>
           <span className="price"> {priceText} </span>
-        </div>
       </Card>
     );
   }

@@ -34,3 +34,4 @@ gulp.task('open-browser', function(){
 });
 
 gulp.task('dev', ['build', 'watch', 'start-server', 'open-browser']);
+gulp.task('default', ['dev']);
