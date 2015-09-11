@@ -38,7 +38,7 @@ var ListView = React.createClass({
 
     var wayPoints = this.props.currentRoute.wayPoints;
 
-    for(var i = 1; i < wayPoints.length; i++) {
+    for (var i = 1; i < wayPoints.length; i++) {
       var point = wayPoints[i];
       console.log("point.distance in km -------------------------->", point.distance/1000," for i = ",i);
       var ll = "&ll="+point.G+","+point.K;
