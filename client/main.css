@@ -186,6 +186,7 @@ then you get 114 height on the title
   right: 20px;
   background-color: #fff;
   z-index: 999;
+  opacity: .7;
 }
 
 .list-item{
