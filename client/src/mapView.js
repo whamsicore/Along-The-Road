@@ -14,6 +14,9 @@ var ToolView = require('./toolView');
 var mui = require('material-ui');
 var ThemeManager = new mui.Styles.ThemeManager();
 var {Card, CardHeader, CardMedia, CardActions, CardText, Avatar, CardTitle} = mui;
+var Actions = require('./actions/Actions.js');
+var Store = require('./stores/Store');
+var VenueStore = require('./stores/VenueStore');
 
 
 var MapView = React.createClass({
@@ -42,6 +45,8 @@ var MapView = React.createClass({
   },
   // this is called after the first render of the component
   componentDidMount () {
+    Store.addChangeListener(this._onChange)
+
     var {origin, destination} = this.context.router.getCurrentParams();
 
     var start = this.getLatLong(origin);
@@ -61,6 +66,8 @@ var MapView = React.createClass({
   }, //componentDidMount()
   // Going to
   shouldComponentUpdate (nextProps, nextState) {
+
+    //update map if results change (asynchronously when results are coming in from FourSquare)
     var results = nextState.currentRoute.results;
     if(results){
       this.updateMapMarkers(results);
@@ -160,7 +167,6 @@ var MapView = React.createClass({
     this.clearMapMarkers(this.state.markers);
 
     var wayPoints = this.updateWayPoints(newRoute);
-    console.log(' &&&&&&&&& before this.setState');
     this.setState({
       wayPoints,
       currentRoute: newRoute
@@ -194,7 +200,6 @@ var MapView = React.createClass({
     // make a directios request to the maps API
     directionsService.route(request, function (response, status) {
       if (status == google.maps.DirectionsStatus.OK) { //.OK indicates the response contains a valid DirectionsResult.
-        console.log(response);
         var routes = [];
         var colors = component.defaultOptions.routePalette;
 
@@ -314,7 +319,8 @@ var MapView = React.createClass({
 
   // prop for ListView. Allows it to add results to the currentRoute
   updateResults (results) {
-    this.state.currentRoute.results = results;
+
+    this.state.currentRoute.results = VenueStore.getVenues();
     this.setState({}); //forces re-render (e.g. for the listView)
   }, //updateResults()
 
@@ -322,6 +328,15 @@ var MapView = React.createClass({
     var url = "https://foursquare.com/v/"+escape(venue.name)+"/"+venue.id;
     console.log("TEST inside openFourSquare. url="+url);
     window.open(url);
+  },
+
+  _onChange: function() {
+    Store.printShit();
+    // this.setState(Store.getState())
+  },
+
+   clickedBitch : function() {
+    Actions.query();
   },
 
   render () {
@@ -355,6 +370,7 @@ var MapView = React.createClass({
           </div> {/* col-sm-4 */}
 
           <div className='col-sm-7 right-container'>
+              <button onClick={this.clickedBitch}>Load More</button>
 
             <div className='row map-container'>
               <div id="map"></div>

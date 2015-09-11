@@ -5,6 +5,10 @@ This component is the home view. It allows the user to input his/her travel rout
 var React = require('react');
 
 var Router = require('react-router');
+var Actions = require('./actions/Actions.js');
+var Store = require('./stores/Store');
+
+
 var Link = Router.Link;
 
 // Import MUI components (material-ui)
@@ -14,6 +18,7 @@ var {RaisedButton, Paper} = mui;
 
 
 var HomeView = React.createClass({
+
   childContextTypes: { // MUI: init
     muiTheme: React.PropTypes.object //connect MUI
   },
@@ -28,6 +33,7 @@ var HomeView = React.createClass({
       destination: ''
     }
   },
+
 
   // Componenet lifecycle method that get's called after the first render
   componentDidMount () {
@@ -86,7 +92,6 @@ var HomeView = React.createClass({
             </div> {/*input-group*/}
           </div> {/* col */}
         </div>{/* row */}
-
         <div className = 'row centered'>
           <div className = 'col-sm-12'>
             <RaisedButton
