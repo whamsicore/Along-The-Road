@@ -252,6 +252,7 @@ var MapView = React.createClass({
           currentRoute: routes[0], // on the initial load make the first suggestion active
           routes
         });
+
         Actions.selectRoute(0);
         // Actions.query();
       } // if
