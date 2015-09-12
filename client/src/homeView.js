@@ -5,7 +5,7 @@ This component is the home view. It allows the user to input his/her travel rout
 var React = require('react');
 
 var Router = require('react-router');
-
+var Actions = require('./actions/Actions.js');
 
 
 var Link = Router.Link;
@@ -92,7 +92,7 @@ var HomeView = React.createClass({
           </div> {/* col */}
         </div>{/* row */}
         <div className = 'row centered'>
-          <div className = 'col-sm-12'>
+          <div className = 'col-sm-12' onClick={Actions.clearData}>
             <RaisedButton
               label="Submit"
               className="submit_button"
