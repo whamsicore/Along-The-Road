@@ -1,19 +1,8 @@
-
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var Constants = require('../constants/Constants');
 
 var Actions = {
 
-  /**
-   * @param  {string} text
-   */
-  create: function(text) {
-  	console.log('got here')
-    AppDispatcher.dispatch({
-      actionType: Constants.TODO_CREATE,
-      // text: text
-    });
-  },
 
   query: function() {
     AppDispatcher.dispatch({
@@ -45,6 +34,11 @@ var Actions = {
       actionType: Constants.RATING_FILTER,
       minRating: minRating
     })
+  },
+  clearData: function() {
+    AppDispatcher.dispatch({
+      actionType: Constants.CLEAR_DATA
+    });
   }
 
 };

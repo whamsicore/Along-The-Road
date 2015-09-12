@@ -14,7 +14,7 @@ var ToolView = require('./toolView');
 var mui = require('material-ui');
 var ThemeManager = new mui.Styles.ThemeManager();
 var {Card, CardHeader, CardMedia, CardActions, CardText, Avatar, CardTitle} = mui;
-var Store = require('./stores/Store');
+var QueryStore = require('./stores/QueryStore');
 var Actions = require('./actions/Actions.js');
 var VenueStore = require('./stores/VenueStore');
 
@@ -45,7 +45,7 @@ var MapView = React.createClass({
   },
   // this is called after the first render of the component
   componentDidMount () {
-    Store.addChangeListener(this.updateResults)
+    QueryStore.addChangeListener(this.updateResults)
     VenueStore.addChangeListener(this.updateResults)
 
     var {origin, destination} = this.context.router.getCurrentParams();
@@ -306,11 +306,9 @@ var MapView = React.createClass({
 
   // prop for ListView. Allows it to add results to the currentRoute
   updateResults () {
-
     this.state.currentRoute.results = VenueStore.getVenues();
-    console.log(VenueStore.getVenues())
     this.clearMapMarkers(this.state.markers)
-    this.updateMapMarkers(VenueStore.getVenues())
+    this.updateMapMarkers(this.state.currentRoute.results)
     this.setState({}); //forces re-render (e.g. for the listView)
   }, //updateResults()
 
@@ -365,7 +363,8 @@ var MapView = React.createClass({
               <button onClick={function(){that.ratingFilter(7)}}>7+</button>
               <button onClick={function(){that.ratingFilter(8)}}>8+</button>
               <button onClick={function(){that.ratingFilter(9)}}>9+</button>
-
+              <button onClick={function(){that.ratingFilter(-1);that.priceFilter(-1);}}>Clear Filters</button>
+              <button onClick={function(){Actions.clearData();}}>Clear Data</button>
 
             <div className='row map-container'>
               <div id="map"></div>

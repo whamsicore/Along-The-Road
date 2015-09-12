@@ -22,13 +22,13 @@ var VenueView = React.createClass({
     muiTheme: React.PropTypes.object
   },
 
-  getChildContext: function() {
+  getChildContext: function () {
     return {
       muiTheme: ThemeManager.getCurrentTheme()
     };
   },
 
-  openFourSquare (){
+  openFourSquare: function () {
     var venue = this.props.venue;
     var url = "https://foursquare.com/v/"+escape(venue.name)+"/"+venue.id;
     console.log("TEST inside openFourSquare. url="+url);

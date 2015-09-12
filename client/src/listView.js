@@ -5,7 +5,7 @@ This view shows the details of the possible routes from origin to destination
 var React = require('react');
 var VenueView = require('./venueView')
 var Actions = require('./actions/Actions.js');
-var Store = require('./stores/Store');
+var Store = require('./stores/QueryStore');
 var VenueStore = require('./stores/VenueStore');
 
 
