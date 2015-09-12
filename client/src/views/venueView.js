@@ -62,9 +62,10 @@ var VenueView = React.createClass({
     );
 
     var msgToDollarSigns = {
-      Cheap: "$",
-      Moderate: "$$",
-      Expensive: "$$$"
+      "Cheap": "$",
+      "Moderate": "$$",
+      "Expensive": "$$$",
+      "Very Expensive": "$$$$"
     };
 
     var tierToDollarSigns = {
@@ -84,9 +85,13 @@ var VenueView = React.createClass({
     var totalDistanceText = Math.round(totalDistance/1000*.621*10)/10 + " mi";
 
     return (
+<<<<<<< HEAD:client/src/views/venueView.js
       <Card className="card"
           id = {id}
       >{/*Card*/}
+=======
+      <Card className="card">
+>>>>>>> (feat) Add price and open now filters -- markers must be updated:client/src/venueView.js
         <div className="col-xs-2 avatar" >
           {avatar}
         </div>
@@ -100,8 +105,12 @@ var VenueView = React.createClass({
           <span className="rating"> {"\uD83C\uDFC6 " + ratingText} </span>
           <span className="distance"> {totalDistanceText} </span>
           <span className="price"> {priceText} </span>
+<<<<<<< HEAD:client/src/views/venueView.js
           <span onClick={this.openFourSquare}><strong>Foursquare</strong></span>
 
+=======
+          <span className="glyphicon glyphicon-info-sign clickable" onClick={this.props.openFourSquare}></span>
+>>>>>>> (feat) Add price and open now filters -- markers must be updated:client/src/venueView.js
         </div>
       </Card>
     );
