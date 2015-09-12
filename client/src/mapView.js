@@ -33,6 +33,7 @@ var MapView = React.createClass({
       searchRadius: this.defaultOptions.radius
     }
   },
+
   //default options to be used for this view, inclusind route options and radius of search
   defaultOptions: {
     polyline: { //configuration for polylines (inactive ones)
@@ -43,11 +44,13 @@ var MapView = React.createClass({
     radius: 5, // radius used to generate wayPoints, in km.
     routePalette: ['blue', 'black', 'green', 'pink']
   },
+
   // this is called after the first render of the component
   componentDidMount () {
-    QueryStore.addChangeListener(this.updateResults)
     VenueStore.addChangeListener(this.updateResults)
-
+    this.state.routes = [];
+    // this.state.routes[0].wayPoints =
+    this.state.markers = {};
     var {origin, destination} = this.context.router.getCurrentParams();
 
     var start = this.getLatLong(origin);
@@ -89,7 +92,6 @@ var MapView = React.createClass({
 
   // initializes a map and attaches it to the map div
   initializeMap (center) {
-    console.log(this.mapStyles);
     var mapOptions = {
       zoom: 10,
       center,
@@ -161,7 +163,6 @@ var MapView = React.createClass({
     Actions.selectRoute(index);
     var newRoute = this.state.routes[index];
     var venues  = VenueStore.getVenues();
-    console.log(venues);
     // clear previously active route
     if (this.state.currentRoute) {
       this.state.currentRoute.setOptions(this.defaultOptions.polyline);
@@ -170,13 +171,21 @@ var MapView = React.createClass({
     //clear previously displayed map markers
     this.clearMapMarkers(this.state.markers);
 
-    var wayPoints = this.updateWayPoints(newRoute);
     this.setState({
-      wayPoints,
       currentRoute: newRoute
     });
     this.updateResults();
-    Actions.query();
+    // Actions.query();
+  },
+
+  componentWillUnmount () {
+
+    this.state.routes = [];
+    this.state.markers = {};
+    this.state.currentRoute = { wayPoints: [], results: [] };
+    Actions.clearData();
+    console.log(this.state)
+    console.log("Fuck this shit")
   },
 
   // this creates a directions route from the start point to the end point
@@ -234,7 +243,7 @@ var MapView = React.createClass({
           polyLine.addListener('click', component.setCurrentRoute.bind(component, i));
 
           var wayPoints = component.updateWayPoints(routes[i]); //initialize with first route
-          routes[i].wayPoints = wayPoints;
+          Actions.addWaypoints(wayPoints);
         } //for(each route)
 
 
@@ -244,7 +253,7 @@ var MapView = React.createClass({
           routes
         });
         Actions.selectRoute(0);
-        Actions.query();
+        // Actions.query();
       } // if
     }); //directionsService.route callback
 
@@ -313,6 +322,7 @@ var MapView = React.createClass({
 
   // prop for ListView. Allows it to add results to the currentRoute
   updateResults () {
+    console.log('updateResults')
     this.state.currentRoute.results = VenueStore.getVenues();
     this.clearMapMarkers(this.state.markers)
     this.updateMapMarkers(this.state.currentRoute.results)
@@ -355,7 +365,6 @@ var MapView = React.createClass({
                 <ListView
                   searchRadius={this.state.searchRadius}
                   currentRoute={this.state.currentRoute}
-                  updateResults={this.updateResults}
                 /> {/* ListView*/}
 
             </div> {/* list-container */}

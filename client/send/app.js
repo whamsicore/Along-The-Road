@@ -23673,6 +23673,10 @@
 	    destinationAutoComplete.addListener('place_changed', setDestination);
 	  },
 
+	  componentWillUnmount: function componentWillUnmount() {
+	    console.log('got Called');
+	  },
+
 	  render: function render() {
 	    var slider_options = {
 	      dots: true,
@@ -23721,11 +23725,12 @@
 	        { className: 'row centered' },
 	        React.createElement(
 	          'div',
-	          { className: 'col-sm-12', onClick: Actions.clearData },
+	          { className: 'col-sm-12' },
 	          React.createElement(RaisedButton, {
 	            label: 'Submit',
 	            className: 'submit_button',
 	            secondary: true,
+	            // onClick={function(){Actions.clearData()}}
 	            linkButton: 'true',
 	            params: {
 	              origin: this.state.origin,
@@ -23842,6 +23847,12 @@
 	    AppDispatcher.dispatch({
 	      actionType: Constants.SELECT_ROUTE,
 	      index: index
+	    });
+	  },
+	  addWaypoints: function addWaypoints(wayPoints) {
+	    AppDispatcher.dispatch({
+	      actionType: Constants.ADD_WAYPOINTS,
+	      wayPoints: wayPoints
 	    });
 	  }
 
@@ -24185,7 +24196,8 @@
 			CLEAR_DATA: null,
 			OPEN_NOW_FILTER: null,
 			CLEAR_FILTER: null,
-			SELECT_ROUTE: null
+			SELECT_ROUTE: null,
+			ADD_WAYPOINTS: null
 
 	});
 
@@ -44929,6 +44941,7 @@
 	      searchRadius: this.defaultOptions.radius
 	    };
 	  },
+
 	  //default options to be used for this view, inclusind route options and radius of search
 	  defaultOptions: {
 	    polyline: { //configuration for polylines (inactive ones)
@@ -44939,10 +44952,13 @@
 	    radius: 5, // radius used to generate wayPoints, in km.
 	    routePalette: ['blue', 'black', 'green', 'pink']
 	  },
+
 	  // this is called after the first render of the component
 	  componentDidMount: function componentDidMount() {
-	    QueryStore.addChangeListener(this.updateResults);
 	    VenueStore.addChangeListener(this.updateResults);
+	    this.state.routes = [];
+	    // this.state.routes[0].wayPoints =
+	    this.state.markers = {};
 
 	    var _context$router$getCurrentParams = this.context.router.getCurrentParams();
 
@@ -44988,7 +45004,6 @@
 
 	  // initializes a map and attaches it to the map div
 	  initializeMap: function initializeMap(center) {
-	    console.log(this.mapStyles);
 	    var mapOptions = {
 	      zoom: 10,
 	      center: center,
@@ -45063,7 +45078,6 @@
 	    Actions.selectRoute(index);
 	    var newRoute = this.state.routes[index];
 	    var venues = VenueStore.getVenues();
-	    console.log(venues);
 	    // clear previously active route
 	    if (this.state.currentRoute) {
 	      this.state.currentRoute.setOptions(this.defaultOptions.polyline);
@@ -45072,13 +45086,21 @@
 	    //clear previously displayed map markers
 	    this.clearMapMarkers(this.state.markers);
 
-	    var wayPoints = this.updateWayPoints(newRoute);
 	    this.setState({
-	      wayPoints: wayPoints,
 	      currentRoute: newRoute
 	    });
 	    this.updateResults();
-	    Actions.query();
+	    // Actions.query();
+	  },
+
+	  componentWillUnmount: function componentWillUnmount() {
+
+	    this.state.routes = [];
+	    this.state.markers = {};
+	    this.state.currentRoute = { wayPoints: [], results: [] };
+	    Actions.clearData();
+	    console.log(this.state);
+	    console.log("Fuck this shit");
 	  },
 
 	  // this creates a directions route from the start point to the end point
@@ -45137,7 +45159,7 @@
 	          polyLine.addListener('click', component.setCurrentRoute.bind(component, i));
 
 	          var wayPoints = component.updateWayPoints(routes[i]); //initialize with first route
-	          routes[i].wayPoints = wayPoints;
+	          Actions.addWaypoints(wayPoints);
 	        } //for(each route)
 
 	        var searchRadius = component.state.searchRadius;
@@ -45146,7 +45168,7 @@
 	          routes: routes
 	        });
 	        Actions.selectRoute(0);
-	        Actions.query();
+	        // Actions.query();
 	      } // if
 	    }); //directionsService.route callback
 	  }, //calcRoutes()
@@ -45212,6 +45234,7 @@
 
 	  // prop for ListView. Allows it to add results to the currentRoute
 	  updateResults: function updateResults() {
+	    console.log('updateResults');
 	    this.state.currentRoute.results = VenueStore.getVenues();
 	    this.clearMapMarkers(this.state.markers);
 	    this.updateMapMarkers(this.state.currentRoute.results);
@@ -45258,8 +45281,7 @@
 	            { className: 'list-container' },
 	            React.createElement(ListView, {
 	              searchRadius: this.state.searchRadius,
-	              currentRoute: this.state.currentRoute,
-	              updateResults: this.updateResults
+	              currentRoute: this.state.currentRoute
 	            }),
 	            ' '
 	          ),
@@ -45461,7 +45483,6 @@
 
 	  propTypes: {
 	    currentRoute: React.PropTypes.object.isRequired,
-	    updateResults: React.PropTypes.func.isRequired,
 	    searchRadius: React.PropTypes.number.isRequired
 	  },
 
@@ -45486,34 +45507,28 @@
 	  },
 	  //Gets the previous number of waypoints and the new number to be querried
 	  _onChange: function _onChange() {
-	    var previousNumWaypoints = Store.prevWaypoints();
-	    var newNumWaypoints = Store.getWaypoints();
-	    console.log(previousNumWaypoints, newNumWaypoints);
+	    var waypoints = Store.getWaypoints();
 	    // if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length) {
-	    this.queryFourSquare(previousNumWaypoints, newNumWaypoints);
+	    this.queryFourSquare(waypoints);
 	    // }
 	  },
 
 	  //queries fourSquare api to get new results.
 	  //save results to the current route and updates the parent (mapView)
 	  //re-render results onto the page by updating state variable.
-	  queryFourSquare: function queryFourSquare(previousNumWaypoints, newNumWaypoints) {
+	  queryFourSquare: function queryFourSquare(wayPoints) {
 	    var results = {}; //test against duplicates
 	    var component = this;
 
-	    var wayPoints = this.props.currentRoute.wayPoints;
-
-	    var numPoints = wayPoints.length < newNumWaypoints ? wayPoints.length : newNumWaypoints;
-	    console.log(previousNumWaypoints, "asdasd", newNumWaypoints);
-	    for (var i = previousNumWaypoints; i < numPoints; i++) {
+	    for (var i = 0; i < wayPoints.length; i++) {
 	      var point = wayPoints[i];
-	      console.log("point.distance in km -------------------------->", point.distance / 1000, " for i = ", i);
 	      var ll = "&ll=" + point.G + "," + point.K;
 	      var radius_url = "&radius=" + this.props.searchRadius * 1000;
 
 	      //These two properties ensure that the data is only displayed once all of the requests have returned
 	      //It is important for the speed of the app and ensuring that everything works
-	      var sortingPoint = numPoints - previousNumWaypoints;
+	      console.log(wayPoints);
+	      var sortingPoint = wayPoints.length % 20 - 1;
 	      var count = 1;
 
 	      var _defaultOptions = this.defaultOptions;
@@ -45761,11 +45776,15 @@
 
 	var CHANGE_EVENT = 'change';
 
-	var wayPoints = 1;
-	var routeData = [1, 1, 1]; //Stores the last waypoint searched in for that route
+	var routeData = []; //Stores the last waypoint searched in for that route
+	var currentRoute = 0;
 
 	function setCurrentRoute(index) {
-	  wayPoints = routeData[index];
+	  currentRoute = index;
+	}
+
+	function addWaypoints(waypoints) {
+	  routeData.push({ waypoints: waypoints, index: 1 });
 	}
 
 	var Store = assign({}, EventEmitter.prototype, {
@@ -45775,12 +45794,9 @@
 	  },
 
 	  getWaypoints: function getWaypoints() {
-	    wayPoints += 20;
-	    return wayPoints;
-	  },
-
-	  prevWaypoints: function prevWaypoints() {
-	    return wayPoints;
+	    var temp = routeData[currentRoute].waypoints.slice(routeData[currentRoute].index, 20);
+	    routeData[currentRoute].index += 20;
+	    return temp;
 	  },
 
 	  /**
@@ -45808,11 +45824,14 @@
 	      Store.emitChange();
 	      break;
 	    case Constants.CLEAR_DATA:
-	      wayPoints = 1;
-	      Store.emitChange();
+	      routeData = [];
+	      currentRoute = 0;
 	      break;
 	    case Constants.SELECT_ROUTE:
 	      setCurrentRoute(action.index);
+	      break;
+	    case Constants.ADD_WAYPOINTS:
+	      addWaypoints(action.wayPoints);
 	      break;
 
 	    default:
@@ -46293,12 +46312,14 @@
 	      Store.emitChange();
 	      break;
 	    case Constants.CLEAR_DATA:
-	      allVenues = [];
+	      console.log('clear data');
 	      filteredVenues = [];
+	      routeData = [[], [], []];
+	      allVenues = [];
 	      openNowFilter = false;
 	      ratingFilter = -1;
 	      priceFilter = -1;
-	      Store.emitChange();
+	      // Store.emitChange();
 	      break;
 	    case Constants.OPEN_NOW_FILTER:
 	      openNowFilter = true;

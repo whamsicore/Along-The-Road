@@ -61,6 +61,10 @@ var HomeView = React.createClass({
     destinationAutoComplete.addListener('place_changed', setDestination);
   },
 
+  componentWillUnmount () {
+    console.log('got Called')
+  },
+
   render () {
     var slider_options = {
       dots: true,
@@ -92,11 +96,12 @@ var HomeView = React.createClass({
           </div> {/* col */}
         </div>{/* row */}
         <div className = 'row centered'>
-          <div className = 'col-sm-12' onClick={Actions.clearData}>
+          <div className = 'col-sm-12' >
             <RaisedButton
               label="Submit"
               className="submit_button"
               secondary={true}
+              // onClick={function(){Actions.clearData()}}
               linkButton="true"
               params={{
                 origin: this.state.origin,
