@@ -7,11 +7,16 @@ var assign = require('object-assign');
 
 var CHANGE_EVENT = 'change';
 
-var wayPoints = 1;
-var routeData = [1,1,1]; //Stores the last waypoint searched in for that route
+var routeData = []; //Stores the last waypoint searched in for that route
+var currentRoute = 0;
+
 
 function setCurrentRoute (index) {
-  wayPoints = routeData[index]
+  currentRoute = index;
+}
+
+function addWaypoints (waypoints) {
+  routeData.push({waypoints: waypoints, index: 1});
 }
 
 var Store = assign({}, EventEmitter.prototype, {
@@ -23,12 +28,10 @@ var Store = assign({}, EventEmitter.prototype, {
 
 
   getWaypoints: function(){
-    wayPoints += 20;
-    return wayPoints;
-  },
-
-  prevWaypoints: function(){
-    return wayPoints;
+    var temp = routeData[currentRoute].waypoints.slice(routeData[currentRoute].index, 20);
+    routeData[currentRoute].index+=20;
+    console.log(temp, routeData[currentRoute].index);
+    return temp;
   },
 
   /**
@@ -56,11 +59,14 @@ AppDispatcher.register(function(action) {
       Store.emitChange();
       break;
     case Constants.CLEAR_DATA:
-        wayPoints = 1;
-        Store.emitChange();
+        routeData = [];
+        currentRoute = 0;
         break;
     case Constants.SELECT_ROUTE:
         setCurrentRoute(action.index);
+        break;
+    case Constants.ADD_WAYPOINTS:
+        addWaypoints(action.wayPoints);
         break;
 
 

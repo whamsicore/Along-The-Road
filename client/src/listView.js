@@ -13,7 +13,6 @@ var ListView = React.createClass({
 
   propTypes: {
     currentRoute: React.PropTypes.object.isRequired,
-    updateResults: React.PropTypes.func.isRequired,
     searchRadius: React.PropTypes.number.isRequired
   },
 
@@ -38,34 +37,28 @@ var ListView = React.createClass({
   },
   //Gets the previous number of waypoints and the new number to be querried
   _onChange () {
-    var previousNumWaypoints = Store.prevWaypoints();
-    var newNumWaypoints = Store.getWaypoints();
-    console.log(previousNumWaypoints, newNumWaypoints);
+    var waypoints = Store.getWaypoints();
     // if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length) {
-    this.queryFourSquare(previousNumWaypoints, newNumWaypoints);
+    this.queryFourSquare(waypoints);
     // } 
   },
 
   //queries fourSquare api to get new results.
   //save results to the current route and updates the parent (mapView)
   //re-render results onto the page by updating state variable.
-  queryFourSquare (previousNumWaypoints, newNumWaypoints) {
+  queryFourSquare (wayPoints) {
     var results = {}; //test against duplicates
     var component = this;
 
-    var wayPoints = this.props.currentRoute.wayPoints;
 
-    var numPoints = wayPoints.length < newNumWaypoints ? wayPoints.length : newNumWaypoints
-    console.log(previousNumWaypoints, "asdasd", newNumWaypoints)
-    for(var i = previousNumWaypoints; i < numPoints; i++) {
+    for(var i = 0; i < wayPoints.length ; i++) {
       var point = wayPoints[i];
-      console.log("point.distance in km -------------------------->", point.distance/1000," for i = ",i);
       var ll = "&ll="+point.G+","+point.K;
       var radius_url = "&radius="+this.props.searchRadius*1000;
 
       //These two properties ensure that the data is only displayed once all of the requests have returned
       //It is important for the speed of the app and ensuring that everything works
-      var sortingPoint = numPoints - previousNumWaypoints;
+      var sortingPoint = wayPoints.length%20-1;
       var count = 1;
 
       var {fourSquare_url, foodCategory_url, category_url, limit_url, photos_url, distance_url} = this.defaultOptions;

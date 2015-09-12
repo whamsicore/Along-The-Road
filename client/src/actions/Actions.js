@@ -55,6 +55,12 @@ var Actions = {
       actionType: Constants.SELECT_ROUTE,
       index: index
     });
+  },
+  addWaypoints: function(wayPoints){
+    AppDispatcher.dispatch({
+      actionType: Constants.ADD_WAYPOINTS,
+      wayPoints: wayPoints
+    })
   }
 
 };

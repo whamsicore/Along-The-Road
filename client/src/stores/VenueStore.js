@@ -116,12 +116,14 @@ AppDispatcher.register(function(action) {
         Store.emitChange();
         break;
     case Constants.CLEAR_DATA:
-        allVenues = [];
+      console.log('clear data')
         filteredVenues = [];
+        routeData = [[],[],[]];
+        allVenues = [];
         openNowFilter = false;
         ratingFilter = -1;
         priceFilter = -1;
-        Store.emitChange();
+        // Store.emitChange();
         break;
     case Constants.OPEN_NOW_FILTER:
         openNowFilter = true; 
