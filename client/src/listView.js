@@ -5,7 +5,7 @@ This view shows the details of the possible routes from origin to destination
 var React = require('react');
 var VenueView = require('./venueView')
 var Actions = require('./actions/Actions.js');
-var Store = require('./stores/QueryStore');
+var QueryStore = require('./stores/QueryStore');
 var VenueStore = require('./stores/VenueStore');
 
 
@@ -27,14 +27,15 @@ var ListView = React.createClass({
     distance_url: "&sortByDistance=0"
   },
   componentDidMount () {
-    Store.addChangeListener(this._onChange)
+    QueryStore.addChangeListener(this._onChange)
   },
 
   componentDidUpdate(prevProps, prevState) {
-    // if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length && Store.prevWaypoints()==21) {
+    // if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length && QueryStore.prevWaypoints()==21) {
     //   this.queryFourSquare(1, 21);
     // } 
   },
+
   //Gets the previous number of waypoints and the new number to be querried
   _onChange () {
     var waypoints = Store.getWaypoints();
