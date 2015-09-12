@@ -28,6 +28,12 @@ var VenueView = React.createClass({
     };
   },
 
+  openFourSquare (){
+    var venue = this.props.venue;
+    var url = "https://foursquare.com/v/"+escape(venue.name)+"/"+venue.id;
+    console.log("TEST inside openFourSquare. url="+url);
+    window.open(url);
+  },
 
   render () {
     var {featuredPhotos, name, contact, hours, categories, location, menu, price, rating, ratingColor, stats, url, totalDistance} = this.props.venue;
@@ -56,6 +62,7 @@ var VenueView = React.createClass({
     };
 
 
+
     var categoryText = categoryList ? categoryList.join("/") : "N/A";
     var priceText = price && price.message ? msgToDollarSigns[price.message] : "N/A";
     var ratingText = rating ? rating + '/10' : "N/A";
@@ -63,7 +70,7 @@ var VenueView = React.createClass({
     var totalDistanceText = Math.round(totalDistance/1000*.621*10)/10 + " mi";
 
     return (
-      <Card className="card" onClick={this.props.openFourSquare}>
+      <Card className="card" onClick={this.openFourSquare}>
         <div className="col-xs-2 avatar" >
           {avatar}
         </div>
@@ -77,6 +84,8 @@ var VenueView = React.createClass({
           <span className="rating"> {"\uD83C\uDFC6 " + ratingText} </span>
           <span className="distance"> {totalDistanceText} </span>
           <span className="price"> {priceText} </span>
+
+        </div>
       </Card>
     );
   }

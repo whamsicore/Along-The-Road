@@ -32,9 +32,9 @@ var ListView = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length && Store.prevWaypoints()==21) {
-      this.queryFourSquare(1, 21);
-    }
+    // if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length && Store.prevWaypoints()==21) {
+    //   this.queryFourSquare(1, 21);
+    // }
   },
   //Gets the previous number of waypoints and the new number to be querried
   _onChange () {
@@ -42,7 +42,7 @@ var ListView = React.createClass({
     var newNumWaypoints = Store.getWaypoints();
     console.log(previousNumWaypoints, newNumWaypoints);
     // if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length) {
-      this.queryFourSquare(previousNumWaypoints, newNumWaypoints);
+    this.queryFourSquare(previousNumWaypoints, newNumWaypoints);
     // }
   },
 
@@ -63,18 +63,22 @@ var ListView = React.createClass({
       var ll = "&ll="+point.G+","+point.K;
       var radius_url = "&radius="+this.props.searchRadius*1000;
 
+      //These two properties ensure that the data is only displayed once all of the requests have returned
+      //It is important for the speed of the app and ensuring that everything works
+      var sortingPoint = newNumWaypoints - previousNumWaypoints;
+      var count = 1;
+
       var {fourSquare_url, foodCategory_url, category_url, limit_url, photos_url, distance_url} = this.defaultOptions;
       $.ajax({
         url: fourSquare_url+ll+category_url+radius_url+limit_url+photos_url+distance_url,
         method: "GET",
         success: function(data){
+          count++;
           var newResults = {};
           var newResultsArray = [];
           var venues = data.response.groups[0].items;
 
           var point = this;
-          //NEW STUFF
-          //////////////////////////////////////////////
           for (var i = 0; i < venues.length; i++) {
             var venue = venues[i].venue;
             venue.point = point;
@@ -93,46 +97,12 @@ var ListView = React.createClass({
           for (var id in newResults) {
             newResultsArray.push(newResults[id]);
           }
-          //////////////////////////////////////////////
 
-
-          // loops through venues and adds them to results object and also removes duplicates by only saving the duplicate venue with the smallest distance property
-          for (var i = 0; i < venues.length; i++) {
-            var venue = venues[i].venue;
-            venue.point = point;
-
-            venue.totalDistance = venue.location.distance + venue.point.distance; // in meters
-            if (!results[venue.id]) { // if
-                results[venue.id] = venue;
-            } else {
-              if (results[venue.id].location.distance > venue.location.distance) {
-                results[venue.id] = venue;
-              }
-            } //if
-          } //for
-
-
-          var resultsArray = [];
-          for (var id in results) {
-            resultsArray.push(results[id]);
-          }
-
-          console.log("New Results", newResultsArray.length)
-          // sort resultsArray by totalDistance (closest first)
-          var compare = function(a, b) {
-            return a.totalDistance - b.totalDistance
-          }
-
-          resultsArray.sort(compare);
           Actions.addVenues(newResultsArray);
-          console.log("asdMStore", VenueStore.getVenues().length);
-          component.props.updateResults(resultsArray);
 
-          if (resultsArray.length) {
-            component.props.updateResults(resultsArray);
+          if(count >= sortingPoint){
+            Actions.sortVenues();
           }
-
-
         }.bind(point), //success()
         error: function(error){
           console.log("TEST -------> fourSquare error, error=", error);
@@ -146,9 +116,9 @@ var ListView = React.createClass({
   render () {
     var component = this;
 
-    var listDetails = this.props.currentRoute.results.map(function(venue, index) {
+    var listDetails = VenueStore.getVenues().map(function(venue, index) {
       return (
-        <VenueView venue={venue} openFourSquare={component.props.openFourSquare.bind(null, venue)}/>
+        <VenueView venue={venue}/>
       )
     });
 
