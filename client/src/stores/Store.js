@@ -16,7 +16,7 @@ var assign = require('object-assign');
 
 var CHANGE_EVENT = 'change';
 
-var wayPoints = 21;
+var wayPoints = 1;
 
 /**
  * Create a TODO item.

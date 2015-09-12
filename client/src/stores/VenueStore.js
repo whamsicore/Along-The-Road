@@ -16,7 +16,11 @@ var assign = require('object-assign');
 
 var CHANGE_EVENT = 'change';
 
-var venues = [];
+var allVenues = [];
+var filteredVenues = [];
+var ratingFilter = -1;
+var priceFilter = -1;
+
 
 /**
  * Create a TODO item.
@@ -35,13 +39,56 @@ function create(text) {
 }
 
 
-var compare = function(a, b) {
-  return a.totalDistance - b.totalDistance
-}
 
 function addVenues(results){
-  venues = venues.concat(results);
-  venues.sort(compare);
+  allVenues = allVenues.concat(results);
+  filteredVenues = allVenues;
+  // console.log(venues)
+  
+}
+
+function filter () {
+  filteredVenues = [];
+  for(var i = 0 ; i < allVenues.length ; i ++) {
+
+    var valid = true;
+
+    if(ratingFilter !==-1 ){
+      if(!allVenues[i].rating){
+              console.log(allVenues[i].rating)
+
+        valid = false;
+      } else if (allVenues[i].rating < ratingFilter){
+              console.log(allVenues[i].rating)
+
+        valid = false;
+      }
+    }
+
+    if(priceFilter !== -1){
+      if(!allVenues[i].price) {
+        valid = false;
+      } else if (!(allVenues[i].price.tier)){
+        valid = false;
+      } else if (!(allVenues[i].price.tier === priceFilter) ){
+        valid = false;
+      }
+    }
+
+    if(valid) {
+        filteredVenues.push(allVenues[i]);
+
+    }
+
+  }
+
+}
+
+
+function sortVenues() {
+  allVenues.sort(function(a, b) {
+    return a.totalDistance - b.totalDistance
+  });
 }
 
 
@@ -52,7 +99,7 @@ var Store = assign({}, EventEmitter.prototype, {
   },
 
   getVenues: function() {
-    return venues;
+    return filteredVenues;
   },
 
 
@@ -78,9 +125,20 @@ AppDispatcher.register(function(action) {
   switch(action.actionType) {
     case Constants.ADD_VENUES:
         addVenues(action.results);
+        // Store.emitChange();
+        break;
+    case Constants.SORT_VENUES:
+        sortVenues();
         Store.emitChange();
-      break;
-
+        break;
+    case Constants.PRICE_FILTER: 
+        priceFilter = action.tier;
+        filter()
+        Store.emitChange();
+    case Constants.RATING_FILTER: 
+        ratingFilter = action.minRating;
+        filter();
+        Store.emitChange();
 
 
 

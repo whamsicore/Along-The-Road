@@ -1,13 +1,3 @@
-/*
- * Copyright (c) 2014-2015, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- * TodoActions
- */
 
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var Constants = require('../constants/Constants');
@@ -36,6 +26,25 @@ var Actions = {
       actionType: Constants.ADD_VENUES,
       results: results
     });
+  },
+
+  sortVenues: function() {
+    AppDispatcher.dispatch({
+      actionType: Constants.SORT_VENUES
+    });
+  },
+
+  priceFilter: function(tier){
+    AppDispatcher.dispatch({
+      actionType: Constants.PRICE_FILTER,
+      tier: tier
+    });
+  },
+  ratingFilter: function(minRating) {
+    AppDispatcher.dispatch({
+      actionType: Constants.RATING_FILTER,
+      minRating: minRating
+    })
   }
 
 };

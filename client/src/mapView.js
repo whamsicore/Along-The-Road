@@ -14,8 +14,8 @@ var ToolView = require('./toolView');
 var mui = require('material-ui');
 var ThemeManager = new mui.Styles.ThemeManager();
 var {Card, CardHeader, CardMedia, CardActions, CardText, Avatar, CardTitle} = mui;
-var Actions = require('./actions/Actions.js');
 var Store = require('./stores/Store');
+var Actions = require('./actions/Actions.js');
 var VenueStore = require('./stores/VenueStore');
 
 
@@ -45,7 +45,8 @@ var MapView = React.createClass({
   },
   // this is called after the first render of the component
   componentDidMount () {
-    Store.addChangeListener(this._onChange)
+    Store.addChangeListener(this.updateResults)
+    VenueStore.addChangeListener(this.updateResults)
 
     var {origin, destination} = this.context.router.getCurrentParams();
 
@@ -68,7 +69,7 @@ var MapView = React.createClass({
   shouldComponentUpdate (nextProps, nextState) {
 
     //update map if results change (asynchronously when results are coming in from FourSquare)
-    var results = nextState.currentRoute.results; 
+    var results = VenueStore.getVenues(); 
     if(results){
       this.updateMapMarkers(results);
     } //if
@@ -236,6 +237,7 @@ var MapView = React.createClass({
           currentRoute: routes[0], // on the initial load make the first suggestion active
           routes
         });
+        Actions.query();
       } // if
     }); //directionsService.route callback
 
@@ -301,44 +303,31 @@ var MapView = React.createClass({
 
   }, //createWayPoints()
 
-  //display wayPoints on the map
-  displayWayPoints(wayPoints){
-    wayPoints.forEach(function(point) {
-      new google.maps.Circle({
-        center: point,
-        map: this.state.map,
-        radius: this.state.searchRadius * 1000,
-        strokeColor: '#FF0000',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: '#FF0000',
-        fillOpacity: 0.35,
-      });
-    }.bind(this));
-  }, //displayWayPoints()
 
   // prop for ListView. Allows it to add results to the currentRoute
-  updateResults (results) {
+  updateResults () {
 
     this.state.currentRoute.results = VenueStore.getVenues();
+    console.log(VenueStore.getVenues())
+    this.clearMapMarkers(this.state.markers)
+    this.updateMapMarkers(VenueStore.getVenues())
     this.setState({}); //forces re-render (e.g. for the listView)
   }, //updateResults()
 
-  openFourSquare (venue){
-    var url = "https://foursquare.com/v/"+escape(venue.name)+"/"+venue.id;
-    console.log("TEST inside openFourSquare. url="+url);
-    window.open(url);
-  },
-  
-  _onChange: function() {
-    Store.printShit();
-    // this.setState(Store.getState())
-  },
 
-   clickedBitch : function() {
+
+
+  loadMore : function() {
     Actions.query();
   },
 
+  priceFilter: function(tier) {
+    Actions.priceFilter(tier);
+  },
+
+  ratingFilter: function(minimunRating) {
+    Actions.ratingFilter(minimunRating);
+  },
   render () {
     // update display of active route
     if (this.state.currentRoute.setOptions) {
@@ -347,7 +336,7 @@ var MapView = React.createClass({
         strokeOpacity: 1,
       });
     };
-
+    var that = this;
     return (
       <div className='container-fluid' style={{'height': '100%'}} >
         <div className='row' style={{'height': '100%', 'width': '100%'}}>
@@ -362,7 +351,6 @@ var MapView = React.createClass({
                   searchRadius={this.state.searchRadius}
                   currentRoute={this.state.currentRoute}
                   updateResults={this.updateResults}
-                  openFourSquare = {this.openFourSquare}
                 /> {/* ListView*/}
 
             </div> {/* list-container */}
@@ -370,7 +358,14 @@ var MapView = React.createClass({
           </div> {/* col-sm-4 */}
 
           <div className='col-sm-7 right-container'>
-              <button onClick={this.clickedBitch}>Load More</button>
+              <button onClick={this.loadMore}>Load More</button>
+              <button onClick={function(){that.priceFilter(1)}}>$</button>
+              <button onClick={function(){that.priceFilter(2)}}>$$</button>
+              <button onClick={function(){that.priceFilter(3)}}>$$$</button>
+              <button onClick={function(){that.ratingFilter(7)}}>7+</button>
+              <button onClick={function(){that.ratingFilter(8)}}>8+</button>
+              <button onClick={function(){that.ratingFilter(9)}}>9+</button>
+
 
             <div className='row map-container'>
               <div id="map"></div>
