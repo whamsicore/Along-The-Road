@@ -37,5 +37,8 @@
   "bugs": {
     "url": "https://github.com/Diaphanous-Hamburger/Along-The-Road/issues"
   },
-  "homepage": "https://github.com/Diaphanous-Hamburger/Along-The-Road#readme"
+  "homepage": "https://github.com/Diaphanous-Hamburger/Along-The-Road#readme",
+  "devDependencies": {
+    "gulp-minify": "0.0.5"
+  }
 }

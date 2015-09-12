@@ -5,17 +5,18 @@ var Constants = require('../constants/Constants');
 var assign = require('object-assign');
 
 var CHANGE_EVENT = 'change';
-
-var allVenues = [];
+var routeData = [[],[],[]];
+var allVenues = routeData[0];
+var routeNumber = 0;
 var filteredVenues = [];
 var ratingFilter = -1;
 var priceFilter = -1;
+var openNowFilter = false;
 
 
 function addVenues(results){
   allVenues = allVenues.concat(results);
   filteredVenues = allVenues;
-
 }
 
 function filter () {
@@ -44,12 +45,26 @@ function filter () {
       }
     }
 
+    //Open now filter
+    if(openNowFilter){
+      if(!allVenues[i].hours || !allVenues[i].hours.isOpen){
+        valid = false;
+      }
+    }
+
     if(valid) {
         filteredVenues.push(allVenues[i]);
     }
   }
 }
 
+function setCurrentRoute (index) {
+  //First save the old data
+  //Then find current one and set data to that
+  routeData[routeNumber] = allVenues;
+  allVenues = routeData[index];
+  routeNumber = index;
+}
 
 function sortVenues() {
   allVenues.sort(function(a, b) {
@@ -101,15 +116,28 @@ AppDispatcher.register(function(action) {
         Store.emitChange();
         break;
     case Constants.CLEAR_DATA:
-        console.log('got here');
         allVenues = [];
         filteredVenues = [];
+        openNowFilter = false;
         ratingFilter = -1;
         priceFilter = -1;
         Store.emitChange();
-
         break;
-
+    case Constants.OPEN_NOW_FILTER:
+        openNowFilter = true;
+        filter();
+        Store.emitChange();
+        break;
+    case Constants.CLEAR_FILTER:
+        openNowFilter = false;
+        ratingFilter = -1;
+        priceFilter = -1;
+        filter();
+        Store.emitChange();
+        break;
+    case Constants.SELECT_ROUTE:
+        setCurrentRoute(action.index);
+        break;
 
     default:
   }

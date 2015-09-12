@@ -65,7 +65,7 @@ var ListView = React.createClass({
 
       //These two properties ensure that the data is only displayed once all of the requests have returned
       //It is important for the speed of the app and ensuring that everything works
-      var sortingPoint = newNumWaypoints - previousNumWaypoints;
+      var sortingPoint = numPoints - previousNumWaypoints;
       var count = 1;
 
       var {fourSquare_url, foodCategory_url, category_url, limit_url, photos_url, distance_url} = this.defaultOptions;

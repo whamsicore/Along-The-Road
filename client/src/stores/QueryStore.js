@@ -8,6 +8,11 @@ var assign = require('object-assign');
 var CHANGE_EVENT = 'change';
 
 var wayPoints = 1;
+var routeData = [1,1,1]; //Stores the last waypoint searched in for that route
+
+function setCurrentRoute (index) {
+  wayPoints = routeData[index]
+}
 
 var Store = assign({}, EventEmitter.prototype, {
 
@@ -52,9 +57,12 @@ AppDispatcher.register(function(action) {
       break;
     case Constants.CLEAR_DATA:
         wayPoints = 1;
-              // Store.emitChange();
-
+        Store.emitChange();
         break;
+    case Constants.SELECT_ROUTE:
+        setCurrentRoute(action.index);
+        break;
+
 
     default:
       // no op

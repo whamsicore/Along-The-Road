@@ -9,6 +9,9 @@ module.exports = keyMirror({
 	SORT_VENUES: null,
 	PRICE_FILTER: null,
 	RATING_FILTER: null,
-	CLEAR_DATA: null
+	CLEAR_DATA: null,
+	OPEN_NOW_FILTER: null,
+	CLEAR_FILTER: null,
+	SELECT_ROUTE: null
 
 });
