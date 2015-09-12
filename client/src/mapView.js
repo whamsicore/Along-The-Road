@@ -158,7 +158,10 @@ var MapView = React.createClass({
 
   // set the current selected route
   setCurrentRoute (index) {
+    Actions.selectRoute(index);
     var newRoute = this.state.routes[index];
+    var venues  = VenueStore.getVenues();
+    console.log(venues);
     // clear previously active route
     if (this.state.currentRoute) {
       this.state.currentRoute.setOptions(this.defaultOptions.polyline);
@@ -172,6 +175,8 @@ var MapView = React.createClass({
       wayPoints,
       currentRoute: newRoute
     });
+    this.updateResults();
+    Actions.query();
   },
 
   // this creates a directions route from the start point to the end point
@@ -228,15 +233,17 @@ var MapView = React.createClass({
           // add event listener to update the route on click
           polyLine.addListener('click', component.setCurrentRoute.bind(component, i));
 
+          var wayPoints = component.updateWayPoints(routes[i]); //initialize with first route
+          routes[i].wayPoints = wayPoints;
         } //for(each route)
 
-        var wayPoints = component.updateWayPoints(routes[0]); //initialize with first route
-        routes[0].wayPoints = wayPoints;
+
         var searchRadius = component.state.searchRadius;
         component.setState({
           currentRoute: routes[0], // on the initial load make the first suggestion active
           routes
         });
+        Actions.selectRoute(0);
         Actions.query();
       } // if
     }); //directionsService.route callback
@@ -363,7 +370,8 @@ var MapView = React.createClass({
               <button onClick={function(){that.ratingFilter(7)}}>7+</button>
               <button onClick={function(){that.ratingFilter(8)}}>8+</button>
               <button onClick={function(){that.ratingFilter(9)}}>9+</button>
-              <button onClick={function(){that.ratingFilter(-1);that.priceFilter(-1);}}>Clear Filters</button>
+              <button onClick={function(){Actions.clearFilter();}}>Clear Filters</button>
+              <button onClick={function(){Actions.openNowFilter();}}>Open Now</button>
               <button onClick={function(){Actions.clearData();}}>Clear Data</button>
 
             <div className='row map-container'>

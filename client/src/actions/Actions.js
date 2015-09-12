@@ -39,6 +39,22 @@ var Actions = {
     AppDispatcher.dispatch({
       actionType: Constants.CLEAR_DATA
     });
+  },
+  openNowFilter: function() {
+    AppDispatcher.dispatch({
+      actionType: Constants.OPEN_NOW_FILTER,
+    });
+  },
+  clearFilter: function() {
+    AppDispatcher.dispatch({
+      actionType: Constants.CLEAR_FILTER,
+    });
+  },
+  selectRoute: function(index) {
+    AppDispatcher.dispatch({
+      actionType: Constants.SELECT_ROUTE,
+      index: index
+    });
   }
 
 };
