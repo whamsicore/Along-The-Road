@@ -27,7 +27,13 @@ var getMiddlePoint = function(a, b) {
   return new google.maps.LatLng((a.G+b.G)/2, (a.K+b.K)/2);
 };
 
+// turns a lat/long string into a google maps LatLong Object
+var getLatLong = function(location) {
+  return new google.maps.LatLng(location.split(',')[0], location.split(',')[1]);
+};
+
 module.exports = {
   getDistanceBetweenPoints,
-  getMiddlePoint
+  getMiddlePoint,
+  getLatLong
 };
