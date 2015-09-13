@@ -5,7 +5,7 @@ This component is the home view. It allows the user to input his/her travel rout
 var React = require('react');
 
 var Router = require('react-router');
-var Actions = require('./actions/Actions.js');
+var Actions = require('../actions/Actions.js');
 
 
 var Link = Router.Link;
@@ -37,6 +37,7 @@ var HomeView = React.createClass({
   // Componenet lifecycle method that get's called after the first render
   componentDidMount () {
     // allows access of the props inside setOrigin and setDestination
+    console.log("TEST ---------> mounting HomeView");
     var component = this;
 
     var setOrigin = function() {
@@ -107,7 +108,7 @@ var HomeView = React.createClass({
                 origin: this.state.origin,
                 destination: this.state.destination
               }}
-              containerElement={<Link to="map"/>}
+              containerElement={<Link to="overview"/>}
               style={{
                 'width':'180px',
                 'borderRadius': '5px'

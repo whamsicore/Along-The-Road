@@ -3,10 +3,12 @@ This component is the map view. It shows the user the possible routes he/she can
 */
 
 var React = require('react');
-var RouteDetailView = require('./routeDetailView');
+var MapView = require('./mapView');
+var MapRoutingView = require('./mapRoutingView');
 var ListView = require('./listView');
-var MapHelpers = require('./mapHelpers');
 var ToolView = require('./toolView');
+
+var MapHelpers = require('../helpers/mapHelpers');
 
 /***************
 ****** MUI *****
@@ -14,12 +16,13 @@ var ToolView = require('./toolView');
 var mui = require('material-ui');
 var ThemeManager = new mui.Styles.ThemeManager();
 var {Card, CardHeader, CardMedia, CardActions, CardText, Avatar, CardTitle} = mui;
-var QueryStore = require('./stores/QueryStore');
-var Actions = require('./actions/Actions.js');
-var VenueStore = require('./stores/VenueStore');
+
+var QueryStore = require('../stores/QueryStore');
+var Actions = require('../actions/Actions.js');
+var VenueStore = require('../stores/VenueStore');
 
 
-var MapView = React.createClass({
+var overView = React.createClass({
   // adds access to the router context. the getCurrentParams method can then be used to get the properties from the route
   contextTypes: {
     router: React.PropTypes.func
@@ -47,16 +50,22 @@ var MapView = React.createClass({
 
   // this is called after the first render of the component
   componentDidMount () {
+<<<<<<< HEAD:client/src/mapView.js
+=======
+    console.log("TEST ----> inside componentDidMount()");
+    QueryStore.addChangeListener(this.updateResults)
+>>>>>>> (refactor) begin refactor of map functions into mapview:client/src/views/overView.js
     VenueStore.addChangeListener(this.updateResults)
     this.state.routes = [];
     // this.state.routes[0].wayPoints = 
     this.state.markers = {};
     var {origin, destination} = this.context.router.getCurrentParams();
 
-    var start = this.getLatLong(origin);
-    var end = this.getLatLong(destination);
+    var start = MapHelpers.getLatLong(origin);
+    var end = MapHelpers.getLatLong(destination);
 
     var map = this.initializeMap(start);
+
     this.setState({
       map
     });
@@ -68,21 +77,22 @@ var MapView = React.createClass({
     bounds.extend(end);
     map.fitBounds(bounds);
   }, //componentDidMount()
+
+  componentWillUnmount () {
+    console.log("TEST ----> inside componentWillUnmount()");
+  },
+
   // Going to
   shouldComponentUpdate (nextProps, nextState) {
 
     //update map if results change (asynchronously when results are coming in from FourSquare)
-    var results = VenueStore.getVenues(); 
+    var results = VenueStore.getVenues();
     if(results){
       this.updateMapMarkers(results);
     } //if
 
     return true;
   }, //shouldComponentUpdate()
-  // turns a lat/long string into a google maps LatLong Object
-  getLatLong (location) {
-    return new google.maps.LatLng(location.split(',')[0], location.split(',')[1]);
-  },
 
   //mapStyles: [{"featureType":"administrative","elementType":"all","stylers":[{"visibility":"on"},{"lightness":33}]},{"featureType":"landscape","elementType":"all","stylers":[{"color":"#f2e5d4"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#c5dac6"}]},{"featureType":"poi.park","elementType":"labels","stylers":[{"visibility":"on"},{"lightness":20}]},{"featureType":"road","elementType":"all","stylers":[{"lightness":20}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#c5c6c6"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#e4d7c6"}]},{"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#fbfaf7"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"on"},{"color":"#acbcc9"}]}],
   //mapStyles: [{"featureType":"landscape.natural","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#e0efef"}]},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"hue":"#1900ff"},{"color":"#c0e8e8"}]},{"featureType":"road","elementType":"geometry","stylers":[{"lightness":100},{"visibility":"simplified"}]},{"featureType":"road","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"transit.line","elementType":"geometry","stylers":[{"visibility":"on"},{"lightness":700}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#7dcdcd"}]}],
@@ -92,6 +102,10 @@ var MapView = React.createClass({
 
   // initializes a map and attaches it to the map div
   initializeMap (center) {
+<<<<<<< HEAD:client/src/mapView.js
+=======
+    // console.log(this.mapStyles);
+>>>>>>> (refactor) begin refactor of map functions into mapview:client/src/views/overView.js
     var mapOptions = {
       zoom: 10,
       center,
@@ -385,14 +399,14 @@ var MapView = React.createClass({
               <button onClick={function(){Actions.clearData();}}>Clear Data</button>
 
             <div className='row map-container'>
-              <div id="map"></div>
+              <MapView id="map"/>
             </div> {/* row */}
 
             <div className='row route-container'>
-              <RouteDetailView
+              <MapRoutingView
                 routes={this.state.routes}
                 setCurrentRoute={this.setCurrentRoute}
-              /> {/* RouteDetailView */}
+              /> {/* MapRoutingView */}
             </div> {/* row */}
 
           </div> {/* col-sm-8 */}
@@ -403,4 +417,4 @@ var MapView = React.createClass({
   }
 });
 
-module.exports = MapView;
+module.exports = overView;

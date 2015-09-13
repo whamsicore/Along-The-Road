@@ -3,10 +3,11 @@ This view shows the details of the possible routes from origin to destination
 */
 
 var React = require('react');
-var VenueView = require('./venueView')
-var Actions = require('./actions/Actions.js');
-var QueryStore = require('./stores/QueryStore');
-var VenueStore = require('./stores/VenueStore');
+var VenueView = require('./venueView');
+
+var Actions = require('../actions/Actions.js');
+var QueryStore = require('../stores/QueryStore');
+var VenueStore = require('../stores/VenueStore');
 
 
 var ListView = React.createClass({
@@ -33,7 +34,7 @@ var ListView = React.createClass({
   componentDidUpdate(prevProps, prevState) {
     // if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length && QueryStore.prevWaypoints()==21) {
     //   this.queryFourSquare(1, 21);
-    // } 
+    // }
   },
 
   //Gets the previous number of waypoints and the new number to be querried
@@ -74,7 +75,7 @@ var ListView = React.createClass({
 
           var point = this;
           for (var i = 0; i < venues.length; i++) {
-            var venue = venues[i].venue; 
+            var venue = venues[i].venue;
             venue.point = point;
 
             venue.totalDistance = venue.location.distance + venue.point.distance; // in meters
