@@ -153,6 +153,7 @@ var MapView = React.createClass({
 
   // clear map markers
   clearMapMarkers (){
+
     var markers = this.state.markers;
     
     for(var key in markers){
@@ -160,7 +161,6 @@ var MapView = React.createClass({
       marker.setMap(null);
     } //for
 
-    this.state.markers = {};
   }, //clearMapMarkers
 
   render () {
