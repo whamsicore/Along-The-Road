@@ -58,6 +58,7 @@ var overView = React.createClass({
     var end = MapHelpers.getLatLong(destination);
     var map = MapHelpers.initializeMap(start);
     window.map = map; 
+
     /****** CREATE START/END MARKERS *******/
     MapHelpers.initializeMarkers(start, end, map);
 
@@ -81,33 +82,12 @@ var overView = React.createClass({
 
     }.bind(this)); //update routes
 
+
+
     /****** BEGIN APP INITIALIZATION *****/ 
     this.getRoutes(start, end, map);
 
-    // VenueStore.addChangeListener(this.updateResults)
-    
   }, //componentDidMount()
-
-  shouldComponentUpdate (nextProps, nextState) { //before the 
-    // console.log("overView ----> inside shouldComponentUpdate() nextState=", nextState);
-
-    //update map if results change (asynchronously when results are coming in from FourSquare)
-    // var results = VenueStore.getVenues();
-    // if(results){
-    //   this.updateMapMarkers(results);
-    // } //if
-
-    return true;
-  }, //shouldComponentUpdate()
-  
-  componentWillUnmount () {
-    // console.log("overView ----> inside componentWillUnmount()");
-    // this.state.routes = [];
-    // this.state.markers = {};
-    // this.state.currentRoute = { wayPoints: [], results: [] };
-    // Actions.clearData();
-    // console.log(this.state)
-  }, //componentWillUnmount()
 
   // SETUP PHASE STEP 1: Obtain routes from Google Maps Api
   // NOTE: asyncronous function
@@ -155,14 +135,11 @@ var overView = React.createClass({
           var radius = MapHelpers.getSearchRadius(newRoute);
           newRoute.searchRadius = radius;
           newRoute.wayPoints = MapHelpers.getWayPoints(newRoute, radius); //syncronously get waypoints for select googleRoute
-
-          /******* ROUTE newRoute CLICK *******/
           newRoute.addListener('click', component.changeCurrentRoute.bind(component, newRoute));
 
-          // save routes in array
-          newRoutes.push(newRoute);
+          newRoutes.push(newRoute); // save routes in array
           
-          // Actions.addWaypoints(wayPoints);
+          
 
         }); //for(routes)
         
@@ -178,36 +155,27 @@ var overView = React.createClass({
   // Event: switch the route and update the active venues
   changeCurrentRoute (newRoute) {
     // console.log("overView ------> changeCurrentRoute() newRoute=", newRoute);
+    
     /******** UPDATE POLYLINES *********/
-    if(this.state.currentRoute){ // there is previous active route
-      this.state.currentRoute.setOptions(this.defaultOptions.polyline);
-    } //if
-
-    // update display of active route
-    newRoute.setOptions({
-      zIndex: 2,
-      strokeOpacity: 1
-    });
-
-    //Change Current Route
-    var component = this;
+    this.state.currentRoute.setOptions(this.defaultOptions.polyline); //hide old route
+    newRoute.setOptions({zIndex: 2, strokeOpacity: 1}); //show currentRoute
 
     Actions.selectRoute(newRoute.index);
   }, // changeCurrentRoute()
 
-  loadMore () {
-    this.getFourSquare(newRoute.wayPoints, function(data){
-      var point = this; // waypoint used for query, bound to this for for callback
+  // loadMore () { //still in beta
+  //   this.getFourSquare(newRoute.wayPoints, function(data){
+  //     var point = this; // waypoint used for query, bound to this for for callback
       
-      var venue_wrappers = data.response.groups[0].items; //extract venues array from data
-      Actions.addVenues(venue_wrappers, point);
+  //     var venue_wrappers = data.response.groups[0].items; //extract venues array from data
+  //     Actions.addVenues(venue_wrappers, point);
 
-      // if(count >= sortingPoint){
-      //   Actions.sortVenues();
-      // } //if
+  //     // if(count >= sortingPoint){
+  //     //   Actions.sortVenues();
+  //     // } //if
 
-    }); // getFourSquare(callback)
-  }, // loadMore()
+  //   }); // getFourSquare(callback)
+  // }, // loadMore()
 
   render () {
     var that = this;
