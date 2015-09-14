@@ -44,7 +44,7 @@ var ListView = React.createClass({
     if(this.props.currentRoute){
       var listDetails = this.props.currentRoute.filteredVenues.map(function(venue, index) {
         return (
-          <VenueView venue={venue}/>
+          <VenueView venue={venue} origin={component.props.origin}/>
         )
       });
 

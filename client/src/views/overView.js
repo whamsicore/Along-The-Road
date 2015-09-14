@@ -62,6 +62,7 @@ var overView = React.createClass({
 
     /****** INITIALIZE MAP ******/
     var {origin, destination} = this.context.router.getCurrentParams();
+    this.state.origin = origin;
     var start = MapHelpers.getLatLong(origin);
     var end = MapHelpers.getLatLong(destination);
     var map = MapHelpers.initializeMap(start);
@@ -193,7 +194,6 @@ var overView = React.createClass({
   //re-render results onto the page by updating state variable.
   getFourSquare (wayPoints) {
 
-    console.log("$$$$$$$$$$ insdie getFourSquare()");
     // var index = currentRoute.queryIndex;
     // if(index<wayPoints.length){
 
@@ -204,7 +204,7 @@ var overView = React.createClass({
     // if(max>wayPoints.length){
 
     // }
-    var count = waypoints.length;
+    var count = wayPoints.length;
 
     // for(var i=index; i<max; i++){
     for(var i=0; i<wayPoints.length; i++){
@@ -230,8 +230,9 @@ var overView = React.createClass({
           if(count === 0 ){
             Actions.sortVenues();
           }
-        },
+        }.bind(point),
         error: function(error){
+          count--;
           console.log("TEST -------> fourSquare error, error=", error);
         }
       }); //ajax()
@@ -256,6 +257,7 @@ var overView = React.createClass({
                 <ListView
                   // currentRoute={this.state.currentRoute}
                   currentRoute = {this.state.currentRoute}
+                  origin = {this.state.origin}
                 /> {/* ListView*/}
 
             </div> {/* list-container */}
