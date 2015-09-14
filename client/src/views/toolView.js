@@ -29,6 +29,7 @@ var ToolView = React.createClass({
     return (
       <div className = "container">
           {/*<button onClick={this.loadMore}>Load More</button>*/}
+          <button onClick={this.props.loadMore}>Load More</button>
           <button onClick={function(){Actions.priceFilter(1)}}>$</button>
           <button onClick={function(){Actions.priceFilter(2)}}>$$</button>
           <button onClick={function(){Actions.priceFilter(3)}}>$$$</button>
