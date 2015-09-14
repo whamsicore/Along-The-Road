@@ -151,18 +151,6 @@ var MapView = React.createClass({
     }); //forEach
   }, //updateMapMarkers()
 
-  // // clear map markers
-  // clearMapMarkers (){
-  //   var markers = this.state.markers;
-
-  //   for(var key in markers){
-  //     var marker = markers[key];
-  //     marker.setMap(null);
-  //   } //for
-
-  //   this.state.markers = {};
-  // }, //clearMapMarkers
-
   // clear map markers
   clearMapMarkers (){
     var markers = this.state.markers;
