@@ -21,17 +21,18 @@ var RouteDetailView = React.createClass({
   },
   propTypes: {
     routes: React.PropTypes.array.isRequired,
-    setCurrentRoute: React.PropTypes.func.isRequired
+    changeCurrentRoute: React.PropTypes.func.isRequired
   },
 
   render () {
     var component = this;
-    var routeDetails = this.props.routes.map(function(route, index) {
+    var routes = this.props.routes; 
+    var routeDetails = routes.map(function(route, index) {
       var colorCodedRouteInfo = (<span><span className="glyphicon glyphicon-road" style={{color:route.color}}></span>{" "+route.distance+" → "+route.duration}</span>);
       return (
           <ListItem
             primaryText={colorCodedRouteInfo}
-            onClick={function(){component.props.setCurrentRoute(index)}}
+            onClick={function(){component.props.changeCurrentRoute(routes[index])}}
             key={index}
             className='list-item'>
           </ListItem>

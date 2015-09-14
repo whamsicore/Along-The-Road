@@ -12,8 +12,8 @@ var Router = require('react-router');
 var { Route, DefaultRoute, NotFoundRoute, RouteHandler, Link } = Router;
 
 // Import Views
-var HomeView = require('./homeView');
-var MapView = require('./mapView');
+var HomeView = require('./views/homeView');
+var OverView = require('./views/overView');
 
 // This component includes the navigation between pages and the routehandler
 var App = React.createClass({
@@ -43,7 +43,7 @@ var routes = (
   <Route handler={App}>
     <DefaultRoute handler={HomeView}/>
     <Route name="home" path="home" handler={HomeView}/>
-    <Route name="map" path="map/:origin/:destination" handler={MapView}/>
+    <Route name="overview" path="overview/:origin/:destination" handler={OverView}/>
     <NotFoundRoute handler={HomeView}/>
   </Route>
 )

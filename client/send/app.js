@@ -65,7 +65,7 @@
 
 	// Import Views
 	var HomeView = __webpack_require__(196);
-	var MapView = __webpack_require__(360);
+	var OverView = __webpack_require__(360);
 
 	// This component includes the navigation between pages and the routehandler
 	var App = React.createClass({
@@ -108,7 +108,7 @@
 	  { handler: App },
 	  React.createElement(DefaultRoute, { handler: HomeView }),
 	  React.createElement(Route, { name: 'home', path: 'home', handler: HomeView }),
-	  React.createElement(Route, { name: 'map', path: 'map/:origin/:destination', handler: MapView }),
+	  React.createElement(Route, { name: 'overview', path: 'overview/:origin/:destination', handler: OverView }),
 	  React.createElement(NotFoundRoute, { handler: HomeView })
 	);
 
@@ -23649,6 +23649,7 @@
 	  // Componenet lifecycle method that get's called after the first render
 	  componentDidMount: function componentDidMount() {
 	    // allows access of the props inside setOrigin and setDestination
+	    console.log("TEST ---------> mounting HomeView");
 	    var component = this;
 
 	    var setOrigin = function setOrigin() {
@@ -23736,7 +23737,7 @@
 	              origin: this.state.origin,
 	              destination: this.state.destination
 	            },
-	            containerElement: React.createElement(Link, { to: 'map' }),
+	            containerElement: React.createElement(Link, { to: 'overview' }),
 	            style: {
 	              'width': '180px',
 	              'borderRadius': '5px'
@@ -44903,10 +44904,12 @@
 	'use strict';
 
 	var React = __webpack_require__(1);
-	var RouteDetailView = __webpack_require__(361);
-	var ListView = __webpack_require__(362);
-	var MapHelpers = __webpack_require__(368);
+	var MapView = __webpack_require__(361);
+	var MapRoutingView = __webpack_require__(362);
+	var ListView = __webpack_require__(363);
 	var ToolView = __webpack_require__(369);
+
+	var MapHelpers = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../helpers/mapHelpers\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 
 	/***************
 	****** MUI *****
@@ -44921,12 +44924,12 @@
 	var Avatar = mui.Avatar;
 	var CardTitle = mui.CardTitle;
 
-	var QueryStore = __webpack_require__(364);
+	var QueryStore = __webpack_require__(365);
 	var Actions = __webpack_require__(197);
-	var VenueStore = __webpack_require__(367);
+	var VenueStore = __webpack_require__(368);
 
-	var MapView = React.createClass({
-	  displayName: 'MapView',
+	var overView = React.createClass({
+	  displayName: 'overView',
 
 	  // adds access to the router context. the getCurrentParams method can then be used to get the properties from the route
 	  contextTypes: {
@@ -44954,34 +44957,52 @@
 	  },
 
 	  // this is called after the first render of the component
+	  //
 	  componentDidMount: function componentDidMount() {
-	    VenueStore.addChangeListener(this.updateResults);
-	    this.state.routes = [];
-	    // this.state.routes[0].wayPoints =
-	    this.state.markers = {};
+	    console.log("Overview ----> inside componentDidMount()");
+	    // QueryStore.addChangeListener(this.updateResults)
+
+	    /****** INITIALIZE MAP ******/
 
 	    var _context$router$getCurrentParams = this.context.router.getCurrentParams();
 
 	    var origin = _context$router$getCurrentParams.origin;
 	    var destination = _context$router$getCurrentParams.destination;
 
-	    var start = this.getLatLong(origin);
-	    var end = this.getLatLong(destination);
+	    var start = MapHelpers.getLatLong(origin);
+	    var end = MapHelpers.getLatLong(destination);
+	    var map = MapHelpers.initializeMap(start);
+	    /****** CREATE START/END MARKERS *******/
+	    MapHelpers.initializeMarkers(start, end, map);
 
-	    var map = this.initializeMap(start);
+	    // this.state.routes = [];
+	    // // this.state.routes[0].wayPoints =
+	    // this.state.markers = {};
 	    this.setState({
-	      map: map
+	      map: map,
+	      routes: [], // keep?
+	      markers: {} // keep?
 	    });
 
-	    this.calcRoute(start, end, map);
+	    this.getRoutes(start, end, map);
 
+	    /****** FLUX ******/
+	    VenueStore.addChangeListener(this.updateResults);
+
+	    /****** ZOOM ******/
 	    var bounds = new google.maps.LatLngBounds();
 	    bounds.extend(start);
 	    bounds.extend(end);
 	    map.fitBounds(bounds);
 	  }, //componentDidMount()
+
+	  componentWillUnmount: function componentWillUnmount() {
+	    console.log("overView ----> inside componentWillUnmount()");
+	  },
+
 	  // Going to
 	  shouldComponentUpdate: function shouldComponentUpdate(nextProps, nextState) {
+	    console.log("overView ----> inside shouldComponentUpdate()");
 
 	    //update map if results change (asynchronously when results are coming in from FourSquare)
 	    var results = VenueStore.getVenues();
@@ -44991,26 +45012,66 @@
 
 	    return true;
 	  }, //shouldComponentUpdate()
-	  // turns a lat/long string into a google maps LatLong Object
-	  getLatLong: function getLatLong(location) {
-	    return new google.maps.LatLng(location.split(',')[0], location.split(',')[1]);
-	  },
 
-	  //mapStyles: [{"featureType":"administrative","elementType":"all","stylers":[{"visibility":"on"},{"lightness":33}]},{"featureType":"landscape","elementType":"all","stylers":[{"color":"#f2e5d4"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#c5dac6"}]},{"featureType":"poi.park","elementType":"labels","stylers":[{"visibility":"on"},{"lightness":20}]},{"featureType":"road","elementType":"all","stylers":[{"lightness":20}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#c5c6c6"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#e4d7c6"}]},{"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#fbfaf7"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"on"},{"color":"#acbcc9"}]}],
-	  //mapStyles: [{"featureType":"landscape.natural","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#e0efef"}]},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"hue":"#1900ff"},{"color":"#c0e8e8"}]},{"featureType":"road","elementType":"geometry","stylers":[{"lightness":100},{"visibility":"simplified"}]},{"featureType":"road","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"transit.line","elementType":"geometry","stylers":[{"visibility":"on"},{"lightness":700}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#7dcdcd"}]}],
-	  mapStyles: [{ "featureType": "administrative", "elementType": "labels.text.fill", "stylers": [{ "color": "#6195a0" }] }, { "featureType": "landscape", "elementType": "all", "stylers": [{ "color": "#f2f2f2" }] }, { "featureType": "landscape", "elementType": "geometry.fill", "stylers": [{ "color": "#ffffff" }] }, { "featureType": "poi", "elementType": "all", "stylers": [{ "visibility": "off" }] }, { "featureType": "poi.park", "elementType": "geometry.fill", "stylers": [{ "color": "#e6f3d6" }, { "visibility": "on" }] }, { "featureType": "road", "elementType": "all", "stylers": [{ "saturation": -100 }, { "lightness": 45 }, { "visibility": "simplified" }] }, { "featureType": "road.highway", "elementType": "all", "stylers": [{ "visibility": "simplified" }] }, { "featureType": "road.highway", "elementType": "geometry.fill", "stylers": [{ "color": "#f4d2c5" }, { "visibility": "simplified" }] }, { "featureType": "road.highway", "elementType": "labels.text", "stylers": [{ "color": "#4e4e4e" }] }, { "featureType": "road.arterial", "elementType": "geometry.fill", "stylers": [{ "color": "#f4f4f4" }] }, { "featureType": "road.arterial", "elementType": "labels.text.fill", "stylers": [{ "color": "#787878" }] }, { "featureType": "road.arterial", "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] }, { "featureType": "transit", "elementType": "all", "stylers": [{ "visibility": "off" }] }, { "featureType": "water", "elementType": "all", "stylers": [{ "color": "#eaf6f8" }, { "visibility": "on" }] }, { "featureType": "water", "elementType": "geometry.fill", "stylers": [{ "color": "#eaf6f8" }] }],
-	  //mapStyles: [{"featureType":"administrative.province","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"administrative.locality","elementType":"labels.text","stylers":[{"lightness":"-50"},{"visibility":"simplified"}]},{"featureType":"landscape","elementType":"all","stylers":[{"saturation":-100},{"lightness":65},{"visibility":"on"}]},{"featureType":"landscape","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"saturation":"0"},{"hue":"#ff0000"}]},{"featureType":"landscape","elementType":"labels.icon","stylers":[{"visibility":"simplified"}]},{"featureType":"poi","elementType":"all","stylers":[{"saturation":-100},{"lightness":51},{"visibility":"off"}]},{"featureType":"poi.government","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"poi.medical","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road","elementType":"all","stylers":[{"saturation":"-100"},{"lightness":"0"}]},{"featureType":"road","elementType":"labels.text","stylers":[{"lightness":"0"}]},{"featureType":"road","elementType":"labels.icon","stylers":[{"lightness":"50"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#95969a"}]},{"featureType":"road.highway","elementType":"labels","stylers":[{"lightness":"0"}]},{"featureType":"road.highway","elementType":"labels.icon","stylers":[{"visibility":"on"},{"lightness":"0"}]},{"featureType":"road.highway.controlled_access","elementType":"geometry.fill","stylers":[{"color":"#3c3c31"}]},{"featureType":"road.highway.controlled_access","elementType":"labels","stylers":[{"lightness":"0"}]},{"featureType":"road.highway.controlled_access","elementType":"labels.icon","stylers":[{"lightness":"-10"},{"saturation":"0"}]},{"featureType":"road.local","elementType":"all","stylers":[{"visibility":"on"},{"lightness":"41"},{"saturation":"0"}]},{"featureType":"transit","elementType":"all","stylers":[{"saturation":-100},{"visibility":"simplified"}]},{"featureType":"transit.line","elementType":"geometry.fill","stylers":[{"lightness":"0"}]},{"featureType":"transit.station.bus","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#dce6e6"}]},{"featureType":"water","elementType":"labels","stylers":[{"visibility":"on"},{"lightness":-25},{"saturation":-100}]},{"featureType":"water","elementType":"labels.text","stylers":[{"lightness":"50"}]}],
-	  //mapStyles: [{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"color":"#6195a0"}]},{"featureType":"administrative.province","elementType":"geometry.stroke","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"geometry","stylers":[{"lightness":"0"},{"saturation":"0"},{"color":"#f5f5f2"},{"gamma":"1"}]},{"featureType":"landscape.man_made","elementType":"all","stylers":[{"lightness":"-3"},{"gamma":"1.00"}]},{"featureType":"landscape.natural.terrain","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"poi","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"poi.park","elementType":"geometry.fill","stylers":[{"color":"#bae5ce"},{"visibility":"on"}]},{"featureType":"road","elementType":"all","stylers":[{"saturation":-100},{"lightness":45},{"visibility":"simplified"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#fac9a9"},{"visibility":"simplified"}]},{"featureType":"road.highway","elementType":"labels.text","stylers":[{"color":"#4e4e4e"}]},{"featureType":"road.arterial","elementType":"labels.text.fill","stylers":[{"color":"#787878"}]},{"featureType":"road.arterial","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"transit","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"transit.station.airport","elementType":"labels.icon","stylers":[{"hue":"#0a00ff"},{"saturation":"-77"},{"gamma":"0.57"},{"lightness":"0"}]},{"featureType":"transit.station.rail","elementType":"labels.text.fill","stylers":[{"color":"#43321e"}]},{"featureType":"transit.station.rail","elementType":"labels.icon","stylers":[{"hue":"#ff6c00"},{"lightness":"4"},{"gamma":"0.75"},{"saturation":"-68"}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#eaf6f8"},{"visibility":"on"}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#c7eced"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"lightness":"-49"},{"saturation":"-53"},{"gamma":"0.79"}]}],
+	  // func: use start and end locations to obtain routes from Google Maps Api
+	  getRoutes: function getRoutes(start, end, map) {
+	    var directionsService = new google.maps.DirectionsService();
+	    var component = this;
 
-	  // initializes a map and attaches it to the map div
-	  initializeMap: function initializeMap(center) {
-	    var mapOptions = {
-	      zoom: 10,
-	      center: center,
-	      styles: this.mapStyles
-	    };
-	    return new google.maps.Map(document.getElementById('map'), mapOptions);
-	  },
+	    /****** GET ROUTES *******/
+	    var request = {
+	      origin: start,
+	      destination: end,
+	      travelMode: google.maps.TravelMode.DRIVING,
+	      provideRouteAlternatives: true
+	    }; //request
+
+	    directionsService.route(request, function (response, status) {
+	      if (status == google.maps.DirectionsStatus.OK) {
+	        //.OK indicates the response contains a valid DirectionsResult.
+	        var routes = [];
+	        var colors = component.defaultOptions.routePalette;
+
+	        for (var i = 0, len = response.routes.length; i < len; i++) {
+	          // create a polyline for each suggested route
+	          var polyLine = new google.maps.Polyline({
+	            path: response.routes[i].overview_path,
+	            strokeColor: colors[i],
+	            map: map
+	          });
+
+	          // add properties to each polyline
+	          polyLine.path = response.routes[i].overview_path;
+	          polyLine.color = colors[i];
+	          polyLine.distance = response.routes[i].legs[0].distance.text;
+	          polyLine.distanceMeters = response.routes[i].legs[0].distance.value;
+	          polyLine.duration = response.routes[i].legs[0].duration.text;
+	          polyLine.wayPoints = [];
+	          polyLine.results = [];
+
+	          polyLine.setOptions(component.defaultOptions.polyline);
+	          // save polylines for later use
+	          routes.push(polyLine);
+
+	          // add event listener to update the route on click
+	          polyLine.addListener('click', component.setCurrentRoute.bind(component, i));
+
+	          var wayPoints = component.updateWayPoints(routes[i]); //initialize with first route
+	          Actions.addWaypoints(wayPoints);
+	        } //for(each route)
+
+	        var searchRadius = component.state.searchRadius;
+	        component.setState({
+	          currentRoute: routes[0], // on the initial load make the first suggestion active
+	          routes: routes
+	        });
+
+	        Actions.selectRoute(0);
+	        // Actions.query();
+	      } // if
+	    }); //directionsService.route callback
+	  }, //getRoutes()
+
 	  // Print new markers
 	  updateMapMarkers: function updateMapMarkers(results) {
 	    var map = this.state.map;
@@ -45037,20 +45098,41 @@
 	          content: venue.name + "<br> Rating: " + venue.rating
 	        });
 
+	        var markerIsActive = false;
+
 	        //create event listener to open info window
 	        google.maps.event.addListener(marker, 'mouseover', function () {
-	          infowindow.open(map, this);
+	          if (!markerIsActive) {
+	            infowindow.open(map, this);
+	          }
 	        }); //mouseover
 
 	        // create event listener to close info window
 	        google.maps.event.addListener(marker, 'mouseout', function () {
-	          infowindow.close();
+	          if (!markerIsActive) {
+	            infowindow.close();
+	          }
 	        }); //mouseout
 
 	        // create event listener to close info window
 	        google.maps.event.addListener(marker, 'click', function () {
-	          component.openFourSquare(venue);
+	          if (markerIsActive) {
+	            // deactivate this marker
+	            markerIsActive = false;
+	            infowindow.close();
+	          } else if (!markerIsActive) {
+	            //activate this marker
+	            markerIsActive = true;
+	            if (window.activeInfoWindow) {
+	              window.activeInfoWindow.close(); //close previous
+	            }
+	            window.activeInfoWindow = infowindow; //update current;
+	          } //if
 	        }); //mouseout
+
+	        google.maps.event.addListener(marker, 'dblclick', function () {
+	          component.openFourSquare(venue); //load new page
+	        });
 
 	        //show map marker
 	        marker.setMap(map);
@@ -45102,76 +45184,6 @@
 	    console.log(this.state);
 	    console.log("Fuck this shit");
 	  },
-
-	  // this creates a directions route from the start point to the end point
-	  calcRoute: function calcRoute(start, end, map) {
-	    var directionsService = new google.maps.DirectionsService();
-	    var component = this;
-
-	    // create markers
-	    new google.maps.Marker({
-	      position: start,
-	      map: map,
-	      label: 'A'
-	    });
-	    new google.maps.Marker({
-	      position: end,
-	      map: map,
-	      label: 'B'
-	    });
-
-	    var request = {
-	      origin: start,
-	      destination: end,
-	      travelMode: google.maps.TravelMode.DRIVING,
-	      provideRouteAlternatives: true
-	    }; //request
-
-	    // make a directios request to the maps API
-	    directionsService.route(request, function (response, status) {
-	      if (status == google.maps.DirectionsStatus.OK) {
-	        //.OK indicates the response contains a valid DirectionsResult.
-	        var routes = [];
-	        var colors = component.defaultOptions.routePalette;
-
-	        for (var i = 0, len = response.routes.length; i < len; i++) {
-	          // create a polyline for each suggested route
-	          var polyLine = new google.maps.Polyline({
-	            path: response.routes[i].overview_path,
-	            strokeColor: colors[i],
-	            map: map
-	          });
-
-	          // add properties to each polyline
-	          polyLine.path = response.routes[i].overview_path;
-	          polyLine.color = colors[i];
-	          polyLine.distance = response.routes[i].legs[0].distance.text;
-	          polyLine.distanceMeters = response.routes[i].legs[0].distance.value;
-	          polyLine.duration = response.routes[i].legs[0].duration.text;
-	          polyLine.wayPoints = [];
-	          polyLine.results = [];
-
-	          polyLine.setOptions(component.defaultOptions.polyline);
-	          // save polylines for later use
-	          routes.push(polyLine);
-
-	          // add event listener to update the route on click
-	          polyLine.addListener('click', component.setCurrentRoute.bind(component, i));
-
-	          var wayPoints = component.updateWayPoints(routes[i]); //initialize with first route
-	          Actions.addWaypoints(wayPoints);
-	        } //for(each route)
-
-	        var searchRadius = component.state.searchRadius;
-	        component.setState({
-	          currentRoute: routes[0], // on the initial load make the first suggestion active
-	          routes: routes
-	        });
-	        Actions.selectRoute(0);
-	        // Actions.query();
-	      } // if
-	    }); //directionsService.route callback
-	  }, //calcRoutes()
 
 	  // updates wayPoints if available, create wayPoints if not
 	  updateWayPoints: function updateWayPoints(newRoute) {
@@ -45362,13 +45374,13 @@
 	          React.createElement(
 	            'div',
 	            { className: 'row map-container' },
-	            React.createElement('div', { id: 'map' })
+	            React.createElement(MapView, { id: 'map' })
 	          ),
 	          ' ',
 	          React.createElement(
 	            'div',
 	            { className: 'row route-container' },
-	            React.createElement(RouteDetailView, {
+	            React.createElement(MapRoutingView, {
 	              routes: this.state.routes,
 	              setCurrentRoute: this.setCurrentRoute
 	            }),
@@ -45383,11 +45395,56 @@
 	  }
 	});
 
-	module.exports = MapView;
-	/* ToolView */ /* ListView*/ /* list-container */ /* col-sm-4 */ /* row */ /* RouteDetailView */ /* row */ /* col-sm-8 */ /* row */
+	module.exports = overView;
+	/* ToolView */ /* ListView*/ /* list-container */ /* col-sm-4 */ /* row */ /* MapRoutingView */ /* row */ /* col-sm-8 */ /* row */
 
 /***/ },
 /* 361 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(1);
+
+	var MapView = React.createClass({
+	  displayName: "MapView",
+
+	  propTypes: {},
+
+	  defaultOptions: {},
+	  componentDidMount: function componentDidMount() {
+	    console.log("MapView ---> inside componentDidMount");
+	    // QueryStore.addChangeListener(this._onChange)
+	  },
+
+	  componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
+	    console.log("MapView ---> inside componentDidUpdate");
+	  },
+
+	  //Gets the previous number of waypoints and the new number to be querried
+	  _onChange: function _onChange() {},
+
+	  render: function render() {
+	    // var component = this;
+
+	    // var listDetails = VenueStore.getVenues().map(function(venue, index) {
+	    //   return (
+	    //     <VenueView venue={venue}/>
+	    //   )
+	    // });
+
+	    return React.createElement(
+	      "div",
+	      { id: "map" },
+	      "  "
+	    );
+	  }
+	});
+
+	module.exports = MapView;
+
+/***/ },
+/* 362 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -45463,7 +45520,7 @@
 	module.exports = RouteDetailView;
 
 /***/ },
-/* 362 */
+/* 363 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -45473,10 +45530,11 @@
 	'use strict';
 
 	var React = __webpack_require__(1);
-	var VenueView = __webpack_require__(363);
+	var VenueView = __webpack_require__(364);
+
 	var Actions = __webpack_require__(197);
-	var Store = __webpack_require__(364);
-	var VenueStore = __webpack_require__(367);
+	var QueryStore = __webpack_require__(365);
+	var VenueStore = __webpack_require__(368);
 
 	var ListView = React.createClass({
 	  displayName: 'ListView',
@@ -45497,14 +45555,17 @@
 	    distance_url: "&sortByDistance=0"
 	  },
 	  componentDidMount: function componentDidMount() {
-	    Store.addChangeListener(this._onChange);
+	    console.log("listView -----> componentDidMount()");
+
+	    QueryStore.addChangeListener(this._onChange);
 	  },
 
 	  componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
-	    // if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length && Store.prevWaypoints()==21) {
+	    // if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length && QueryStore.prevWaypoints()==21) {
 	    //   this.queryFourSquare(1, 21);
 	    // }
 	  },
+
 	  //Gets the previous number of waypoints and the new number to be querried
 	  _onChange: function _onChange() {
 	    var waypoints = Store.getWaypoints();
@@ -45527,7 +45588,6 @@
 
 	      //These two properties ensure that the data is only displayed once all of the requests have returned
 	      //It is important for the speed of the app and ensuring that everything works
-	      console.log(wayPoints);
 	      var sortingPoint = wayPoints.length % 20 - 1;
 	      var count = 1;
 
@@ -45543,6 +45603,7 @@
 	        url: fourSquare_url + ll + category_url + radius_url + limit_url + photos_url + distance_url,
 	        method: "GET",
 	        success: (function (data) {
+	          console.log("listView ----> inside queryFourSquare() Success");
 	          count++;
 	          var newResults = {};
 	          var newResultsArray = [];
@@ -45602,7 +45663,7 @@
 	module.exports = ListView;
 
 /***/ },
-/* 363 */
+/* 364 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -45764,15 +45825,15 @@
 	module.exports = VenueView;
 
 /***/ },
-/* 364 */
+/* 365 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var AppDispatcher = __webpack_require__(198);
-	var EventEmitter = __webpack_require__(365).EventEmitter;
+	var EventEmitter = __webpack_require__(366).EventEmitter;
 	var Constants = __webpack_require__(202);
-	var assign = __webpack_require__(366);
+	var assign = __webpack_require__(367);
 
 	var CHANGE_EVENT = 'change';
 
@@ -45796,6 +45857,7 @@
 	  getWaypoints: function getWaypoints() {
 	    var temp = routeData[currentRoute].waypoints.slice(routeData[currentRoute].index, 20);
 	    routeData[currentRoute].index += 20;
+	    console.log(temp, routeData[currentRoute].index);
 	    return temp;
 	  },
 
@@ -45842,7 +45904,7 @@
 	module.exports = Store;
 
 /***/ },
-/* 365 */
+/* 366 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -46149,7 +46211,7 @@
 
 
 /***/ },
-/* 366 */
+/* 367 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -46192,15 +46254,15 @@
 
 
 /***/ },
-/* 367 */
+/* 368 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var AppDispatcher = __webpack_require__(198);
-	var EventEmitter = __webpack_require__(365).EventEmitter;
+	var EventEmitter = __webpack_require__(366).EventEmitter;
 	var Constants = __webpack_require__(202);
-	var assign = __webpack_require__(366);
+	var assign = __webpack_require__(367);
 
 	var CHANGE_EVENT = 'change';
 	var routeData = [[], [], []];
@@ -46344,42 +46406,6 @@
 	module.exports = Store;
 
 /***/ },
-/* 368 */
-/***/ function(module, exports) {
-
-	// helper function for getDistanceBetweenPoints
-	"use strict";
-
-	var deg2rad = function deg2rad(deg) {
-	  return deg * (Math.PI / 180);
-	};
-
-	// calculates the distance in km between two points based on their Latitude and Longitude
-	var getDistanceBetweenPoints = function getDistanceBetweenPoints(point1, point2) {
-	  // great-circle distance calculation; code from Stack Overflow
-	  var lat1 = point1.G;
-	  var lon1 = point1.K;
-	  var lat2 = point2.G;
-	  var lon2 = point2.K;
-	  var R = 6371; // Radius of the earth in km
-	  var dLat = deg2rad(lat2 - lat1); // deg2rad below
-	  var dLon = deg2rad(lon2 - lon1);
-	  var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-	  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-	  var d = R * c; // Distance in km
-	  return d;
-	};
-
-	var getMiddlePoint = function getMiddlePoint(a, b) {
-	  return new google.maps.LatLng((a.G + b.G) / 2, (a.K + b.K) / 2);
-	};
-
-	module.exports = {
-	  getDistanceBetweenPoints: getDistanceBetweenPoints,
-	  getMiddlePoint: getMiddlePoint
-	};
-
-/***/ },
 /* 369 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -46434,42 +46460,10 @@
 	      React.createElement(
 	        'ul',
 	        { className: 'dropdown-menu', 'aria-labelledby': 'dropdownMenu1' },
-	        React.createElement(
-	          'li',
-	          null,
-	          React.createElement(
-	            'a',
-	            { href: '#' },
-	            'Action'
-	          )
-	        ),
-	        React.createElement(
-	          'li',
-	          null,
-	          React.createElement(
-	            'a',
-	            { href: '#' },
-	            'Another action'
-	          )
-	        ),
-	        React.createElement(
-	          'li',
-	          null,
-	          React.createElement(
-	            'a',
-	            { href: '#' },
-	            'Something else here'
-	          )
-	        ),
-	        React.createElement(
-	          'li',
-	          null,
-	          React.createElement(
-	            'a',
-	            { href: '#' },
-	            'Separated link'
-	          )
-	        )
+	        React.createElement('li', null),
+	        React.createElement('li', null),
+	        React.createElement('li', null),
+	        React.createElement('li', null)
 	      )
 	    );
 	  } //render()

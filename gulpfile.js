@@ -27,7 +27,8 @@ gulp.task('compress', function() {
 gulp.task('watch', function() {
   livereload.listen();
 
-  gulp.watch('client/src/*.js', ['build'])
+  gulp.watch('client/src/**/*.js', ['build'])
+  // gulp.watch('client/src/**/*.js', ['build', 'compress'])
 });
 
 // Starts the node server to serve static assets
