@@ -44,7 +44,16 @@ var overView = React.createClass({
       strokeWeight: 6
     },
     radius: 5, // radius used to generate wayPoints, in km.
-    routePalette: ['blue', 'black', 'green', 'pink'], 
+    routePalette: ['blue', 'black', 'green', 'pink'],
+
+    _fourSquare: {
+      fourSquare_url: "https://api.foursquare.com/v2/venues/explore?client_id=ELLZUH013LMEXWRWGBOSNBTXE3NV02IUUO3ZFPVFFSZYLA30&client_secret=U2EQ1N1J4EAG4XH4QO4HCZTGM3FCWDLXU2WJ0OPTD2Q3YUKF&v=20150902",
+      foodCategory_url: "&categoryId=4d4b7105d754a06374d81259",
+      limit_url: "&limit=10",
+      photos_url: "&venuePhotos=1",
+      category_url: "&section=food",
+      distance_url: "&sortByDistance=0"  
+    }
   },
 
   // this is called after the first render of the component
@@ -152,6 +161,7 @@ var overView = React.createClass({
   }, //getRoutes()
 
 
+
   // Event: switch the route and update the active venues
   changeCurrentRoute (newRoute) {
     // console.log("overView ------> changeCurrentRoute() newRoute=", newRoute);
@@ -161,7 +171,66 @@ var overView = React.createClass({
     newRoute.setOptions({zIndex: 2, strokeOpacity: 1}); //show currentRoute
 
     Actions.selectRoute(newRoute.index);
+
+    /******** QUERY FOR VENUES *********/
+    if(Object.keys(newRoute.allVenues).length===0){
+      this.getFourSquare(newRoute.wayPoints, function(data){
+      var point = this; // waypoint used for query, bound to this for for callback
+        
+      var venue_wrappers = data.response.groups[0].items; //extract venues array from data
+      
+      Actions.addVenues(venue_wrappers, point);
+
+      }); //getFourSquare
+    } //if
+
+
   }, // changeCurrentRoute()
+
+
+  // SETUP PHASE (STEP 3): Obtain waypoints for each route
+  // NOTE: asyncronous function
+  //queries fourSquare api to get new results.
+  //save results to the current route and updates the parent (mapView)
+  //re-render results onto the page by updating state variable.
+  getFourSquare (wayPoints, success) {
+
+    console.log("$$$$$$$$$$ insdie getFourSquare()");
+    // var index = currentRoute.queryIndex;
+    // if(index<wayPoints.length){
+      
+    // }
+    // var max = index+2; 
+    // var results = {}; //test against duplicates
+    // var component = this;
+    // if(max>wayPoints.length){
+
+    // }
+    
+    // for(var i=index; i<max; i++){
+    for(var i=0; i<wayPoints.length; i++){
+      var point = wayPoints[i]; 
+      var ll = "&ll=" + point.G+"," + point.K;
+      var radius_url = "&radius=" + this.state.currentRoute.searchRadius * 1000;
+
+      //These two properties ensure that the data is only displayed once all of the requests have returned
+      //It is important for the speed of the app and ensuring that everything works
+      // var sortingPoint = wayPoints.length%20-1;
+      // var count = 1;
+
+      var {fourSquare_url, foodCategory_url, category_url, limit_url, photos_url, distance_url} = this.defaultOptions._fourSquare;
+
+      $.ajax({
+        url: fourSquare_url + ll + category_url + radius_url + limit_url + photos_url + distance_url,
+        method: "GET",
+        success: success.bind(point), //success()
+        error: function(error){
+          console.log("TEST -------> fourSquare error, error=", error);
+        }
+      }); //ajax()
+
+    }; //for()
+  }, // getFourSquare()
 
   // loadMore () { //still in beta
   //   this.getFourSquare(newRoute.wayPoints, function(data){
