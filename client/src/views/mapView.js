@@ -1,3 +1,5 @@
+/*** MapView ***/
+//NOTE: Mapview only renders the DOM once. From then on, it only renders inside the google map via api controls
 var React = require('react');
 
 var MapView = React.createClass({
@@ -12,7 +14,7 @@ var MapView = React.createClass({
 
   getInitialState () {
     return {
-      markers: []
+      displayedMarkers: []
     }
   }, //getInitialState()
   componentDidMount () {
@@ -24,31 +26,71 @@ var MapView = React.createClass({
 
   componentDidUpdate(prevProps, prevState) {
     // console.log("MapView ---> inside componentDidUpdate ");
-    
-    this.clearMapMarkers();
-    this.updateMapMarkers();
+    // if(prevProps.currentRoute)
+    // this.clearMapMarkers();
+    // this.updateMapMarkers();
+  },
+
+  shouldComponentUpdate(prevProps, prevState) {
+    var prevRoute = this.props.currentRoute;
+    var newRoute = prevProps.currentRoute;
+    if(prevRoute && newRoute){
+
+      // console.log("************** prevProps = ", prevProps);
+      // console.log("************** currentRoute = ", this.props.currentRoute);
+      // if(prevProps.currentRoute.index !== this.props.currentRoute.index){
+      // }
+      if(prevRoute.index !== newRoute.index){
+        console.log("************** New Route has been set");
+        this.clearMapMarkers();
+      }
+    }else{ // currentRoute has changed
+      this.clearMapMarkers();
+    } //
+
+    this.updateMapMarkers(newRoute.filteredVenues);
+
+    return false;
   },
 
   //Gets the previous number of waypoints and the new number to be querried
   _onChange () {
     // this.clearMapMarkers(); 
-    // this.updateMapMarkers(); //results
+    // this.updateMapMarkers(); //newVenuesArr
   },
 
 
-  // Print new markers
-  updateMapMarkers: function(){
-    // set to new prop
-    var results = this.props.currentRoute.filteredVenues;
+  // Print new markers ()
+  updateMapMarkers: function(newVenuesArr){
+    // we are going to check markers array has already been printed
+    // var newVenuesArr = this.props.currentRoute.filteredVenues;
 
     var map = window.map;
-    var markers = this.state.markers; //array of
+    var displayedMarkers = this.state.displayedMarkers; //array of
     var component = this;
-    results.forEach(function(venue, index){
+
+    /**** remove unnecessary displayedMarkers ****/
+    for(var venue_id in displayedMarkers){
+      var marker = displayedMarkers[venue_id];
+
+      var found = newVenuesArr.filter(function(venue){
+        return venue_id === venue.id;
+      });
+
+      if(found.length===0){ //not found
+        marker.setMap(null);
+        delete displayedMarkers[venue_id]; //delete marker from displayed markers
+      } //if
+
+    };
+
+    /**** print un ****/
+    newVenuesArr.forEach(function(venue, index){
+
       var {lng, lat} = venue.location;
 
       //create new marker only if marker has not been displayed
-      if(!markers[venue.id]){ //
+      if(!displayedMarkers[venue.id]){ //
         var position = new google.maps.LatLng(lat, lng);
 
         var marker = new google.maps.Marker({
@@ -101,8 +143,8 @@ var MapView = React.createClass({
         //show map marker
         marker.setMap(map);
         // add current marker to state
-        component.state.markers[venue.id] = marker;
-        // component.state.markers.push(marker);
+        component.state.displayedMarkers[venue.id] = marker;
+        // component.state.displayedMarkers.push(marker);
       } //if(marker)
 
       //display markers
@@ -111,28 +153,14 @@ var MapView = React.createClass({
 
   // clear map markers
   clearMapMarkers (){
-
     var markers = this.state.markers;
-    var results = this.props.currentRoute.filteredVenues;
-    var toKeep = {};  
-
-    var size = 0; 
-    for(var i in results) {
-      var venueId = results[i].id
-      if(markers[venueId]) {
-        size++;
-        toKeep[venueId] = true;
-      }
-    }
-
+    
     for(var key in markers){
-      if(!toKeep[key]){
-        var marker = markers[key];
-        marker.setMap(null);
-        delete this.state.markers[key];
-      }
-    }
-   
+      var marker = markers[key];
+      marker.setMap(null);
+    } //for
+
+    this.state.markers = {};
   }, //clearMapMarkers
 
 
