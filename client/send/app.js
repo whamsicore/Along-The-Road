@@ -23798,59 +23798,81 @@
 
 	var Actions = {
 
+	  // What does this do?
+	  initRoutes: function initRoutes(newRoutes) {
+	    //get all routes and save to RouteStore
+	    AppDispatcher.dispatch({
+	      actionType: Constants.INIT_ROUTES,
+	      newRoutes: newRoutes
+	    });
+	  },
+
+	  /********* LEGACY ********/
+
 	  query: function query() {
+	    console.log("Actions ----> Query");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.QUERY_WAYPOINTS
 	    });
 	  },
 
-	  addVenues: function addVenues(results) {
+	  addVenues: function addVenues(results, point) {
+	    console.log("Actions ----> addVenues");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.ADD_VENUES,
-	      results: results
+	      results: results,
+	      point: point
 	    });
 	  },
 
 	  sortVenues: function sortVenues() {
+	    console.log("Actions ----> sortVenues");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.SORT_VENUES
 	    });
 	  },
 
 	  priceFilter: function priceFilter(tier) {
+	    console.log("Actions ----> priceFilter");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.PRICE_FILTER,
 	      tier: tier
 	    });
 	  },
 	  ratingFilter: function ratingFilter(minRating) {
+	    console.log("Actions ----> ratingFilter");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.RATING_FILTER,
 	      minRating: minRating
 	    });
 	  },
 	  clearData: function clearData() {
+	    console.log("Actions ----> clearData");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.CLEAR_DATA
 	    });
 	  },
 	  openNowFilter: function openNowFilter() {
+	    console.log("Actions ----> openNowFilter");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.OPEN_NOW_FILTER
 	    });
 	  },
 	  clearFilter: function clearFilter() {
+	    console.log("Actions ----> clearFilter");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.CLEAR_FILTER
 	    });
 	  },
 	  selectRoute: function selectRoute(index) {
+	    console.log("Actions ----> selectRoute");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.SELECT_ROUTE,
 	      index: index
 	    });
 	  },
 	  addWaypoints: function addWaypoints(wayPoints) {
+	    console.log("Actions ----> addWaypoints");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.ADD_WAYPOINTS,
 	      wayPoints: wayPoints
@@ -24198,7 +24220,9 @@
 			OPEN_NOW_FILTER: null,
 			CLEAR_FILTER: null,
 			SELECT_ROUTE: null,
-			ADD_WAYPOINTS: null
+			ADD_WAYPOINTS: null,
+			// NEW FUNCTIONS
+			UPDATE_ROUTES: null
 
 	});
 
@@ -44898,18 +44922,18 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
-	This component is the map view. It shows the user the possible routes he/she can take to arrive at the destination
+	This component is the overView. It shows the user the possible routes he/she can take to arrive at the destination
 	*/
 
 	'use strict';
 
 	var React = __webpack_require__(1);
 	var MapView = __webpack_require__(361);
-	var MapRoutingView = __webpack_require__(362);
+	var RouteDetailView = __webpack_require__(362);
 	var ListView = __webpack_require__(363);
-	var ToolView = __webpack_require__(369);
+	var ToolView = __webpack_require__(365);
 
-	var MapHelpers = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../helpers/mapHelpers\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	var MapHelpers = __webpack_require__(366);
 
 	/***************
 	****** MUI *****
@@ -44924,9 +44948,10 @@
 	var Avatar = mui.Avatar;
 	var CardTitle = mui.CardTitle;
 
-	var QueryStore = __webpack_require__(365);
+	// var QueryStore = require('../stores/QueryStore');
+
 	var Actions = __webpack_require__(197);
-	var VenueStore = __webpack_require__(368);
+	var RouteStore = __webpack_require__(367);
 
 	var overView = React.createClass({
 	  displayName: 'overView',
@@ -44939,15 +44964,14 @@
 	  getInitialState: function getInitialState() {
 	    return {
 	      routes: [],
-	      markers: {},
-	      currentRoute: { wayPoints: [], results: [] }, //default values for currentRoute
-	      searchRadius: this.defaultOptions.radius
-	    };
+	      currentRoute: null };
 	  },
 
+	  // current route in the form of a polyline object
+	  // searchRadius: this.defaultOptions.radius
 	  //default options to be used for this view, inclusind route options and radius of search
 	  defaultOptions: {
-	    polyline: { //configuration for polylines (inactive ones)
+	    polyline: { //configuration for inactive polylines
 	      zIndex: 1,
 	      strokeOpacity: 0.4,
 	      strokeWeight: 6
@@ -44957,7 +44981,6 @@
 	  },
 
 	  // this is called after the first render of the component
-	  //
 	  componentDidMount: function componentDidMount() {
 	    console.log("Overview ----> inside componentDidMount()");
 	    // QueryStore.addChangeListener(this.updateResults)
@@ -44972,48 +44995,36 @@
 	    var start = MapHelpers.getLatLong(origin);
 	    var end = MapHelpers.getLatLong(destination);
 	    var map = MapHelpers.initializeMap(start);
+	    window.map = map;
+
 	    /****** CREATE START/END MARKERS *******/
 	    MapHelpers.initializeMarkers(start, end, map);
-
-	    // this.state.routes = [];
-	    // // this.state.routes[0].wayPoints =
-	    // this.state.markers = {};
-	    this.setState({
-	      map: map,
-	      routes: [], // keep?
-	      markers: {} // keep?
-	    });
-
-	    this.getRoutes(start, end, map);
-
-	    /****** FLUX ******/
-	    VenueStore.addChangeListener(this.updateResults);
 
 	    /****** ZOOM ******/
 	    var bounds = new google.maps.LatLngBounds();
 	    bounds.extend(start);
 	    bounds.extend(end);
 	    map.fitBounds(bounds);
+
+	    /****** FLUX:  ******/
+	    RouteStore.addChangeListener((function () {
+	      var routes = RouteStore.getRoutes();
+	      var currentRoute = RouteStore.getCurrentRoute();
+	      // console.log("$$$$$$$$$$$ RouteStore returned. currentRoute = ", currentRoute);
+
+	      //The only place we are going to set state
+	      this.setState({
+	        routes: routes,
+	        currentRoute: currentRoute
+	      });
+	    }).bind(this)); //update routes
+
+	    /****** BEGIN APP INITIALIZATION *****/
+	    this.getRoutes(start, end, map);
 	  }, //componentDidMount()
 
-	  componentWillUnmount: function componentWillUnmount() {
-	    console.log("overView ----> inside componentWillUnmount()");
-	  },
-
-	  // Going to
-	  shouldComponentUpdate: function shouldComponentUpdate(nextProps, nextState) {
-	    console.log("overView ----> inside shouldComponentUpdate()");
-
-	    //update map if results change (asynchronously when results are coming in from FourSquare)
-	    var results = VenueStore.getVenues();
-	    if (results) {
-	      this.updateMapMarkers(results);
-	    } //if
-
-	    return true;
-	  }, //shouldComponentUpdate()
-
-	  // func: use start and end locations to obtain routes from Google Maps Api
+	  // SETUP PHASE STEP 1: Obtain routes from Google Maps Api
+	  // NOTE: asyncronous function
 	  getRoutes: function getRoutes(start, end, map) {
 	    var directionsService = new google.maps.DirectionsService();
 	    var component = this;
@@ -45026,64 +45037,193 @@
 	      provideRouteAlternatives: true
 	    }; //request
 
+	    // func: Asynchronously gets routes from google
 	    directionsService.route(request, function (response, status) {
 	      if (status == google.maps.DirectionsStatus.OK) {
 	        //.OK indicates the response contains a valid DirectionsResult.
-	        var routes = [];
+	        var newRoutes = []; //empty array for storing route polylines
 	        var colors = component.defaultOptions.routePalette;
 
-	        for (var i = 0, len = response.routes.length; i < len; i++) {
-	          // create a polyline for each suggested route
-	          var polyLine = new google.maps.Polyline({
-	            path: response.routes[i].overview_path,
+	        response.routes.forEach(function (googleRoute, i) {
+
+	          // create a polyline for each suggested googleRoute
+	          var newRoute = new google.maps.Polyline({
+	            path: googleRoute.overview_path,
 	            strokeColor: colors[i],
 	            map: map
 	          });
 
-	          // add properties to each polyline
-	          polyLine.path = response.routes[i].overview_path;
-	          polyLine.color = colors[i];
-	          polyLine.distance = response.routes[i].legs[0].distance.text;
-	          polyLine.distanceMeters = response.routes[i].legs[0].distance.value;
-	          polyLine.duration = response.routes[i].legs[0].duration.text;
-	          polyLine.wayPoints = [];
-	          polyLine.results = [];
+	          newRoute.setOptions(component.defaultOptions.polyline);
 
-	          polyLine.setOptions(component.defaultOptions.polyline);
-	          // save polylines for later use
-	          routes.push(polyLine);
+	          newRoute.path = googleRoute.overview_path; //saved for future use
+	          newRoute.color = colors[i];
+	          newRoute.distance = googleRoute.legs[0].distance.text;
+	          newRoute.distanceMeters = googleRoute.legs[0].distance.value;
+	          newRoute.duration = googleRoute.legs[0].duration.text;
 
-	          // add event listener to update the route on click
-	          polyLine.addListener('click', component.setCurrentRoute.bind(component, i));
+	          // derived properties
+	          newRoute.index = i; //tracks position in routes array
+	          newRoute.allVenues = {}; //all venues found
+	          newRoute.filteredVenues = []; //processed (filtered OR sorted) venues to be displayed
+	          newRoute.queryIndex = 1; //where we begin with queries, defaults to 0
+	          newRoute.queryComplete = false; //whether all waypoints have been queried. Defaults to false
+	          var radius = MapHelpers.getSearchRadius(newRoute);
+	          newRoute.searchRadius = radius;
+	          newRoute.wayPoints = MapHelpers.getWayPoints(newRoute, radius); //syncronously get waypoints for select googleRoute
+	          newRoute.addListener('click', component.changeCurrentRoute.bind(component, newRoute));
 
-	          var wayPoints = component.updateWayPoints(routes[i]); //initialize with first route
-	          Actions.addWaypoints(wayPoints);
-	        } //for(each route)
+	          newRoutes.push(newRoute); // save routes in array
+	        }); //for(routes)
 
-	        var searchRadius = component.state.searchRadius;
-	        component.setState({
-	          currentRoute: routes[0], // on the initial load make the first suggestion active
-	          routes: routes
-	        });
+	        Actions.initRoutes(newRoutes);
 
-	        Actions.selectRoute(0);
-	        // Actions.query();
-	      } // if
+	        component.changeCurrentRoute(RouteStore.getCurrentRoute()); //load the first route
+	      } // if(success)
 	    }); //directionsService.route callback
 	  }, //getRoutes()
 
+	  // Event: switch the route and update the active venues
+	  changeCurrentRoute: function changeCurrentRoute(newRoute) {
+	    // console.log("overView ------> changeCurrentRoute() newRoute=", newRoute);
+
+	    /******** UPDATE POLYLINES *********/
+	    this.state.currentRoute.setOptions(this.defaultOptions.polyline); //hide old route
+	    newRoute.setOptions({ zIndex: 2, strokeOpacity: 1 }); //show currentRoute
+
+	    Actions.selectRoute(newRoute.index);
+	  }, // changeCurrentRoute()
+
+	  // loadMore () { //still in beta
+	  //   this.getFourSquare(newRoute.wayPoints, function(data){
+	  //     var point = this; // waypoint used for query, bound to this for for callback
+
+	  //     var venue_wrappers = data.response.groups[0].items; //extract venues array from data
+	  //     Actions.addVenues(venue_wrappers, point);
+
+	  //     // if(count >= sortingPoint){
+	  //     //   Actions.sortVenues();
+	  //     // } //if
+
+	  //   }); // getFourSquare(callback)
+	  // }, // loadMore()
+
+	  render: function render() {
+	    var that = this;
+	    return React.createElement(
+	      'div',
+	      { className: 'container-fluid', style: { 'height': '100%' } },
+	      React.createElement(
+	        'div',
+	        { className: 'row', style: { 'height': '100%', 'width': '100%' } },
+	        React.createElement(
+	          'div',
+	          { className: 'col-sm-5 left-container' },
+	          React.createElement(
+	            'div',
+	            { className: 'tool-bar-container' },
+	            React.createElement(ToolView, null),
+	            ' '
+	          ),
+	          React.createElement(
+	            'div',
+	            { className: 'list-container' },
+	            React.createElement(ListView,
+	            // currentRoute={this.state.currentRoute}
+	            { currentRoute: this.state.currentRoute
+	            }),
+	            ' '
+	          ),
+	          ' '
+	        ),
+	        ' ',
+	        React.createElement(
+	          'div',
+	          { className: 'col-sm-7 right-container' },
+	          React.createElement(
+	            'div',
+	            { className: 'row map-container' },
+	            React.createElement(MapView, {
+	              currentRoute: this.state.currentRoute,
+	              id: 'map'
+	            }),
+	            ' '
+	          ),
+	          ' ',
+	          React.createElement(
+	            'div',
+	            { className: 'row route-container' },
+	            React.createElement(RouteDetailView, {
+	              routes: this.state.routes,
+	              changeCurrentRoute: this.changeCurrentRoute
+	            }),
+	            ' '
+	          ),
+	          ' '
+	        ),
+	        ' '
+	      ),
+	      ' '
+	    );
+	  }
+	});
+
+	module.exports = overView;
+	/* ToolView */ /* ListView*/ /* list-container */ /* col-sm-4 */ /* MapView */ /* row */ /* RouteDetailView */ /* row */ /* col-sm-8 */ /* row */
+
+/***/ },
+/* 361 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var React = __webpack_require__(1);
+
+	var MapView = React.createClass({
+	  displayName: 'MapView',
+
+	  propTypes: {},
+
+	  defaultOptions: {},
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      markers: []
+	    };
+	  }, //getInitialState()
+	  componentDidMount: function componentDidMount() {
+	    // console.log("MapView ---> inside componentDidMount");
+
+	    // QueryStore.addChangeListener(this._onChange)
+
+	  },
+
+	  componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
+	    // console.log("MapView ---> inside componentDidUpdate ");
+
+	    this.clearMapMarkers();
+	    this.updateMapMarkers();
+	  },
+
+	  //Gets the previous number of waypoints and the new number to be querried
+	  _onChange: function _onChange() {
+	    // this.clearMapMarkers();
+	    // this.updateMapMarkers(); //results
+	  },
+
 	  // Print new markers
-	  updateMapMarkers: function updateMapMarkers(results) {
-	    var map = this.state.map;
+	  updateMapMarkers: function updateMapMarkers() {
+	    // set to new prop
+	    var results = this.props.currentRoute.filteredVenues;
+
+	    var map = window.map;
 	    var markers = this.state.markers; //array of
 	    var component = this;
-
 	    results.forEach(function (venue, index) {
 	      var _venue$location = venue.location;
 	      var lng = _venue$location.lng;
 	      var lat = _venue$location.lat;
 
-	      //create new marker
+	      //create new marker only if marker has not been displayed
 	      if (!markers[venue.id]) {
 	        //
 	        var position = new google.maps.LatLng(lat, lng);
@@ -45139,290 +45279,33 @@
 	        // add current marker to state
 	        component.state.markers[venue.id] = marker;
 	        // component.state.markers.push(marker);
-	      } //if
+	      } //if(marker)
 
 	      //display markers
 	    }); //forEach
 	  }, //updateMapMarkers()
 
 	  // clear map markers
-	  clearMapMarkers: function clearMapMarkers(markers) {
-	    this.state.markers = {};
+	  clearMapMarkers: function clearMapMarkers() {
+	    var markers = this.state.markers;
+	    var results = this.props.currentRoute.filteredVenues;
+	    var toKeep = {};
 
-	    for (var key in markers) {
-	      var marker = markers[key];
-	      marker.setMap(null);
-	    } //for
-	  }, //clearMapMarkers
-
-	  // set the current selected route
-	  setCurrentRoute: function setCurrentRoute(index) {
-	    Actions.selectRoute(index);
-	    var newRoute = this.state.routes[index];
-	    var venues = VenueStore.getVenues();
-	    // clear previously active route
-	    if (this.state.currentRoute) {
-	      this.state.currentRoute.setOptions(this.defaultOptions.polyline);
-	    } //if
-
-	    //clear previously displayed map markers
-	    this.clearMapMarkers(this.state.markers);
-
-	    this.setState({
-	      currentRoute: newRoute
-	    });
-	    this.updateResults();
-	    // Actions.query();
-	  },
-
-	  componentWillUnmount: function componentWillUnmount() {
-
-	    this.state.routes = [];
-	    this.state.markers = {};
-	    this.state.currentRoute = { wayPoints: [], results: [] };
-	    Actions.clearData();
-	    console.log(this.state);
-	    console.log("Fuck this shit");
-	  },
-
-	  // updates wayPoints if available, create wayPoints if not
-	  updateWayPoints: function updateWayPoints(newRoute) {
-	    //lazy-load currentRoute wayPoints, and save it to currentRoute object when complete
-	    var wayPoints = newRoute.wayPoints.length > 1 ? newRoute.wayPoints : this.createWayPoints(newRoute); //only create new wayPoints if hasn't been done before
-	    //this.displayWayPoints(newRoute.wayPoints);
-
-	    return wayPoints;
-	  }, // updateWayPoints()
-
-	  // creates wayPoints for new route. Only executes once per route, and becomes saved.
-	  createWayPoints: function createWayPoints(newRoute) {
-
-	    var radius = this.defaultOptions.radius; //default radius
-	    var minRadiusToDistanceFactor = 5;
-
-	    var distance = newRoute.distanceMeters / 1000;
-	    if (distance < minRadiusToDistanceFactor * radius) {
-	      radius = distance / minRadiusToDistanceFactor;
-	      this.state.searchRadius = radius; // do not set off re-render here
+	    for (var i in results) {
+	      if (markers[results[i].id]) {
+	        toKeep[results[i].id] = true;
+	      }
 	    }
 
-	    var path = newRoute.path; // get path from target route
-	    var map = this.state.map; // note: map is a state of this view
-
-	    var wayPoints = [];
-	    var lastWayPoint;
-
-	    path.forEach(function (point, index) {
-	      // calculate cumulative distance from start, in meters
-	      if (index === 0) {
-	        point.distance = 0;
-	      } else {
-	        var prevPoint = path[index - 1];
-	        point.distance = prevPoint.distance + MapHelpers.getDistanceBetweenPoints(prevPoint, point) * 1000;
+	    for (var key in markers) {
+	      if (!toKeep[key]) {
+	        var marker = markers[key];
+	        marker.setMap(null);
 	      }
+	    }
 
-	      // add first point
-	      if (!lastWayPoint) {
-	        wayPoints.push(point);
-	        lastWayPoint = point;
-	      }
-	      // add an inbetween point if the distance is too big
-	      if (MapHelpers.getDistanceBetweenPoints(lastWayPoint, point) > 1.5 * radius) {
-	        var middlePoint = MapHelpers.getMiddlePoint(lastWayPoint, point);
-	        middlePoint.distance = prevPoint.distance + MapHelpers.getDistanceBetweenPoints(prevPoint, middlePoint) * 1000;
-	        wayPoints.push(middlePoint);
-	      }
-
-	      // add new point if the distance is larger than the radius
-	      if (MapHelpers.getDistanceBetweenPoints(lastWayPoint, point) > radius) {
-	        wayPoints.push(point);
-	        lastWayPoint = point;
-	      }
-	    });
-
-	    newRoute.wayPoints = wayPoints; //save to the currentRoute object
-	    return wayPoints;
-	  }, //createWayPoints()
-
-	  // prop for ListView. Allows it to add results to the currentRoute
-	  updateResults: function updateResults() {
-	    console.log('updateResults');
-	    this.state.currentRoute.results = VenueStore.getVenues();
-	    this.clearMapMarkers(this.state.markers);
-	    this.updateMapMarkers(this.state.currentRoute.results);
-	    this.setState({}); //forces re-render (e.g. for the listView)
-	  }, //updateResults()
-
-	  loadMore: function loadMore() {
-	    Actions.query();
-	  },
-
-	  priceFilter: function priceFilter(tier) {
-	    Actions.priceFilter(tier);
-	  },
-
-	  ratingFilter: function ratingFilter(minimunRating) {
-	    Actions.ratingFilter(minimunRating);
-	  },
-	  render: function render() {
-	    // update display of active route
-	    if (this.state.currentRoute.setOptions) {
-	      this.state.currentRoute.setOptions({
-	        zIndex: 2,
-	        strokeOpacity: 1
-	      });
-	    };
-	    var that = this;
-	    return React.createElement(
-	      'div',
-	      { className: 'container-fluid', style: { 'height': '100%' } },
-	      React.createElement(
-	        'div',
-	        { className: 'row', style: { 'height': '100%', 'width': '100%' } },
-	        React.createElement(
-	          'div',
-	          { className: 'col-sm-5 left-container' },
-	          React.createElement(
-	            'div',
-	            { className: 'tool-bar-container' },
-	            React.createElement(ToolView, null),
-	            ' '
-	          ),
-	          React.createElement(
-	            'div',
-	            { className: 'list-container' },
-	            React.createElement(ListView, {
-	              searchRadius: this.state.searchRadius,
-	              currentRoute: this.state.currentRoute
-	            }),
-	            ' '
-	          ),
-	          ' '
-	        ),
-	        ' ',
-	        React.createElement(
-	          'div',
-	          { className: 'col-sm-7 right-container' },
-	          React.createElement(
-	            'button',
-	            { onClick: this.loadMore },
-	            'Load More'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: function () {
-	                that.priceFilter(1);
-	              } },
-	            '$'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: function () {
-	                that.priceFilter(2);
-	              } },
-	            '$$'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: function () {
-	                that.priceFilter(3);
-	              } },
-	            '$$$'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: function () {
-	                that.ratingFilter(7);
-	              } },
-	            '7+'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: function () {
-	                that.ratingFilter(8);
-	              } },
-	            '8+'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: function () {
-	                that.ratingFilter(9);
-	              } },
-	            '9+'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: function () {
-	                Actions.clearFilter();
-	              } },
-	            'Clear Filters'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: function () {
-	                Actions.openNowFilter();
-	              } },
-	            'Open Now'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: function () {
-	                Actions.clearData();
-	              } },
-	            'Clear Data'
-	          ),
-	          React.createElement(
-	            'div',
-	            { className: 'row map-container' },
-	            React.createElement(MapView, { id: 'map' })
-	          ),
-	          ' ',
-	          React.createElement(
-	            'div',
-	            { className: 'row route-container' },
-	            React.createElement(MapRoutingView, {
-	              routes: this.state.routes,
-	              setCurrentRoute: this.setCurrentRoute
-	            }),
-	            ' '
-	          ),
-	          ' '
-	        ),
-	        ' '
-	      ),
-	      ' '
-	    );
-	  }
-	});
-
-	module.exports = overView;
-	/* ToolView */ /* ListView*/ /* list-container */ /* col-sm-4 */ /* row */ /* MapRoutingView */ /* row */ /* col-sm-8 */ /* row */
-
-/***/ },
-/* 361 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var React = __webpack_require__(1);
-
-	var MapView = React.createClass({
-	  displayName: "MapView",
-
-	  propTypes: {},
-
-	  defaultOptions: {},
-	  componentDidMount: function componentDidMount() {
-	    console.log("MapView ---> inside componentDidMount");
-	    // QueryStore.addChangeListener(this._onChange)
-	  },
-
-	  componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
-	    console.log("MapView ---> inside componentDidUpdate");
-	  },
-
-	  //Gets the previous number of waypoints and the new number to be querried
-	  _onChange: function _onChange() {},
+	    this.state.markers = {};
+	  }, //clearMapMarkers
 
 	  render: function render() {
 	    // var component = this;
@@ -45434,9 +45317,9 @@
 	    // });
 
 	    return React.createElement(
-	      "div",
-	      { id: "map" },
-	      "  "
+	      'div',
+	      { id: 'map' },
+	      '  '
 	    );
 	  }
 	});
@@ -45478,12 +45361,13 @@
 	  },
 	  propTypes: {
 	    routes: React.PropTypes.array.isRequired,
-	    setCurrentRoute: React.PropTypes.func.isRequired
+	    changeCurrentRoute: React.PropTypes.func.isRequired
 	  },
 
 	  render: function render() {
 	    var component = this;
-	    var routeDetails = this.props.routes.map(function (route, index) {
+	    var routes = this.props.routes;
+	    var routeDetails = routes.map(function (route, index) {
 	      var colorCodedRouteInfo = React.createElement(
 	        'span',
 	        null,
@@ -45493,7 +45377,7 @@
 	      return React.createElement(ListItem, {
 	        primaryText: colorCodedRouteInfo,
 	        onClick: function () {
-	          component.props.setCurrentRoute(index);
+	          component.props.changeCurrentRoute(routes[index]);
 	        },
 	        key: index,
 	        className: 'list-item' });
@@ -45524,7 +45408,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
-	This view shows the details of the possible routes from origin to destination
+	ListView: This view shows the details of the possible routes from origin to destination
 	*/
 
 	'use strict';
@@ -45533,31 +45417,19 @@
 	var VenueView = __webpack_require__(364);
 
 	var Actions = __webpack_require__(197);
-	var QueryStore = __webpack_require__(365);
-	var VenueStore = __webpack_require__(368);
+	// var VenueStore = require('../stores/VenueStore');
 
 	var ListView = React.createClass({
 	  displayName: 'ListView',
 
 	  propTypes: {
-	    currentRoute: React.PropTypes.object.isRequired,
-	    searchRadius: React.PropTypes.number.isRequired
+	    currentRoute: React.PropTypes.object.isRequired
 	  },
 
-	  defaultOptions: {
-
-	    fourSquare_url: "https://api.foursquare.com/v2/venues/explore?client_id=ELLZUH013LMEXWRWGBOSNBTXE3NV02IUUO3ZFPVFFSZYLA30&client_secret=U2EQ1N1J4EAG4XH4QO4HCZTGM3FCWDLXU2WJ0OPTD2Q3YUKF&v=20150902",
-
-	    foodCategory_url: "&categoryId=4d4b7105d754a06374d81259",
-	    limit_url: "&limit=10",
-	    photos_url: "&venuePhotos=1",
-	    category_url: "&section=food",
-	    distance_url: "&sortByDistance=0"
-	  },
+	  defaultOptions: {},
 	  componentDidMount: function componentDidMount() {
-	    console.log("listView -----> componentDidMount()");
+	    // console.log("listView -----> componentDidMount()");
 
-	    QueryStore.addChangeListener(this._onChange);
 	  },
 
 	  componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
@@ -45567,97 +45439,38 @@
 	  },
 
 	  //Gets the previous number of waypoints and the new number to be querried
-	  _onChange: function _onChange() {
-	    var waypoints = Store.getWaypoints();
-	    // if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length) {
-	    this.queryFourSquare(waypoints);
-	    // }
-	  },
-
-	  //queries fourSquare api to get new results.
-	  //save results to the current route and updates the parent (mapView)
-	  //re-render results onto the page by updating state variable.
-	  queryFourSquare: function queryFourSquare(wayPoints) {
-	    var results = {}; //test against duplicates
-	    var component = this;
-
-	    for (var i = 0; i < wayPoints.length; i++) {
-	      var point = wayPoints[i];
-	      var ll = "&ll=" + point.G + "," + point.K;
-	      var radius_url = "&radius=" + this.props.searchRadius * 1000;
-
-	      //These two properties ensure that the data is only displayed once all of the requests have returned
-	      //It is important for the speed of the app and ensuring that everything works
-	      var sortingPoint = wayPoints.length % 20 - 1;
-	      var count = 1;
-
-	      var _defaultOptions = this.defaultOptions;
-	      var fourSquare_url = _defaultOptions.fourSquare_url;
-	      var foodCategory_url = _defaultOptions.foodCategory_url;
-	      var category_url = _defaultOptions.category_url;
-	      var limit_url = _defaultOptions.limit_url;
-	      var photos_url = _defaultOptions.photos_url;
-	      var distance_url = _defaultOptions.distance_url;
-
-	      $.ajax({
-	        url: fourSquare_url + ll + category_url + radius_url + limit_url + photos_url + distance_url,
-	        method: "GET",
-	        success: (function (data) {
-	          console.log("listView ----> inside queryFourSquare() Success");
-	          count++;
-	          var newResults = {};
-	          var newResultsArray = [];
-	          var venues = data.response.groups[0].items;
-
-	          var point = this;
-	          for (var i = 0; i < venues.length; i++) {
-	            var venue = venues[i].venue;
-	            venue.point = point;
-
-	            venue.totalDistance = venue.location.distance + venue.point.distance; // in meters
-	            if (!results[venue.id]) {
-	              // if
-	              newResults[venue.id] = venue;
-	            } else {
-	              if (results[venue.id].location.distance > venue.location.distance) {
-	                newResults[venue.id] = venue;
-	              }
-	            } //if
-	          } //for
-
-	          for (var id in newResults) {
-	            newResultsArray.push(newResults[id]);
-	          }
-
-	          Actions.addVenues(newResultsArray);
-
-	          if (count >= sortingPoint) {
-	            Actions.sortVenues();
-	          }
-	        }).bind(point), //success()
-	        error: function error(_error) {
-	          console.log("TEST -------> fourSquare error, error=", _error);
-	        }
-	        // dataType: dataType
-	      }); //ajax()
-	    } //for
-	  }, // queryFourSquare()
+	  // _onChange () {
+	  //   var waypoints = QueryStore.getWaypoints();
+	  //   // if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length) {
+	  //   this.queryFourSquare(waypoints);
+	  //   // }
+	  // },
 
 	  render: function render() {
 	    var component = this;
 
-	    var listDetails = VenueStore.getVenues().map(function (venue, index) {
-	      return React.createElement(VenueView, { venue: venue });
-	    });
+	    if (this.props.currentRoute) {
+	      var listDetails = this.props.currentRoute.filteredVenues.map(function (venue, index) {
+	        return React.createElement(VenueView, { venue: venue });
+	      });
 
-	    return React.createElement(
-	      'div',
-	      null,
-	      ' ',
-	      listDetails,
-	      ' '
-	    );
-	  }
+	      return React.createElement(
+	        'div',
+	        null,
+	        ' ',
+	        listDetails,
+	        ' '
+	      );
+	    } else {
+	      return null;
+	    } //if
+
+	    // var listDetails = this.state.venues.map(function(venue, index) {
+	    //   return (
+	    //     <VenueView venue={venue}/>
+	    //   )
+	    // });
+	  } //render()
 	});
 
 	module.exports = ListView;
@@ -45691,10 +45504,10 @@
 	  displayName: 'VenueView',
 
 	  propTypes: {
-	    venue: React.PropTypes.object.isRequired,
-	    openFourSquare: React.PropTypes.func.isRequired
+	    venue: React.PropTypes.object.isRequired
 	  },
 
+	  // openFourSquare: React.PropTypes.func.isRequired
 	  childContextTypes: {
 	    muiTheme: React.PropTypes.object
 	  },
@@ -45828,37 +45641,474 @@
 /* 365 */
 /***/ function(module, exports, __webpack_require__) {
 
+	/*
+	This view returns the tool bar to be shown as part of the MapView
+	*/
+
+	'use strict';
+
+	var React = __webpack_require__(1);
+	var Actions = __webpack_require__(197);
+	/***************
+	****** MUI *****
+	****************/
+	var mui = __webpack_require__(204);
+	var ThemeManager = new mui.Styles.ThemeManager();
+	var Toolbar = mui.Toolbar;
+	var ToolbarGroup = mui.ToolbarGroup;
+	var ToolbarTitle = mui.ToolbarTitle;
+	var ToolbarSeparator = mui.ToolbarSeparator;
+	var DropDownMenu = mui.DropDownMenu;
+	var FontIcon = mui.FontIcon;
+	var RaisedButton = mui.RaisedButton;
+	var DropDownIcon = mui.DropDownIcon;
+
+	var ToolView = React.createClass({
+	  displayName: 'ToolView',
+
+	  // propTypes: {
+
+	  // },
+	  childContextTypes: { // MUI: init
+	    muiTheme: React.PropTypes.object //connect MUI
+	  },
+	  getChildContext: function getChildContext() {
+	    // MUI: set theme
+	    return {
+	      muiTheme: ThemeManager.getCurrentTheme() //set MUI theme to default
+	    };
+	  },
+
+	  render: function render() {
+	    return React.createElement(
+	      'div',
+	      { className: 'container' },
+	      React.createElement(
+	        'button',
+	        { onClick: function () {
+	            Actions.priceFilter(1);
+	          } },
+	        '$'
+	      ),
+	      React.createElement(
+	        'button',
+	        { onClick: function () {
+	            Actions.priceFilter(2);
+	          } },
+	        '$$'
+	      ),
+	      React.createElement(
+	        'button',
+	        { onClick: function () {
+	            Actions.priceFilter(3);
+	          } },
+	        '$$$'
+	      ),
+	      React.createElement(
+	        'button',
+	        { onClick: function () {
+	            Actions.ratingFilter(7);
+	          } },
+	        '7+'
+	      ),
+	      React.createElement(
+	        'button',
+	        { onClick: function () {
+	            Actions.ratingFilter(8);
+	          } },
+	        '8+'
+	      ),
+	      React.createElement(
+	        'button',
+	        { onClick: function () {
+	            Actions.ratingFilter(9);
+	          } },
+	        '9+'
+	      ),
+	      React.createElement(
+	        'button',
+	        { onClick: function () {
+	            Actions.clearFilter();
+	          } },
+	        'Clear Filters'
+	      ),
+	      React.createElement(
+	        'button',
+	        { onClick: function () {
+	            Actions.openNowFilter();
+	          } },
+	        'Open Now'
+	      )
+	    );
+	  } //render()
+	}); // toolView
+
+	module.exports = ToolView;
+	/*<button onClick={this.loadMore}>Load More</button>*/ /*<button onClick={function(){Actions.clearData();}}>Clear Data</button>*/
+
+/***/ },
+/* 366 */
+/***/ function(module, exports) {
+
+	// helper function for getDistanceBetweenPoints
+	'use strict';
+
+	var deg2rad = function deg2rad(deg) {
+	  return deg * (Math.PI / 180);
+	};
+
+	// calculates the distance in km between two points based on their Latitude and Longitude
+	var getDistanceBetweenPoints = function getDistanceBetweenPoints(point1, point2) {
+	  // great-circle distance calculation; code from Stack Overflow
+	  var lat1 = point1.G;
+	  var lon1 = point1.K;
+	  var lat2 = point2.G;
+	  var lon2 = point2.K;
+	  var R = 6371; // Radius of the earth in km
+	  var dLat = deg2rad(lat2 - lat1); // deg2rad below
+	  var dLon = deg2rad(lon2 - lon1);
+	  var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+	  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	  var d = R * c; // Distance in km
+	  return d;
+	};
+
+	var getMiddlePoint = function getMiddlePoint(a, b) {
+	  return new google.maps.LatLng((a.G + b.G) / 2, (a.K + b.K) / 2);
+	};
+
+	// turns a lat/long string into a google maps LatLong Object
+	var getLatLong = function getLatLong(location) {
+	  return new google.maps.LatLng(location.split(',')[0], location.split(',')[1]);
+	};
+
+	//mapStyles: [{"featureType":"administrative","elementType":"all","stylers":[{"visibility":"on"},{"lightness":33}]},{"featureType":"landscape","elementType":"all","stylers":[{"color":"#f2e5d4"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#c5dac6"}]},{"featureType":"poi.park","elementType":"labels","stylers":[{"visibility":"on"},{"lightness":20}]},{"featureType":"road","elementType":"all","stylers":[{"lightness":20}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#c5c6c6"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#e4d7c6"}]},{"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#fbfaf7"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"on"},{"color":"#acbcc9"}]}],
+	//mapStyles: [{"featureType":"landscape.natural","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#e0efef"}]},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"hue":"#1900ff"},{"color":"#c0e8e8"}]},{"featureType":"road","elementType":"geometry","stylers":[{"lightness":100},{"visibility":"simplified"}]},{"featureType":"road","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"transit.line","elementType":"geometry","stylers":[{"visibility":"on"},{"lightness":700}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#7dcdcd"}]}],
+	var mapStyles = [{ "featureType": "administrative", "elementType": "labels.text.fill", "stylers": [{ "color": "#6195a0" }] }, { "featureType": "landscape", "elementType": "all", "stylers": [{ "color": "#f2f2f2" }] }, { "featureType": "landscape", "elementType": "geometry.fill", "stylers": [{ "color": "#ffffff" }] }, { "featureType": "poi", "elementType": "all", "stylers": [{ "visibility": "off" }] }, { "featureType": "poi.park", "elementType": "geometry.fill", "stylers": [{ "color": "#e6f3d6" }, { "visibility": "on" }] }, { "featureType": "road", "elementType": "all", "stylers": [{ "saturation": -100 }, { "lightness": 45 }, { "visibility": "simplified" }] }, { "featureType": "road.highway", "elementType": "all", "stylers": [{ "visibility": "simplified" }] }, { "featureType": "road.highway", "elementType": "geometry.fill", "stylers": [{ "color": "#f4d2c5" }, { "visibility": "simplified" }] }, { "featureType": "road.highway", "elementType": "labels.text", "stylers": [{ "color": "#4e4e4e" }] }, { "featureType": "road.arterial", "elementType": "geometry.fill", "stylers": [{ "color": "#f4f4f4" }] }, { "featureType": "road.arterial", "elementType": "labels.text.fill", "stylers": [{ "color": "#787878" }] }, { "featureType": "road.arterial", "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] }, { "featureType": "transit", "elementType": "all", "stylers": [{ "visibility": "off" }] }, { "featureType": "water", "elementType": "all", "stylers": [{ "color": "#eaf6f8" }, { "visibility": "on" }] }, { "featureType": "water", "elementType": "geometry.fill", "stylers": [{ "color": "#eaf6f8" }] }];
+	//mapStyles: [{"featureType":"administrative.province","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"administrative.locality","elementType":"labels.text","stylers":[{"lightness":"-50"},{"visibility":"simplified"}]},{"featureType":"landscape","elementType":"all","stylers":[{"saturation":-100},{"lightness":65},{"visibility":"on"}]},{"featureType":"landscape","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"saturation":"0"},{"hue":"#ff0000"}]},{"featureType":"landscape","elementType":"labels.icon","stylers":[{"visibility":"simplified"}]},{"featureType":"poi","elementType":"all","stylers":[{"saturation":-100},{"lightness":51},{"visibility":"off"}]},{"featureType":"poi.government","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"poi.medical","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road","elementType":"all","stylers":[{"saturation":"-100"},{"lightness":"0"}]},{"featureType":"road","elementType":"labels.text","stylers":[{"lightness":"0"}]},{"featureType":"road","elementType":"labels.icon","stylers":[{"lightness":"50"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#95969a"}]},{"featureType":"road.highway","elementType":"labels","stylers":[{"lightness":"0"}]},{"featureType":"road.highway","elementType":"labels.icon","stylers":[{"visibility":"on"},{"lightness":"0"}]},{"featureType":"road.highway.controlled_access","elementType":"geometry.fill","stylers":[{"color":"#3c3c31"}]},{"featureType":"road.highway.controlled_access","elementType":"labels","stylers":[{"lightness":"0"}]},{"featureType":"road.highway.controlled_access","elementType":"labels.icon","stylers":[{"lightness":"-10"},{"saturation":"0"}]},{"featureType":"road.local","elementType":"all","stylers":[{"visibility":"on"},{"lightness":"41"},{"saturation":"0"}]},{"featureType":"transit","elementType":"all","stylers":[{"saturation":-100},{"visibility":"simplified"}]},{"featureType":"transit.line","elementType":"geometry.fill","stylers":[{"lightness":"0"}]},{"featureType":"transit.station.bus","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#dce6e6"}]},{"featureType":"water","elementType":"labels","stylers":[{"visibility":"on"},{"lightness":-25},{"saturation":-100}]},{"featureType":"water","elementType":"labels.text","stylers":[{"lightness":"50"}]}],
+	//mapStyles: [{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"color":"#6195a0"}]},{"featureType":"administrative.province","elementType":"geometry.stroke","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"geometry","stylers":[{"lightness":"0"},{"saturation":"0"},{"color":"#f5f5f2"},{"gamma":"1"}]},{"featureType":"landscape.man_made","elementType":"all","stylers":[{"lightness":"-3"},{"gamma":"1.00"}]},{"featureType":"landscape.natural.terrain","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"poi","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"poi.park","elementType":"geometry.fill","stylers":[{"color":"#bae5ce"},{"visibility":"on"}]},{"featureType":"road","elementType":"all","stylers":[{"saturation":-100},{"lightness":45},{"visibility":"simplified"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#fac9a9"},{"visibility":"simplified"}]},{"featureType":"road.highway","elementType":"labels.text","stylers":[{"color":"#4e4e4e"}]},{"featureType":"road.arterial","elementType":"labels.text.fill","stylers":[{"color":"#787878"}]},{"featureType":"road.arterial","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"transit","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"transit.station.airport","elementType":"labels.icon","stylers":[{"hue":"#0a00ff"},{"saturation":"-77"},{"gamma":"0.57"},{"lightness":"0"}]},{"featureType":"transit.station.rail","elementType":"labels.text.fill","stylers":[{"color":"#43321e"}]},{"featureType":"transit.station.rail","elementType":"labels.icon","stylers":[{"hue":"#ff6c00"},{"lightness":"4"},{"gamma":"0.75"},{"saturation":"-68"}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#eaf6f8"},{"visibility":"on"}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#c7eced"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"lightness":"-49"},{"saturation":"-53"},{"gamma":"0.79"}]}],
+
+	// initializes a map and attaches it to the map div
+	var initializeMap = function initializeMap(center) {
+	  var mapOptions = {
+	    zoom: 10,
+	    center: center,
+	    styles: mapStyles
+	  };
+	  return new google.maps.Map(document.getElementById('map'), mapOptions);
+	}; //initializeMap()
+
+	var initializeMarkers = function initializeMarkers(start, end, map) {
+	  new google.maps.Marker({
+	    position: start,
+	    map: map,
+	    label: 'A'
+	  });
+
+	  new google.maps.Marker({
+	    position: end,
+	    map: map,
+	    label: 'B'
+	  });
+	}; //initializeMarkers()
+
+	var minRadiusToDistanceFactor = 8;
+	var defaultSearchRadius = 5; // in km
+
+	// FUNC: scale search radius according to the route distance
+	var getSearchRadius = function getSearchRadius(route) {
+	  var distance = route.distanceMeters / 1000;
+	  if (distance < minRadiusToDistanceFactor * defaultSearchRadius) {
+	    return distance / minRadiusToDistanceFactor;
+	  } else {
+	    return defaultSearchRadius;
+	  } //if
+	}; //getSearchRadius
+
+	// SETUP PHASE (STEP 2): Obtain waypoints for each route
+	// NOTE: syncronous function
+	var getWayPoints = function getWayPoints(newRoute, radius) {
+
+	  var path = newRoute.path; // get path from target route
+	  // var map = this.state.map; // note: map is a state of this view
+
+	  var wayPoints = [];
+	  var lastWayPoint;
+
+	  path.forEach(function (point, index) {
+	    // calculate cumulative distance from start, in meters
+	    if (index === 0) {
+	      point.distance = 0;
+	    } else {
+	      var prevPoint = path[index - 1];
+	      point.distance = prevPoint.distance + getDistanceBetweenPoints(prevPoint, point) * 1000;
+	    }
+
+	    // add first point
+	    if (!lastWayPoint) {
+	      wayPoints.push(point);
+	      lastWayPoint = point;
+	    }
+	    // add an inbetween point if the distance is too big
+	    if (getDistanceBetweenPoints(lastWayPoint, point) > 1.5 * radius) {
+	      var middlePoint = getMiddlePoint(lastWayPoint, point);
+	      middlePoint.distance = prevPoint.distance + getDistanceBetweenPoints(prevPoint, middlePoint) * 1000;
+	      wayPoints.push(middlePoint);
+	    }
+
+	    // add new point if the distance is larger than the radius
+	    if (getDistanceBetweenPoints(lastWayPoint, point) > radius) {
+	      wayPoints.push(point);
+	      lastWayPoint = point;
+	    }
+	  });
+
+	  return wayPoints;
+	}; //getWayPoints()
+
+	module.exports = {
+	  getDistanceBetweenPoints: getDistanceBetweenPoints,
+	  getMiddlePoint: getMiddlePoint,
+	  getLatLong: getLatLong,
+	  initializeMap: initializeMap,
+	  initializeMarkers: initializeMarkers,
+	  getWayPoints: getWayPoints,
+	  getSearchRadius: getSearchRadius
+	};
+
+/***/ },
+/* 367 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* The only store we are going to use, contains information of all routes, attached waypoints, venues, filtered venues, etc... */
+
 	'use strict';
 
 	var AppDispatcher = __webpack_require__(198);
-	var EventEmitter = __webpack_require__(366).EventEmitter;
+	var EventEmitter = __webpack_require__(368).EventEmitter;
 	var Constants = __webpack_require__(202);
-	var assign = __webpack_require__(367);
+	var assign = __webpack_require__(369);
 
 	var CHANGE_EVENT = 'change';
 
-	var routeData = []; //Stores the last waypoint searched in for that route
+	/********* OUR STORE DATA ***********/
+
+	var routes = []; //Stores the last waypoint searched in for that route
 	var currentRoute = 0;
+	var _venueFilters = {
+	  ratingFilter: -1,
+	  priceFilter: -1,
+	  openNowFilter: false
+	};
+	//used for this.getFourSquare()
+	var _fourSquare = {
+	  fourSquare_url: "https://api.foursquare.com/v2/venues/explore?client_id=ELLZUH013LMEXWRWGBOSNBTXE3NV02IUUO3ZFPVFFSZYLA30&client_secret=U2EQ1N1J4EAG4XH4QO4HCZTGM3FCWDLXU2WJ0OPTD2Q3YUKF&v=20150902",
+	  foodCategory_url: "&categoryId=4d4b7105d754a06374d81259",
+	  limit_url: "&limit=10",
+	  photos_url: "&venuePhotos=1",
+	  category_url: "&section=food",
+	  distance_url: "&sortByDistance=0"
+	};
+
+	/********* OUR ACTION RESPONSE ***********/
+
+	/*** PAYTON ***/
+	function initRoutes(newRoutes) {
+	  // console.log("RouteStore inside initRoutes. routes = ", newRoutes)
+	  routes = newRoutes;
+	  currentRoute = routes[0]; //set default currentRoute to first result
+	} //initRoutes
+
+	function addVenues(venue_wrappers, point) {
+	  //NOTE: point is used for calulating total distance, which is equal to distance of point to origin, plus distance of point to venue
+	  console.log("RouteStore inside addVenues()");
+
+	  // count++;
+	  // var prevResults = newRoute.results || {}; //results is a hash for quick checking
+	  var newResults = {};
+	  var newResultsArr = [];
+	  var allVenues = currentRoute.allVenues;
+
+	  venue_wrappers.forEach(function (venue_wrapper, i) {
+	    var venue = venue_wrapper.venue;
+	    venue.totalDistance = venue.location.distance + point.distance; // in meters
+
+	    //remove duplicate venues
+	    if (!allVenues[venue.id]) {
+	      // if venue does NOT exist already
+	      // newResults[venue.id] = venue; //save into newResults
+	      allVenues[venue.id] = venue; //save to allVenues
+	    } else {
+	        // if venue is brand new, on
+	        // NOTE: only save if new result is closer to radii than the one from before; THEN: save the new result, get rid of previous; ELSE: don't save new venue
+	        if (allVenues[venue.id].location.distance > venue.location.distance) {
+	          allVenues[venue.id] = venue; //save to allVenues
+	        } //if
+	      } //if
+	  }); //forEach(venues)
+
+	  //NOTE: allVenues has completed update
+	  /***** updated filteredVenues *****/
+	  for (var venue_id in allVenues) {
+	    //convert newResults object into array
+	    newResultsArr.push(newResults[venue_id]); //push value into array
+	  }
+
+	  currentRoute.filteredVenues = getFilteredArr(); //NOTE: get back a filtered and sorted array
+
+	  /**************/
+
+	  currentRoute.filteredVenues = getFilteredArr();
+	} //addVenues()
 
 	function setCurrentRoute(index) {
-	  currentRoute = index;
+	  //First save the old data
+	  //Then find current one and set data to that
+	  currentRoute = routes[index];
+
+	  if (Object.keys(currentRoute.allVenues).length === 0) {
+	    getFourSquare(currentRoute.wayPoints, function (data) {
+	      var point = this; // waypoint used for query, bound to this for for callback
+
+	      var venue_wrappers = data.response.groups[0].items; //extract venues array from data
+
+	      addVenues(venue_wrappers, point);
+	      Store.emitChange();
+	    }); //getFourSquare
+	  } //if
 	}
 
-	function addWaypoints(waypoints) {
-	  routeData.push({ waypoints: waypoints, index: 1 });
-	}
+	function getFilteredArr() {
+	  var filteredVenues = [];
+	  var allVenues = currentRoute.allVenues;
+	  // console.log("$$$$$$$$$$$$ getFilteredArr &&&&&& allvenues = ", allVenues)
+	  var ratingFilter = _venueFilters.ratingFilter;
+	  var priceFilter = _venueFilters.priceFilter;
+	  var openNowFilter = _venueFilters.openNowFilter;
+
+	  for (var id in allVenues) {
+	    var venue = allVenues[id];
+	    var valid = true;
+
+	    //Ratings
+	    if (ratingFilter !== -1) {
+	      if (!venue.rating) {
+	        valid = false;
+	      } else if (venue.rating < ratingFilter) {
+	        valid = false;
+	      }
+	    }
+
+	    //Price
+	    if (priceFilter !== -1) {
+	      if (!venue.price) {
+	        valid = false;
+	      } else if (!venue.price.tier) {
+	        valid = false;
+	      } else if (!(venue.price.tier === priceFilter)) {
+	        valid = false;
+	      }
+	    }
+
+	    //Open now filter
+	    if (openNowFilter) {
+	      if (!venue.hours || !venue.hours.isOpen) {
+	        valid = false;
+	      }
+	    }
+
+	    if (valid) {
+	      filteredVenues.push(venue);
+	    }
+	  } //for(allVenues)
+
+	  return filteredVenues;
+	} //getFilteredArr()
+
+	// SETUP PHASE (STEP 3): Obtain waypoints for each route
+	// NOTE: asyncronous function
+	//queries fourSquare api to get new results.
+	//save results to the current route and updates the parent (mapView)
+	//re-render results onto the page by updating state variable.
+	var getFourSquare = function getFourSquare(wayPoints, success) {
+
+	  console.log("$$$$$$$$$$ insdie getFourSquare()");
+	  // var index = currentRoute.queryIndex;
+	  // if(index<wayPoints.length){
+
+	  // }
+	  // var max = index+2;
+	  // var results = {}; //test against duplicates
+	  // var component = this;
+	  // if(max>wayPoints.length){
+
+	  // }
+
+	  // for(var i=index; i<max; i++){
+	  for (var i = 0; i < wayPoints.length; i++) {
+	    var point = wayPoints[i];
+	    var ll = "&ll=" + point.G + "," + point.K;
+	    var radius_url = "&radius=" + currentRoute.searchRadius * 1000;
+
+	    //These two properties ensure that the data is only displayed once all of the requests have returned
+	    //It is important for the speed of the app and ensuring that everything works
+	    // var sortingPoint = wayPoints.length%20-1;
+	    // var count = 1;
+
+	    var fourSquare_url = _fourSquare.fourSquare_url;
+	    var foodCategory_url = _fourSquare.foodCategory_url;
+	    var category_url = _fourSquare.category_url;
+	    var limit_url = _fourSquare.limit_url;
+	    var photos_url = _fourSquare.photos_url;
+	    var distance_url = _fourSquare.distance_url;
+
+	    $.ajax({
+	      url: fourSquare_url + ll + category_url + radius_url + limit_url + photos_url + distance_url,
+	      method: "GET",
+	      success: success.bind(point), //success()
+	      error: function error(_error) {
+	        console.log("TEST -------> fourSquare error, error=", _error);
+	      }
+	    }); //ajax()
+	  }; //for()
+	}; // getFourSquare()
+
+	/*** LINUS ***/
+	// function setCurrentRoute (index) {
+	//   currentRoute = index;
+	// }
+
+	// function addWaypoints (waypoints) {
+	//   routeData.push({waypoints: waypoints, index: 1});
+	// }
+
+	/*****************
+	******************
+	*STORE CALLBACKS
+	******************
+	*****************/
 
 	var Store = assign({}, EventEmitter.prototype, {
+	  /* Payton */
+
+	  getRoutes: function getRoutes() {
+	    return routes;
+	  },
+
+	  getCurrentRoute: function getCurrentRoute() {
+	    return currentRoute;
+	  },
+
+	  /* Linus */
+	  // getWaypoints: function(){
+	  //   var temp = routeData[currentRoute].waypoints.slice(routeData[currentRoute].index, 20);
+	  //   routeData[currentRoute].index+=20;
+	  //   console.log(temp, routeData[currentRoute].index);
+	  //   return temp;
+	  // },
 
 	  emitChange: function emitChange() {
 	    this.emit(CHANGE_EVENT);
-	  },
-
-	  getWaypoints: function getWaypoints() {
-	    var temp = routeData[currentRoute].waypoints.slice(routeData[currentRoute].index, 20);
-	    routeData[currentRoute].index += 20;
-	    console.log(temp, routeData[currentRoute].index);
-	    return temp;
 	  },
 
 	  /**
@@ -45881,20 +46131,53 @@
 	  var text;
 
 	  switch (action.actionType) {
-
-	    case Constants.QUERY_WAYPOINTS:
+	    case Constants.INIT_ROUTES:
+	      // initializes after a new trip is defined
+	      initRoutes(action.newRoutes);
 	      Store.emitChange();
 	      break;
-	    case Constants.CLEAR_DATA:
-	      routeData = [];
-	      currentRoute = 0;
+
+	    case Constants.ADD_VENUES:
+	      addVenues(action.results, action.point);
+	      Store.emitChange();
 	      break;
+
 	    case Constants.SELECT_ROUTE:
 	      setCurrentRoute(action.index);
+	      Store.emitChange();
 	      break;
-	    case Constants.ADD_WAYPOINTS:
-	      addWaypoints(action.wayPoints);
+
+	    case Constants.PRICE_FILTER:
+	      _venueFilters.priceFilter = action.tier;
+	      currentRoute.filteredVenues = getFilteredArr();
+	      Store.emitChange();
 	      break;
+	    case Constants.RATING_FILTER:
+	      _venueFilters.ratingFilter = action.minRating;
+	      currentRoute.filteredVenues = getFilteredArr();
+	      Store.emitChange();
+	      break;
+
+	    case Constants.OPEN_NOW_FILTER:
+	      _venueFilters.openNowFilter = !_venueFilters.openNowFilter;
+	      currentRoute.filteredVenues = getFilteredArr();
+	      Store.emitChange();
+	      break;
+	    case Constants.CLEAR_FILTER:
+	      _venueFilters.openNowFilter = false;
+	      _venueFilters.ratingFilter = -1;
+	      _venueFilters.priceFilter = -1;
+	      currentRoute.filteredVenues = getFilteredArr();
+	      Store.emitChange();
+	      break;
+
+	    // case Constants.CLEAR_DATA:
+	    //     routeData = [];
+	    //     currentRoute = 0;
+	    //     break;
+	    // case Constants.ADD_WAYPOINTS:
+	    //     addWaypoints(action.wayPoints);
+	    //     break;
 
 	    default:
 	    // no op
@@ -45904,7 +46187,7 @@
 	module.exports = Store;
 
 /***/ },
-/* 366 */
+/* 368 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -46211,7 +46494,7 @@
 
 
 /***/ },
-/* 367 */
+/* 369 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -46252,224 +46535,6 @@
 		return to;
 	};
 
-
-/***/ },
-/* 368 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var AppDispatcher = __webpack_require__(198);
-	var EventEmitter = __webpack_require__(366).EventEmitter;
-	var Constants = __webpack_require__(202);
-	var assign = __webpack_require__(367);
-
-	var CHANGE_EVENT = 'change';
-	var routeData = [[], [], []];
-	var allVenues = routeData[0];
-	var routeNumber = 0;
-	var filteredVenues = [];
-	var ratingFilter = -1;
-	var priceFilter = -1;
-	var openNowFilter = false;
-
-	function addVenues(results) {
-	  allVenues = allVenues.concat(results);
-	  filteredVenues = allVenues;
-	}
-
-	function filter() {
-	  filteredVenues = [];
-	  for (var i = 0; i < allVenues.length; i++) {
-
-	    var valid = true;
-
-	    //Ratings
-	    if (ratingFilter !== -1) {
-	      if (!allVenues[i].rating) {
-	        valid = false;
-	      } else if (allVenues[i].rating < ratingFilter) {
-	        valid = false;
-	      }
-	    }
-
-	    //Price
-	    if (priceFilter !== -1) {
-	      if (!allVenues[i].price) {
-	        valid = false;
-	      } else if (!allVenues[i].price.tier) {
-	        valid = false;
-	      } else if (!(allVenues[i].price.tier === priceFilter)) {
-	        valid = false;
-	      }
-	    }
-
-	    //Open now filter
-	    if (openNowFilter) {
-	      if (!allVenues[i].hours || !allVenues[i].hours.isOpen) {
-	        valid = false;
-	      }
-	    }
-
-	    if (valid) {
-	      filteredVenues.push(allVenues[i]);
-	    }
-	  }
-	}
-
-	function setCurrentRoute(index) {
-	  //First save the old data
-	  //Then find current one and set data to that
-	  routeData[routeNumber] = allVenues;
-	  allVenues = routeData[index];
-	  routeNumber = index;
-	}
-
-	function sortVenues() {
-	  allVenues.sort(function (a, b) {
-	    return a.totalDistance - b.totalDistance;
-	  });
-	}
-
-	var Store = assign({}, EventEmitter.prototype, {
-
-	  emitChange: function emitChange() {
-	    this.emit(CHANGE_EVENT);
-	  },
-
-	  getVenues: function getVenues() {
-	    filter();
-	    return filteredVenues;
-	  },
-
-	  addChangeListener: function addChangeListener(callback) {
-	    this.on(CHANGE_EVENT, callback);
-	  },
-
-	  removeChangeListener: function removeChangeListener(callback) {
-	    this.removeListener(CHANGE_EVENT, callback);
-	  }
-	});
-
-	// Register callback to handle all updates
-	AppDispatcher.register(function (action) {
-	  var text;
-
-	  switch (action.actionType) {
-	    case Constants.ADD_VENUES:
-	      addVenues(action.results);
-	      break;
-	    case Constants.SORT_VENUES:
-	      sortVenues();
-	      Store.emitChange();
-	      break;
-	    case Constants.PRICE_FILTER:
-	      priceFilter = action.tier;
-	      filter();
-	      Store.emitChange();
-	      break;
-	    case Constants.RATING_FILTER:
-	      ratingFilter = action.minRating;
-	      filter();
-	      Store.emitChange();
-	      break;
-	    case Constants.CLEAR_DATA:
-	      console.log('clear data');
-	      filteredVenues = [];
-	      routeData = [[], [], []];
-	      allVenues = [];
-	      openNowFilter = false;
-	      ratingFilter = -1;
-	      priceFilter = -1;
-	      // Store.emitChange();
-	      break;
-	    case Constants.OPEN_NOW_FILTER:
-	      openNowFilter = true;
-	      filter();
-	      Store.emitChange();
-	      break;
-	    case Constants.CLEAR_FILTER:
-	      openNowFilter = false;
-	      ratingFilter = -1;
-	      priceFilter = -1;
-	      filter();
-	      Store.emitChange();
-	      break;
-	    case Constants.SELECT_ROUTE:
-	      setCurrentRoute(action.index);
-	      break;
-
-	    default:
-	  }
-	});
-
-	module.exports = Store;
-
-/***/ },
-/* 369 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/*
-	This view returns the tool bar to be shown as part of the MapView
-	*/
-
-	'use strict';
-
-	var React = __webpack_require__(1);
-
-	/***************
-	****** MUI *****
-	****************/
-	var mui = __webpack_require__(204);
-	var ThemeManager = new mui.Styles.ThemeManager();
-	var Toolbar = mui.Toolbar;
-	var ToolbarGroup = mui.ToolbarGroup;
-	var ToolbarTitle = mui.ToolbarTitle;
-	var ToolbarSeparator = mui.ToolbarSeparator;
-	var DropDownMenu = mui.DropDownMenu;
-	var FontIcon = mui.FontIcon;
-	var RaisedButton = mui.RaisedButton;
-	var DropDownIcon = mui.DropDownIcon;
-
-	var ToolView = React.createClass({
-	  displayName: 'ToolView',
-
-	  // propTypes: {
-
-	  // },
-	  childContextTypes: { // MUI: init
-	    muiTheme: React.PropTypes.object //connect MUI
-	  },
-	  getChildContext: function getChildContext() {
-	    // MUI: set theme
-	    return {
-	      muiTheme: ThemeManager.getCurrentTheme() //set MUI theme to default
-	    };
-	  },
-
-	  render: function render() {
-	    return React.createElement(
-	      'div',
-	      { className: 'dropdown' },
-	      React.createElement(
-	        'button',
-	        { className: 'btn btn-default dropdown-toggle', type: 'button', id: 'dropdownMenu1', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'true' },
-	        'Filter Results',
-	        React.createElement('span', { className: 'caret' })
-	      ),
-	      React.createElement(
-	        'ul',
-	        { className: 'dropdown-menu', 'aria-labelledby': 'dropdownMenu1' },
-	        React.createElement('li', null),
-	        React.createElement('li', null),
-	        React.createElement('li', null),
-	        React.createElement('li', null)
-	      )
-	    );
-	  } //render()
-	}); // toolView
-
-	module.exports = ToolView;
 
 /***/ }
 /******/ ]);
