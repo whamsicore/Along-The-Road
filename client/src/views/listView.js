@@ -1,19 +1,18 @@
 /*
-This view shows the details of the possible routes from origin to destination
+ListView: This view shows the details of the possible routes from origin to destination
 */
 
 var React = require('react');
 var VenueView = require('./venueView');
 
 var Actions = require('../actions/Actions.js');
-var QueryStore = require('../stores/QueryStore');
-var VenueStore = require('../stores/VenueStore');
+// var VenueStore = require('../stores/VenueStore');
 
 
 var ListView = React.createClass({
 
   propTypes: {
-
+    currentRoute: React.PropTypes.object.isRequired
   },
 
   defaultOptions: {
@@ -21,9 +20,8 @@ var ListView = React.createClass({
 
   },
   componentDidMount () {
-    console.log("listView -----> componentDidMount()");
+    // console.log("listView -----> componentDidMount()");
 
-    // QueryStore.addChangeListener(this._onChange)
   },
 
   componentDidUpdate(prevProps, prevState) {
@@ -43,16 +41,28 @@ var ListView = React.createClass({
   render () {
     var component = this;
 
-    var listDetails = VenueStore.getVenues().map(function(venue, index) {
-      return (
-        <VenueView venue={venue}/>
-      )
-    });
+    if(this.props.currentRoute){
+      var listDetails = this.props.currentRoute.filteredVenues.map(function(venue, index) {
+        return (
+          <VenueView venue={venue}/>
+        )
+      });
 
-    return (
-      <div> {listDetails} </div>
-    );
-  }
+      return (
+        <div> {listDetails} </div>
+      );
+
+    }else{
+      return null;
+    } //if
+
+    // var listDetails = this.state.venues.map(function(venue, index) {
+    //   return (
+    //     <VenueView venue={venue}/>
+    //   )
+    // });
+
+  } //render()
 });
 
 module.exports = ListView;

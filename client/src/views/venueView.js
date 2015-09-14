@@ -15,7 +15,7 @@ var {Card, CardHeader, CardMedia, CardActions, CardText, Avatar, CardTitle} = mu
 var VenueView = React.createClass({
   propTypes: {
     venue: React.PropTypes.object.isRequired,
-    openFourSquare: React.PropTypes.func.isRequired
+    // openFourSquare: React.PropTypes.func.isRequired
   },
 
   childContextTypes: {

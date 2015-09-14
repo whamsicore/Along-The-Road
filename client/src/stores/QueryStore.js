@@ -1,4 +1,4 @@
-
+/* Saves query information about each route: going to refactor back to overView state -> routes */
 
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var EventEmitter = require('events').EventEmitter;

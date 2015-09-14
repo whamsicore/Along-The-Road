@@ -9,16 +9,24 @@ var MapView = React.createClass({
   defaultOptions: {
 
   },
+
+  getInitialState () {
+    return {
+      markers: []
+    }
+  }, //getInitialState()
   componentDidMount () {
-    console.log("MapView ---> inside componentDidMount");
+    // console.log("MapView ---> inside componentDidMount");
 
     // QueryStore.addChangeListener(this._onChange)
 
   },
 
   componentDidUpdate(prevProps, prevState) {
-    console.log("MapView ---> inside componentDidUpdate ");
+    // console.log("MapView ---> inside componentDidUpdate ");
 
+    this.clearMapMarkers();
+    this.updateMapMarkers();
   },
 
   //Gets the previous number of waypoints and the new number to be querried
@@ -29,18 +37,18 @@ var MapView = React.createClass({
 
 
   // Print new markers
-  updateMapMarkers(results){
+  updateMapMarkers: function(){
     // set to new prop
-    results = this.props.results;
+    var results = this.props.currentRoute.filteredVenues;
 
-    var map = this.state.map;
+    var map = window.map;
     var markers = this.state.markers; //array of
     var component = this;
 
     results.forEach(function(venue, index){
       var {lng, lat} = venue.location;
 
-      //create new marker
+      //create new marker only if marker has not been displayed
       if(!markers[venue.id]){ //
         var position = new google.maps.LatLng(lat, lng);
 
@@ -96,20 +104,22 @@ var MapView = React.createClass({
         // add current marker to state
         component.state.markers[venue.id] = marker;
         // component.state.markers.push(marker);
-      } //if
+      } //if(marker)
 
       //display markers
     }); //forEach
   }, //updateMapMarkers()
 
   // clear map markers
-  clearMapMarkers (markers){
-    this.state.markers = {};
+  clearMapMarkers (){
+    var markers = this.state.markers;
 
     for(var key in markers){
       var marker = markers[key];
       marker.setMap(null);
     } //for
+
+    this.state.markers = {};
   }, //clearMapMarkers
 
 

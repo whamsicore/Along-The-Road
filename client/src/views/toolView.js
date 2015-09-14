@@ -3,7 +3,7 @@ This view returns the tool bar to be shown as part of the MapView
 */
 
 var React = require('react');
-
+var Actions = require('../actions/Actions')
 /***************
 ****** MUI *****
 ****************/
@@ -27,17 +27,19 @@ var ToolView = React.createClass({
 
   render () {
     return (
-      <div className="dropdown">
-        <button className="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-          Filter Results
-          <span className="caret"></span>
-        </button>
-        <ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-        </ul>
+      <div className = "container">
+          {/*<button onClick={this.loadMore}>Load More</button>*/}
+          <button onClick={function(){Actions.priceFilter(1)}}>$</button>
+          <button onClick={function(){Actions.priceFilter(2)}}>$$</button>
+          <button onClick={function(){Actions.priceFilter(3)}}>$$$</button>
+          <button onClick={function(){Actions.ratingFilter(7)}}>7+</button>
+          <button onClick={function(){Actions.ratingFilter(8)}}>8+</button>
+          <button onClick={function(){Actions.ratingFilter(9)}}>9+</button>
+          <button onClick={function(){Actions.clearFilter();}}>Clear Filters</button>
+          <button onClick={function(){Actions.openNowFilter();}}>Open Now</button>
+          {/*<button onClick={function(){Actions.clearData();}}>Clear Data</button>*/}
+
+
       </div>
     );
   } //render()
