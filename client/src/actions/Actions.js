@@ -21,7 +21,7 @@ var Actions = {
   },
 
   addVenues: function(results, point){
-    console.log("Actions ----> addVenues")
+    // console.log("Actions ----> addVenues")
     AppDispatcher.dispatch({
       actionType: Constants.ADD_VENUES,
       results: results,
