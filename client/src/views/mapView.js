@@ -44,7 +44,6 @@ var MapView = React.createClass({
     var map = window.map;
     var markers = this.state.markers; //array of
     var component = this;
-
     results.forEach(function(venue, index){
       var {lng, lat} = venue.location;
 
@@ -113,11 +112,22 @@ var MapView = React.createClass({
   // clear map markers
   clearMapMarkers (){
     var markers = this.state.markers;
+    var results = this.props.currentRoute.filteredVenues;
+    var toKeep = {};
+
+    for(var i in results) {
+      if(markers[results[i].id]) {
+        toKeep[results[i].id] = true;
+      }
+    }
+
 
     for(var key in markers){
-      var marker = markers[key];
-      marker.setMap(null);
-    } //for
+      if(!toKeep[key]){
+        var marker = markers[key];
+        marker.setMap(null);
+      }
+    }
 
     this.state.markers = {};
   }, //clearMapMarkers
