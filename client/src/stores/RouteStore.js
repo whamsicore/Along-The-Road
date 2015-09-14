@@ -16,15 +16,7 @@ var _venueFilters = {
   priceFilter: -1,  
   openNowFilter: false
 };
-//used for this.getFourSquare()
-var _fourSquare = {
-    fourSquare_url: "https://api.foursquare.com/v2/venues/explore?client_id=ELLZUH013LMEXWRWGBOSNBTXE3NV02IUUO3ZFPVFFSZYLA30&client_secret=U2EQ1N1J4EAG4XH4QO4HCZTGM3FCWDLXU2WJ0OPTD2Q3YUKF&v=20150902",
-    foodCategory_url: "&categoryId=4d4b7105d754a06374d81259",
-    limit_url: "&limit=10",
-    photos_url: "&venuePhotos=1",
-    category_url: "&section=food",
-    distance_url: "&sortByDistance=0"  
-}
+
 
 /********* OUR ACTION RESPONSE ***********/
 
@@ -81,17 +73,6 @@ function setCurrentRoute (index) {
   //Then find current one and set data to that
   currentRoute = routes[index];
 
-  if(Object.keys(currentRoute.allVenues).length===0){
-    getFourSquare(currentRoute.wayPoints, function(data){
-      var point = this; // waypoint used for query, bound to this for for callback
-        
-      var venue_wrappers = data.response.groups[0].items; //extract venues array from data
-      
-      addVenues(venue_wrappers, point);
-      Store.emitChange();
-
-    }); //getFourSquare
-  } //if
 }
 
 function getFilteredArr () {    
@@ -141,51 +122,6 @@ function getFilteredArr () {
 } //getFilteredArr()
 
 
-// SETUP PHASE (STEP 3): Obtain waypoints for each route
-// NOTE: asyncronous function
-//queries fourSquare api to get new results.
-//save results to the current route and updates the parent (mapView)
-//re-render results onto the page by updating state variable.
-var getFourSquare = function(wayPoints, success) {
-
-  console.log("$$$$$$$$$$ insdie getFourSquare()");
-  // var index = currentRoute.queryIndex;
-  // if(index<wayPoints.length){
-    
-  // }
-  // var max = index+2; 
-  // var results = {}; //test against duplicates
-  // var component = this;
-  // if(max>wayPoints.length){
-
-  // }
-  
-  // for(var i=index; i<max; i++){
-  for(var i=0; i<wayPoints.length; i++){
-    var point = wayPoints[i]; 
-    var ll = "&ll=" + point.G+"," + point.K;
-    var radius_url = "&radius=" + currentRoute.searchRadius * 1000;
-
-    //These two properties ensure that the data is only displayed once all of the requests have returned
-    //It is important for the speed of the app and ensuring that everything works
-    // var sortingPoint = wayPoints.length%20-1;
-    // var count = 1;
-
-    var {fourSquare_url, foodCategory_url, category_url, limit_url, photos_url, distance_url} = _fourSquare;
-
-    $.ajax({
-      url: fourSquare_url + ll + category_url + radius_url + limit_url + photos_url + distance_url,
-      method: "GET",
-      success: success.bind(point), //success()
-      error: function(error){
-        console.log("TEST -------> fourSquare error, error=", error);
-      }
-    }); //ajax()
-
-  }; //for()
-} // getFourSquare()
-
-
 /*** LINUS ***/
 // function setCurrentRoute (index) {
 //   currentRoute = index;
@@ -225,7 +161,7 @@ var Store = assign({}, EventEmitter.prototype, {
   emitChange: function() {
     this.emit(CHANGE_EVENT);
   },
-  
+
   /**
    * @param {function} callback
    */
