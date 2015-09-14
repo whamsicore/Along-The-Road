@@ -8,7 +8,12 @@ var CHANGE_EVENT = 'change';
 var routeData = [[],[],[]];
 var allVenues = routeData[0];
 var routeNumber = 0;
-var filteredVenues = [];
+var filteredVenues = []; //what we are going to display
+// var venueFilters = {
+//   rating: -1, 
+//   price: -1, 
+//   openNow: false
+// };
 var ratingFilter = -1;
 var priceFilter = -1;
 var openNowFilter = false;
@@ -56,7 +61,7 @@ function filter () {
         filteredVenues.push(allVenues[i]);
     }
   }
-}
+} //filter()
 
 function setCurrentRoute (index) {
   //First save the old data

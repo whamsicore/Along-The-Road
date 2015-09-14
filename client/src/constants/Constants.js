@@ -13,7 +13,9 @@ module.exports = keyMirror({
 	OPEN_NOW_FILTER: null, 
 	CLEAR_FILTER: null,
 	SELECT_ROUTE: null,
-	ADD_WAYPOINTS: null
+	ADD_WAYPOINTS: null, 
+  // NEW FUNCTIONS
+  UPDATE_ROUTES: null
 
 
 });

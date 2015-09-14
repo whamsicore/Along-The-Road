@@ -217,6 +217,7 @@ then you get 114 height on the title
 .drop-down{
   margin-left:28px;
   padding-top: 10px;
+  display: inline;
 }
 /**********************
 ***********************
