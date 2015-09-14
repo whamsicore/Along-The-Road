@@ -30,7 +30,7 @@ function initRoutes (newRoutes){
 
 function addVenues(venue_wrappers, point){
     //NOTE: point is used for calulating total distance, which is equal to distance of point to origin, plus distance of point to venue
-    // console.log("RouteStore inside addVenues()");
+
 
     // count++;
     // var prevResults = newRoute.results || {}; //results is a hash for quick checking

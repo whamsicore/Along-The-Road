@@ -204,6 +204,7 @@ var overView = React.createClass({
     // if(max>wayPoints.length){
 
     // }
+    var count = waypoints.length;
 
     // for(var i=index; i<max; i++){
     for(var i=0; i<wayPoints.length; i++){
@@ -222,9 +223,13 @@ var overView = React.createClass({
         url: fourSquare_url + ll + category_url + radius_url + limit_url + photos_url + distance_url,
         method: "GET",
         success: function(data){
+          count--;
           var point = this; // waypoint used for query, bound to this for for callback
           var venue_wrappers = data.response.groups[0].items; //extract venues array from data
           Actions.addVenues(venue_wrappers, point);
+          if(count === 0 ){
+            Actions.sortVenues();
+          }
         },
         error: function(error){
           console.log("TEST -------> fourSquare error, error=", error);

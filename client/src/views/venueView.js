@@ -31,7 +31,6 @@ var VenueView = React.createClass({
   openFourSquare: function () {
     var venue = this.props.venue;
     var url = "https://foursquare.com/v/"+escape(venue.name)+"/"+venue.id;
-    console.log("TEST inside openFourSquare. url="+url);
     window.open(url);
   },
 
