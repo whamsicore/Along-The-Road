@@ -45065,7 +45065,7 @@
 	          newRoute.index = i; //tracks position in routes array
 	          newRoute.allVenues = {}; //all venues found
 	          newRoute.filteredVenues = []; //processed (filtered OR sorted) venues to be displayed
-	          newRoute.queryIndex = 0; //where we begin with queries, defaults to 0
+	          newRoute.queryIndex = 1; //where we begin with queries, defaults to 0
 	          newRoute.queryComplete = false; //whether all waypoints have been queried. Defaults to false
 	          var radius = MapHelpers.getSearchRadius(newRoute);
 	          newRoute.searchRadius = radius;
@@ -45287,12 +45287,18 @@
 
 	  // clear map markers
 	  clearMapMarkers: function clearMapMarkers() {
-	    var markers = component.state.markers;
+	    var markers = this.state.markers;
 	    var results = this.props.currentRoute.filteredVenues;
+	    var toKeep = {};
+
+	    for (var i in results) {
+	      if (markers[results[i].id]) {
+	        toKeep[results[i].id] = true;
+	      }
+	    }
 
 	    for (var key in markers) {
-	      if (!results[key]) {
-	        console.log('removed marker');
+	      if (!toKeep[key]) {
 	        var marker = markers[key];
 	        marker.setMap(null);
 	      }

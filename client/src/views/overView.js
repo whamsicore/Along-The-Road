@@ -58,7 +58,6 @@ var overView = React.createClass({
 
   // this is called after the first render of the component
   componentDidMount () {
-    console.log("Overview ----> inside componentDidMount()");
     // QueryStore.addChangeListener(this.updateResults)
 
     /****** INITIALIZE MAP ******/
@@ -160,7 +159,13 @@ var overView = React.createClass({
 
   }, //getRoutes()
 
+  loadMore () {
+    var queryIndex = this.state.currentRoute.queryIndex;
+    var queries = this.state.currentRoute.wayPoints.slice(queryIndex, queryIndex+20);
+    this.getFourSquare(queries); //getFourSquare
+    this.state.currentRoute.queryIndex+=20;
 
+  },
 
   // Event: switch the route and update the active venues
   changeCurrentRoute (newRoute) {
@@ -174,14 +179,7 @@ var overView = React.createClass({
 
     /******** QUERY FOR VENUES *********/
     if(Object.keys(newRoute.allVenues).length===0){
-      this.getFourSquare(newRoute.wayPoints, function(data){
-      var point = this; // waypoint used for query, bound to this for for callback
-        
-      var venue_wrappers = data.response.groups[0].items; //extract venues array from data
-      
-      Actions.addVenues(venue_wrappers, point);
-
-      }); //getFourSquare
+      this.loadMore();
     } //if
 
 
@@ -193,7 +191,7 @@ var overView = React.createClass({
   //queries fourSquare api to get new results.
   //save results to the current route and updates the parent (mapView)
   //re-render results onto the page by updating state variable.
-  getFourSquare (wayPoints, success) {
+  getFourSquare (wayPoints) {
 
     console.log("$$$$$$$$$$ insdie getFourSquare()");
     // var index = currentRoute.queryIndex;
@@ -223,7 +221,11 @@ var overView = React.createClass({
       $.ajax({
         url: fourSquare_url + ll + category_url + radius_url + limit_url + photos_url + distance_url,
         method: "GET",
-        success: success.bind(point), //success()
+        success: function(data){
+          var point = this; // waypoint used for query, bound to this for for callback
+          var venue_wrappers = data.response.groups[0].items; //extract venues array from data
+          Actions.addVenues(venue_wrappers, point);
+        }, 
         error: function(error){
           console.log("TEST -------> fourSquare error, error=", error);
         }
@@ -232,19 +234,6 @@ var overView = React.createClass({
     }; //for()
   }, // getFourSquare()
 
-  // loadMore () { //still in beta
-  //   this.getFourSquare(newRoute.wayPoints, function(data){
-  //     var point = this; // waypoint used for query, bound to this for for callback
-      
-  //     var venue_wrappers = data.response.groups[0].items; //extract venues array from data
-  //     Actions.addVenues(venue_wrappers, point);
-
-  //     // if(count >= sortingPoint){
-  //     //   Actions.sortVenues();
-  //     // } //if
-
-  //   }); // getFourSquare(callback)
-  // }, // loadMore()
 
   render () {
     var that = this;
@@ -254,7 +243,8 @@ var overView = React.createClass({
           <div className = 'col-sm-5 left-container'>
 
             <div className = 'tool-bar-container'>
-              <ToolView/> {/* ToolView */}
+              <ToolView
+                loadMore = {this.loadMore}/> {/* ToolView */}
             </div>
 
             <div className = 'list-container'>

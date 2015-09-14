@@ -111,25 +111,28 @@ var MapView = React.createClass({
 
   // clear map markers
   clearMapMarkers (){
+
     var markers = this.state.markers;
     var results = this.props.currentRoute.filteredVenues;
-    var toKeep = {};
+    var toKeep = {};  
 
+    var size = 0; 
     for(var i in results) {
-      if(markers[results[i].id]) {
-        toKeep[results[i].id] = true;
+      var venueId = results[i].id
+      if(markers[venueId]) {
+        size++;
+        toKeep[venueId] = true;
       }
     }
-
 
     for(var key in markers){
       if(!toKeep[key]){
         var marker = markers[key];
         marker.setMap(null);
+        delete this.state.markers[key];
       }
     }
    
-    this.state.markers = {};
   }, //clearMapMarkers
 
 
