@@ -202,17 +202,20 @@ AppDispatcher.register(function(action) {
     case Constants.PRICE_FILTER:
       _venueFilters.priceFilter = action.tier;
       currentRoute.filteredVenues = getFilteredArr();
+      sortVenues();
       Store.emitChange();
       break;
     case Constants.RATING_FILTER:
       _venueFilters.ratingFilter = action.minRating;
       currentRoute.filteredVenues = getFilteredArr();
+      sortVenues();
       Store.emitChange();
       break;
 
     case Constants.OPEN_NOW_FILTER:
       _venueFilters.openNowFilter = !_venueFilters.openNowFilter;
       currentRoute.filteredVenues = getFilteredArr();
+      sortVenues();
       Store.emitChange();
       break;
     case Constants.CLEAR_FILTER:
@@ -220,6 +223,7 @@ AppDispatcher.register(function(action) {
       _venueFilters.ratingFilter = -1;
       _venueFilters.priceFilter = -1;
       currentRoute.filteredVenues = getFilteredArr();
+      sortVenues();
       Store.emitChange();
       break;
     case Constants.SORT_VENUES:
