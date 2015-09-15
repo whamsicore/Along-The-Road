@@ -62,6 +62,7 @@ var overView = React.createClass({
 
     /****** INITIALIZE MAP ******/
     var {origin, destination} = this.context.router.getCurrentParams();
+    this.state.origin = origin;
     var start = MapHelpers.getLatLong(origin);
     var end = MapHelpers.getLatLong(destination);
     var map = MapHelpers.initializeMap(start);
@@ -193,7 +194,6 @@ var overView = React.createClass({
   //re-render results onto the page by updating state variable.
   getFourSquare (wayPoints) {
 
-    console.log("$$$$$$$$$$ insdie getFourSquare()");
     // var index = currentRoute.queryIndex;
     // if(index<wayPoints.length){
       
@@ -204,6 +204,7 @@ var overView = React.createClass({
     // if(max>wayPoints.length){
 
     // }
+    var count = wayPoints.length;
     
     // for(var i=index; i<max; i++){
     for(var i=0; i<wayPoints.length; i++){
@@ -222,11 +223,16 @@ var overView = React.createClass({
         url: fourSquare_url + ll + category_url + radius_url + limit_url + photos_url + distance_url,
         method: "GET",
         success: function(data){
+          count--;
           var point = this; // waypoint used for query, bound to this for for callback
           var venue_wrappers = data.response.groups[0].items; //extract venues array from data
           Actions.addVenues(venue_wrappers, point);
-        }, 
+          if(count === 0 ){
+            Actions.sortVenues();
+          }
+        }.bind(point), 
         error: function(error){
+          count--;
           console.log("TEST -------> fourSquare error, error=", error);
         }
       }); //ajax()
@@ -251,6 +257,8 @@ var overView = React.createClass({
                 <ListView
                   // currentRoute={this.state.currentRoute}
                   currentRoute = {this.state.currentRoute}
+                  origin = {this.state.origin}
+
                 /> {/* ListView*/}
 
             </div> {/* list-container */}
@@ -262,6 +270,8 @@ var overView = React.createClass({
               <MapView 
                 currentRoute={this.state.currentRoute} 
                 id="map"
+                origin = {this.state.origin}
+
               /> {/* MapView */}
             </div> {/* row */}
 

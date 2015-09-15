@@ -27,10 +27,14 @@ function initRoutes (newRoutes){
   currentRoute = routes[0]; //set default currentRoute to first result
 } //initRoutes
 
-
+function sortVenues() {
+  currentRoute.filteredVenues.sort(function(a,b){
+    return a.totalDistance - b.totalDistance;
+  });
+}
 function addVenues(venue_wrappers, point){
     //NOTE: point is used for calulating total distance, which is equal to distance of point to origin, plus distance of point to venue
-    // console.log("RouteStore inside addVenues()");
+
 
     // count++;
     // var prevResults = newRoute.results || {}; //results is a hash for quick checking
@@ -41,7 +45,6 @@ function addVenues(venue_wrappers, point){
     venue_wrappers.forEach(function(venue_wrapper, i){
       var venue = venue_wrapper.venue;
       venue.totalDistance = venue.location.distance + point.distance; // in meters
-      
       //remove duplicate venues 
       if (!allVenues[venue.id]) { // if venue does NOT exist already 
           // newResults[venue.id] = venue; //save into newResults 
@@ -61,10 +64,9 @@ function addVenues(venue_wrappers, point){
     } 
 
     currentRoute.filteredVenues = getFilteredArr(); //NOTE: get back a filtered and sorted array
-
+    // console.log(allVenues);
   /**************/
   
-  currentRoute.filteredVenues = getFilteredArr();
 } //addVenues()
 
 
@@ -200,17 +202,20 @@ AppDispatcher.register(function(action) {
     case Constants.PRICE_FILTER: 
       _venueFilters.priceFilter = action.tier;
       currentRoute.filteredVenues = getFilteredArr();
+      sortVenues();
       Store.emitChange();
       break;
     case Constants.RATING_FILTER: 
       _venueFilters.ratingFilter = action.minRating;
       currentRoute.filteredVenues = getFilteredArr();
+      sortVenues();
       Store.emitChange();
       break;
     
     case Constants.OPEN_NOW_FILTER:
       _venueFilters.openNowFilter = !_venueFilters.openNowFilter; 
       currentRoute.filteredVenues = getFilteredArr();
+      sortVenues();
       Store.emitChange();
       break;
     case Constants.CLEAR_FILTER:
@@ -218,6 +223,11 @@ AppDispatcher.register(function(action) {
       _venueFilters.ratingFilter = -1; 
       _venueFilters.priceFilter = -1; 
       currentRoute.filteredVenues = getFilteredArr(); 
+      sortVenues();
+      Store.emitChange();
+      break;
+    case Constants.SORT_VENUES:
+      sortVenues();
       Store.emitChange();
       break;
 

@@ -37,7 +37,6 @@ var HomeView = React.createClass({
   // Componenet lifecycle method that get's called after the first render
   componentDidMount () {
     // allows access of the props inside setOrigin and setDestination
-    console.log("TEST ---------> mounting HomeView");
     var component = this;
 
     var setOrigin = function() {
@@ -62,9 +61,6 @@ var HomeView = React.createClass({
     destinationAutoComplete.addListener('place_changed', setDestination);
   },
 
-  componentWillUnmount () {
-    console.log('got Called')
-  },
 
   render () {
     var slider_options = {

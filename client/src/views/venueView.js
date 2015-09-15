@@ -31,9 +31,17 @@ var VenueView = React.createClass({
   openFourSquare: function () {
     var venue = this.props.venue;
     var url = "https://foursquare.com/v/"+escape(venue.name)+"/"+venue.id;
-    console.log("TEST inside openFourSquare. url="+url);
     window.open(url);
   },
+
+  openDirections: function() {
+    var venue = this.props.venue;
+    var origin = this.props.origin;
+    var url = "https://www.google.com/maps/dir/" + origin+ "/" + venue.location.lat +"," +venue.location.lng
+    console.log(url);
+    window.open(url);
+  }
+  ,
 
   render () {
     var {featuredPhotos, name, contact, hours, categories, location, menu, price, rating, ratingColor, stats, url, totalDistance} = this.props.venue;
@@ -70,20 +78,21 @@ var VenueView = React.createClass({
     var totalDistanceText = Math.round(totalDistance/1000*.621*10)/10 + " mi";
 
     return (
-      <Card className="card" onClick={this.openFourSquare}>
+      <Card className="card" >
         <div className="col-xs-2 avatar" >
           {avatar}
         </div>
         <div className="col-xs-7">
           <span className="title"> {name} </span>
           <span className="category"> {categoryText} </span>
-          <span className="address">{location.formattedAddress[0] ? location.formattedAddress[0] : null} </span>
+          <span className="address" onClick={this.openDirections}>{location.formattedAddress[0] ? location.formattedAddress[0] : null} </span>
           <span className={hours && hours.status && hours.status.toLowerCase().includes('open') ? 'open' : 'closed'}> {hours && hours.status ? hours.status : null} </span>
         </div>
         <div className="col-xs-3 detail-info">
           <span className="rating"> {"\uD83C\uDFC6 " + ratingText} </span>
           <span className="distance"> {totalDistanceText} </span>
           <span className="price"> {priceText} </span>
+          <span onClick={this.openFourSquare}><strong>Foursquare</strong></span>
 
         </div>
       </Card>
