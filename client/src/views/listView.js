@@ -16,27 +16,37 @@ var ListView = React.createClass({
   },
 
   defaultOptions: {
+    colors: {
+      defaultColor: '#FFF',
+      hoverColor: '#ddd'
 
-    
+    }
   },
+
   componentDidMount () {
     // console.log("listView -----> componentDidMount()");
 
-  },
+    /*******  INIT LISTVIEW UX ********/
+    var {hoverColor, defaultColor} = this.defaultOptions.colors;
 
-  componentDidUpdate(prevProps, prevState) {
-    // if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length && QueryStore.prevWaypoints()==21) {
-    //   this.queryFourSquare(1, 21);
-    // } 
-  },
+    $(document).on('mouseenter', '.card', function(e) {
+      $(e.currentTarget).css({'background-color': hoverColor});
 
-  //Gets the previous number of waypoints and the new number to be querried
-  // _onChange () {
-  //   var waypoints = QueryStore.getWaypoints();
-  //   // if (this.props.currentRoute.wayPoints.length && !this.props.currentRoute.results.length) {
-  //   this.queryFourSquare(waypoints);
-  //   // } 
-  // },
+      //update map markers to show active venue
+      var venue_id = $(e.currentTarget).attr('id');
+      Actions.selectVenue(venue_id);
+    });
+
+    $(document).on('mouseleave', '.card', function(e) {
+      $(e.currentTarget).css({'background-color': defaultColor})
+    });
+
+    // deactivate marker when mouse leave the list-container
+    $(document).on('mouseleave', '.list-container', function(e) {
+      Actions.selectVenue("");
+    });
+
+  }, //componentDidMount()
 
   render () {
     var component = this;
@@ -56,12 +66,6 @@ var ListView = React.createClass({
       return null;
     } //if
 
-    // var listDetails = this.state.venues.map(function(venue, index) {
-    //   return (
-    //     <VenueView venue={venue}/>
-    //   )
-    // });
-    
   } //render()
 });
 

@@ -1,7 +1,8 @@
 /*** MapView ***/
 //NOTE: Mapview only renders the DOM once. From then on, it only renders inside the google map via api controls
 var React = require('react');
-
+var MapHelper = require('../helpers/mapHelpers');
+var MapMarkerStore = require('../stores/MapMarkerStore');
 var MapView = React.createClass({
 
   propTypes: {
@@ -20,7 +21,7 @@ var MapView = React.createClass({
   componentDidMount () {
     // console.log("MapView ---> inside componentDidMount");
     
-    // QueryStore.addChangeListener(this._onChange)
+    MapMarkerStore.addChangeListener(this._onChange)
 
   },
 
@@ -55,9 +56,9 @@ var MapView = React.createClass({
 
   //Gets the previous number of waypoints and the new number to be querried
   _onChange () {
-    // this.clearMapMarkers(); 
-    // this.updateMapMarkers(); //newVenuesArr
+    this.changePoppedMarker();
   },
+
 
   openFourSquare: function (venue) {
     var url = "https://foursquare.com/v/"+escape(venue.name)+"/"+venue.id;
@@ -71,6 +72,23 @@ var MapView = React.createClass({
     return url;
     // window.open(url);
   },
+
+  changePoppedMarker (){
+    var map = window.map;
+
+    var newMarker = this.state.displayedMarkers[MapMarkerStore.getActiveVenue()];
+    var prevMarker = this.state.displayedMarkers[MapMarkerStore.getPrevVenue()];
+
+    if(newMarker){
+      // newMarker.setAnimation(google.maps.Animation.BOUNCE);
+      newMarker.infowindow.open(map, newMarker);
+    }
+
+    if(prevMarker){ //if a previous marker has been set
+      // prevMarker.setAnimation(null);
+      prevMarker.infowindow.close();
+    } //if
+  }, //popMarker()
 
   // Print new markers ()
   updateMapMarkers: function(newVenuesArr){
@@ -128,6 +146,8 @@ var MapView = React.createClass({
           "<a href=" + component.openFourSquare(venue) + " target='_blank'><div float='right'>Details</div></a>"
         });
 
+        marker.infowindow = infowindow;
+
         var markerIsActive = false;
 
         //create event listener to open info window
@@ -161,7 +181,7 @@ var MapView = React.createClass({
         }); //mouseout
 
         google.maps.event.addListener(marker, 'dblclick', function() {
-          component.openFourSquare(venue); //load new page
+          MapHelper.openFourSquare(venue); //load new page
           
         });
 
