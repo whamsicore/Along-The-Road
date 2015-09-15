@@ -59,6 +59,18 @@ var MapView = React.createClass({
     // this.updateMapMarkers(); //newVenuesArr
   },
 
+  openFourSquare: function (venue) {
+    var url = "https://foursquare.com/v/"+escape(venue.name)+"/"+venue.id;
+    return url;
+    // window.open(url);
+  },
+
+  openDirections: function(venue) {
+    var origin = this.props.origin;
+    var url = "https://www.google.com/maps/dir/" + origin+ "/" + venue.location.lat +"," +venue.location.lng
+    return url;
+    // window.open(url);
+  },
 
   // Print new markers ()
   updateMapMarkers: function(newVenuesArr){
@@ -84,6 +96,7 @@ var MapView = React.createClass({
 
     };
 
+
     /**** print un ****/
     newVenuesArr.forEach(function(venue, index){
 
@@ -91,16 +104,28 @@ var MapView = React.createClass({
 
       //create new marker only if marker has not been displayed
       if(!displayedMarkers[venue.id]){ //
+
+        var image = '../../images/orange.png'
+        if(venue.rating >= 7) image = '../../images/orange.png';
+        if(venue.rating >= 8) image = '../../images/yellow.png';
+        if(venue.rating >= 9) image = '../../images/green.png';
+
         var position = new google.maps.LatLng(lat, lng);
 
         var marker = new google.maps.Marker({
           position: position,
+          icon: image
         });
-
+        if(venue.photos.groups[0]){
+          var venueImage = venue.photos.groups[0].items[0].prefix+"110x110"+ venue.photos.groups[0].items[0].suffix;
+        }
         // create custom infowindow
         // NOTE: we can also add rating color to decorate marker
         var infowindow = new google.maps.InfoWindow({
-          content: venue.name + "<br> Rating: "+venue.rating
+          content: '<img border="0" align="Left" src='+ venueImage+ '  style="width: 80px; height: 80px">' + "<strong>" + 
+          venue.name + "</strong>"+ "<br/> Rating: "+venue.rating +  "<br/>" +
+          "<a href="+ component.openDirections(venue) + " target='_blank'><div float='right'>Directions</div></a>" + "<br/>" +
+          "<a href=" + component.openFourSquare(venue) + " target='_blank'><div float='right'>Details</div></a>"
         });
 
         var markerIsActive = false;

@@ -258,6 +258,7 @@ var overView = React.createClass({
                   // currentRoute={this.state.currentRoute}
                   currentRoute = {this.state.currentRoute}
                   origin = {this.state.origin}
+
                 /> {/* ListView*/}
 
             </div> {/* list-container */}
@@ -269,6 +270,8 @@ var overView = React.createClass({
               <MapView 
                 currentRoute={this.state.currentRoute} 
                 id="map"
+                origin = {this.state.origin}
+
               /> {/* MapView */}
             </div> {/* row */}
 
