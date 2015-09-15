@@ -16,7 +16,8 @@ module.exports = keyMirror({
 	SELECT_VENUE: null,
 	ADD_WAYPOINTS: null, 
   // NEW FUNCTIONS
-  UPDATE_ROUTES: null
+  UPDATE_ROUTES: null,
+  	UPDATE_LIST: null
 
 
 });

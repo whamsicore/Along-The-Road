@@ -12,7 +12,7 @@ var CHANGE_EVENT = 'change';
 var routes = []; //Stores the last waypoint searched in for that route
 var currentRoute = 0;
 var _venueFilters = {
-  ratingFilter: -1, 
+  ratingFilter: 7, 
   priceFilter: -1,  
   openNowFilter: false
 };
@@ -217,7 +217,7 @@ AppDispatcher.register(function(action) {
       break;
     case Constants.CLEAR_FILTER:
       _venueFilters.openNowFilter = false; 
-      _venueFilters.ratingFilter = -1; 
+      _venueFilters.ratingFilter = 7 ; 
       _venueFilters.priceFilter = -1; 
       currentRoute.filteredVenues = getFilteredArr(); 
       sortVenues();

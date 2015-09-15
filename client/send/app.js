@@ -23805,14 +23805,13 @@
 	  /********* LEGACY ********/
 
 	  query: function query() {
-	    console.log("Actions ----> Query");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.QUERY_WAYPOINTS
 	    });
 	  },
 
 	  addVenues: function addVenues(results, point) {
-	    console.log("Actions ----> addVenues");
+	    // console.log("Actions ----> addVenues")
 	    AppDispatcher.dispatch({
 	      actionType: Constants.ADD_VENUES,
 	      results: results,
@@ -23821,53 +23820,45 @@
 	  },
 
 	  sortVenues: function sortVenues() {
-	    console.log("Actions ----> sortVenues");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.SORT_VENUES
 	    });
 	  },
 
 	  priceFilter: function priceFilter(tier) {
-	    console.log("Actions ----> priceFilter");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.PRICE_FILTER,
 	      tier: tier
 	    });
 	  },
 	  ratingFilter: function ratingFilter(minRating) {
-	    console.log("Actions ----> ratingFilter");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.RATING_FILTER,
 	      minRating: minRating
 	    });
 	  },
 	  clearData: function clearData() {
-	    console.log("Actions ----> clearData");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.CLEAR_DATA
 	    });
 	  },
 	  openNowFilter: function openNowFilter() {
-	    console.log("Actions ----> openNowFilter");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.OPEN_NOW_FILTER
 	    });
 	  },
 	  clearFilter: function clearFilter() {
-	    console.log("Actions ----> clearFilter");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.CLEAR_FILTER
 	    });
 	  },
 	  selectRoute: function selectRoute(index) {
-	    console.log("Actions ----> selectRoute");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.SELECT_ROUTE,
 	      index: index
 	    });
 	  },
 	  addWaypoints: function addWaypoints(wayPoints) {
-	    console.log("Actions ----> addWaypoints");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.ADD_WAYPOINTS,
 	      wayPoints: wayPoints
@@ -44995,6 +44986,7 @@
 	    var origin = _context$router$getCurrentParams.origin;
 	    var destination = _context$router$getCurrentParams.destination;
 
+	    this.state.origin = origin;
 	    var start = MapHelpers.getLatLong(origin);
 	    var end = MapHelpers.getLatLong(destination);
 	    var map = MapHelpers.initializeMap(start);
@@ -45115,7 +45107,6 @@
 	  //re-render results onto the page by updating state variable.
 	  getFourSquare: function getFourSquare(wayPoints) {
 
-	    console.log("$$$$$$$$$$ insdie getFourSquare()");
 	    // var index = currentRoute.queryIndex;
 	    // if(index<wayPoints.length){
 
@@ -45126,7 +45117,7 @@
 	    // if(max>wayPoints.length){
 
 	    // }
-	    var count = waypoints.length;
+	    var count = wayPoints.length;
 
 	    // for(var i=index; i<max; i++){
 	    for (var i = 0; i < wayPoints.length; i++) {
@@ -45150,7 +45141,7 @@
 	      $.ajax({
 	        url: fourSquare_url + ll + category_url + radius_url + limit_url + photos_url + distance_url,
 	        method: "GET",
-	        success: function success(data) {
+	        success: (function (data) {
 	          count--;
 	          var point = this; // waypoint used for query, bound to this for for callback
 	          var venue_wrappers = data.response.groups[0].items; //extract venues array from data
@@ -45158,8 +45149,9 @@
 	          if (count === 0) {
 	            Actions.sortVenues();
 	          }
-	        },
+	        }).bind(point),
 	        error: function error(_error) {
+	          count--;
 	          console.log("TEST -------> fourSquare error, error=", _error);
 	        }
 	      }); //ajax()
@@ -45189,7 +45181,9 @@
 	            { className: 'list-container' },
 	            React.createElement(ListView,
 	            // currentRoute={this.state.currentRoute}
-	            { currentRoute: this.state.currentRoute
+	            { currentRoute: this.state.currentRoute,
+	              origin: this.state.origin
+
 	            }),
 	            ' '
 	          ),
@@ -45204,7 +45198,9 @@
 	            { className: 'row map-container' },
 	            React.createElement(MapView, {
 	              currentRoute: this.state.currentRoute,
-	              id: 'map'
+	              id: 'map',
+	              origin: this.state.origin
+
 	            }),
 	            ' '
 	          ),
@@ -45234,12 +45230,14 @@
 /* 361 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	/*** MapView ***/
+	//NOTE: Mapview only renders the DOM once. From then on, it only renders inside the google map via api controls
+	"use strict";
 
 	var React = __webpack_require__(1);
 
 	var MapView = React.createClass({
-	  displayName: 'MapView',
+	  displayName: "MapView",
 
 	  propTypes: {},
 
@@ -45247,7 +45245,7 @@
 
 	  getInitialState: function getInitialState() {
 	    return {
-	      markers: []
+	      displayedMarkers: []
 	    };
 	  }, //getInitialState()
 	  componentDidMount: function componentDidMount() {
@@ -45259,43 +45257,105 @@
 
 	  componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
 	    // console.log("MapView ---> inside componentDidUpdate ");
+	    // if(prevProps.currentRoute)
+	    // this.clearMapMarkers();
+	    // this.updateMapMarkers();
+	  },
 
-	    this.clearMapMarkers();
-	    this.updateMapMarkers();
+	  shouldComponentUpdate: function shouldComponentUpdate(prevProps, prevState) {
+	    var prevRoute = this.props.currentRoute;
+	    var newRoute = prevProps.currentRoute;
+	    if (prevRoute && newRoute) {
+
+	      // console.log("************** prevProps = ", prevProps);
+	      // console.log("************** currentRoute = ", this.props.currentRoute);
+	      // if(prevProps.currentRoute.index !== this.props.currentRoute.index){
+	      // }
+	      if (prevRoute.index !== newRoute.index) {
+	        console.log("************** New Route has been set");
+	        this.clearMapMarkers();
+	      }
+	    } else {
+	      // currentRoute has changed
+	      this.clearMapMarkers();
+	    } //
+
+	    this.updateMapMarkers(newRoute.filteredVenues);
+
+	    return false;
 	  },
 
 	  //Gets the previous number of waypoints and the new number to be querried
 	  _onChange: function _onChange() {
 	    // this.clearMapMarkers();
-	    // this.updateMapMarkers(); //results
+	    // this.updateMapMarkers(); //newVenuesArr
 	  },
 
-	  // Print new markers
-	  updateMapMarkers: function updateMapMarkers() {
-	    // set to new prop
-	    var results = this.props.currentRoute.filteredVenues;
+	  openFourSquare: function openFourSquare(venue) {
+	    var url = "https://foursquare.com/v/" + escape(venue.name) + "/" + venue.id;
+	    return url;
+	    // window.open(url);
+	  },
+
+	  openDirections: function openDirections(venue) {
+	    var origin = this.props.origin;
+	    var url = "https://www.google.com/maps/dir/" + origin + "/" + venue.location.lat + "," + venue.location.lng;
+	    return url;
+	    // window.open(url);
+	  },
+
+	  // Print new markers ()
+	  updateMapMarkers: function updateMapMarkers(newVenuesArr) {
+	    // we are going to check markers array has already been printed
+	    // var newVenuesArr = this.props.currentRoute.filteredVenues;
 
 	    var map = window.map;
-	    var markers = this.state.markers; //array of
+	    var displayedMarkers = this.state.displayedMarkers; //array of
 	    var component = this;
-	    results.forEach(function (venue, index) {
+
+	    /**** remove unnecessary displayedMarkers ****/
+	    for (var venue_id in displayedMarkers) {
+	      var marker = displayedMarkers[venue_id];
+
+	      var found = newVenuesArr.filter(function (venue) {
+	        return venue_id === venue.id;
+	      });
+
+	      if (found.length === 0) {
+	        //not found
+	        marker.setMap(null);
+	        delete displayedMarkers[venue_id]; //delete marker from displayed markers
+	      } //if
+	    };
+
+	    /**** print un ****/
+	    newVenuesArr.forEach(function (venue, index) {
 	      var _venue$location = venue.location;
 	      var lng = _venue$location.lng;
 	      var lat = _venue$location.lat;
 
 	      //create new marker only if marker has not been displayed
-	      if (!markers[venue.id]) {
+	      if (!displayedMarkers[venue.id]) {
 	        //
+
+	        var image = '../../images/orange.png';
+	        if (venue.rating >= 7) image = '../../images/orange.png';
+	        if (venue.rating >= 8) image = '../../images/yellow.png';
+	        if (venue.rating >= 9) image = '../../images/green.png';
+
 	        var position = new google.maps.LatLng(lat, lng);
 
 	        var marker = new google.maps.Marker({
-	          position: position
+	          position: position,
+	          icon: image
 	        });
-
+	        if (venue.photos.groups[0]) {
+	          var venueImage = venue.photos.groups[0].items[0].prefix + "110x110" + venue.photos.groups[0].items[0].suffix;
+	        }
 	        // create custom infowindow
 	        // NOTE: we can also add rating color to decorate marker
 	        var infowindow = new google.maps.InfoWindow({
-	          content: venue.name + "<br> Rating: " + venue.rating
+	          content: '<img border="0" align="Left" src=' + venueImage + '  style="width: 80px; height: 80px">' + "<strong>" + venue.name + "</strong>" + "<br/> Rating: " + venue.rating + "<br/>" + "<a href=" + component.openDirections(venue) + " target='_blank'><div float='right'>Directions</div></a>" + "<br/>" + "<a href=" + component.openFourSquare(venue) + " target='_blank'><div float='right'>Details</div></a>"
 	        });
 
 	        var markerIsActive = false;
@@ -45337,8 +45397,8 @@
 	        //show map marker
 	        marker.setMap(map);
 	        // add current marker to state
-	        component.state.markers[venue.id] = marker;
-	        // component.state.markers.push(marker);
+	        component.state.displayedMarkers[venue.id] = marker;
+	        // component.state.displayedMarkers.push(marker);
 	      } //if(marker)
 
 	      //display markers
@@ -45349,23 +45409,11 @@
 	  clearMapMarkers: function clearMapMarkers() {
 
 	    var markers = this.state.markers;
-	    var results = this.props.currentRoute.filteredVenues;
-	    var toKeep = {};
-
-	    for (var i in results) {
-	      var venueId = results[i].id;
-	      if (markers[venueId]) {
-	        toKeep[venueId] = true;
-	      }
-	    }
 
 	    for (var key in markers) {
-	      if (!toKeep[key]) {
-	        var marker = markers[key];
-	        marker.setMap(null);
-	        delete this.state.markers[key];
-	      }
-	    }
+	      var marker = markers[key];
+	      marker.setMap(null);
+	    } //for
 	  }, //clearMapMarkers
 
 	  render: function render() {
@@ -45378,9 +45426,9 @@
 	    // });
 
 	    return React.createElement(
-	      'div',
-	      { id: 'map' },
-	      '  '
+	      "div",
+	      { id: "map" },
+	      "  "
 	    );
 	  }
 	});
@@ -45512,7 +45560,7 @@
 
 	    if (this.props.currentRoute) {
 	      var listDetails = this.props.currentRoute.filteredVenues.map(function (venue, index) {
-	        return React.createElement(VenueView, { venue: venue });
+	        return React.createElement(VenueView, { venue: venue, origin: component.props.origin });
 	      });
 
 	      return React.createElement(
@@ -45585,6 +45633,14 @@
 	    window.open(url);
 	  },
 
+	  openDirections: function openDirections() {
+	    var venue = this.props.venue;
+	    var origin = this.props.origin;
+	    var url = "https://www.google.com/maps/dir/" + origin + "/" + venue.location.lat + "," + venue.location.lng;
+	    console.log(url);
+	    window.open(url);
+	  },
+
 	  render: function render() {
 	    var _props$venue = this.props.venue;
 	    var featuredPhotos = _props$venue.featuredPhotos;
@@ -45629,7 +45685,7 @@
 
 	    return React.createElement(
 	      Card,
-	      { className: 'card', onClick: this.openFourSquare },
+	      { className: 'card' },
 	      React.createElement(
 	        'div',
 	        { className: 'col-xs-2 avatar' },
@@ -45654,7 +45710,7 @@
 	        ),
 	        React.createElement(
 	          'span',
-	          { className: 'address' },
+	          { className: 'address', onClick: this.openDirections },
 	          location.formattedAddress[0] ? location.formattedAddress[0] : null,
 	          ' '
 	        ),
@@ -45689,6 +45745,15 @@
 	          ' ',
 	          priceText,
 	          ' '
+	        ),
+	        React.createElement(
+	          'span',
+	          { onClick: this.openFourSquare },
+	          React.createElement(
+	            'strong',
+	            null,
+	            'Foursquare'
+	          )
 	        )
 	      )
 	    );
@@ -45975,6 +46040,11 @@
 	  currentRoute = routes[0]; //set default currentRoute to first result
 	} //initRoutes
 
+	function sortVenues() {
+	  currentRoute.filteredVenues.sort(function (a, b) {
+	    return a.totalDistance - b.totalDistance;
+	  });
+	}
 	function addVenues(venue_wrappers, point) {
 	  //NOTE: point is used for calulating total distance, which is equal to distance of point to origin, plus distance of point to venue
 
@@ -45987,7 +46057,6 @@
 	  venue_wrappers.forEach(function (venue_wrapper, i) {
 	    var venue = venue_wrapper.venue;
 	    venue.totalDistance = venue.location.distance + point.distance; // in meters
-
 	    //remove duplicate venues
 	    if (!allVenues[venue.id]) {
 	      // if venue does NOT exist already
@@ -46010,10 +46079,8 @@
 	  }
 
 	  currentRoute.filteredVenues = getFilteredArr(); //NOTE: get back a filtered and sorted array
-
+	  // console.log(allVenues);
 	  /**************/
-
-	  currentRoute.filteredVenues = getFilteredArr();
 	} //addVenues()
 
 	function setCurrentRoute(index) {
@@ -46146,17 +46213,20 @@
 	    case Constants.PRICE_FILTER:
 	      _venueFilters.priceFilter = action.tier;
 	      currentRoute.filteredVenues = getFilteredArr();
+	      sortVenues();
 	      Store.emitChange();
 	      break;
 	    case Constants.RATING_FILTER:
 	      _venueFilters.ratingFilter = action.minRating;
 	      currentRoute.filteredVenues = getFilteredArr();
+	      sortVenues();
 	      Store.emitChange();
 	      break;
 
 	    case Constants.OPEN_NOW_FILTER:
 	      _venueFilters.openNowFilter = !_venueFilters.openNowFilter;
 	      currentRoute.filteredVenues = getFilteredArr();
+	      sortVenues();
 	      Store.emitChange();
 	      break;
 	    case Constants.CLEAR_FILTER:
@@ -46164,6 +46234,11 @@
 	      _venueFilters.ratingFilter = -1;
 	      _venueFilters.priceFilter = -1;
 	      currentRoute.filteredVenues = getFilteredArr();
+	      sortVenues();
+	      Store.emitChange();
+	      break;
+	    case Constants.SORT_VENUES:
+	      sortVenues();
 	      Store.emitChange();
 	      break;
 

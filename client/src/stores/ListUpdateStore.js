@@ -10,15 +10,6 @@ var CHANGE_EVENT = 'change';
 var routeData = []; //Stores the last waypoint searched in for that route
 var currentRoute = 0;
 
-
-function setCurrentRoute (index) {
-  currentRoute = index;
-}
-
-function addWaypoints (waypoints) {
-  routeData.push({waypoints: waypoints, index: 1});
-}
-
 var Store = assign({}, EventEmitter.prototype, {
 
 
@@ -27,16 +18,8 @@ var Store = assign({}, EventEmitter.prototype, {
   },
 
 
-  getWaypoints: function(){
-    var temp = routeData[currentRoute].waypoints.slice(routeData[currentRoute].index, 20);
-    routeData[currentRoute].index+=20;
-    console.log(temp, routeData[currentRoute].index);
-    return temp;
-  },
 
-  /**
-   * @param {function} callback
-   */
+
   addChangeListener: function(callback) {
     this.on(CHANGE_EVENT, callback);
   },
@@ -55,19 +38,11 @@ AppDispatcher.register(function(action) {
 
   switch(action.actionType) {
 
-    case Constants.QUERY_WAYPOINTS:
+    case Constants.UPDATE_LIST:
+    console.log('called')
       Store.emitChange();
       break;
-    case Constants.CLEAR_DATA:
-        routeData = [];
-        currentRoute = 0;
-        break;
-    case Constants.SELECT_ROUTE:
-        setCurrentRoute(action.index);
-        break;
-    case Constants.ADD_WAYPOINTS:
-        addWaypoints(action.wayPoints);
-        break;
+
 
 
     default:
