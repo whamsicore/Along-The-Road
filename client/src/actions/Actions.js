@@ -79,6 +79,11 @@ var Actions = {
       actionType: Constants.ADD_WAYPOINTS,
       wayPoints: wayPoints
     })
+  },
+  updateList: function() {
+    AppDispatcher.dispatch({
+      actionType: Constants.UPDATE_LIST,
+    });
   }
 
 };

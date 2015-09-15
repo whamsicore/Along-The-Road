@@ -6,21 +6,27 @@ var React = require('react');
 var VenueView = require('./venueView');
 
 var Actions = require('../actions/Actions.js');
+var ListUpdateStore = require('../stores/ListUpdateStore');
 // var VenueStore = require('../stores/VenueStore');
 
 
 var ListView = React.createClass({
 
+
   propTypes: {
     currentRoute: React.PropTypes.object.isRequired
   },
 
+  shouldComponentUpdate () {
+    return false;
+  },
   defaultOptions: {
     colors: {
       defaultColor: '#FFF',
       hoverColor: '#ddd'
 
     }
+    
   },
 
   componentDidMount () {
@@ -28,7 +34,8 @@ var ListView = React.createClass({
 
     /*******  INIT LISTVIEW UX ********/
     var {hoverColor, defaultColor} = this.defaultOptions.colors;
-
+    ListUpdateStore.addChangeListener(this.updateList);
+ 
     $(document).on('mouseenter', '.card', function(e) {
       $(e.currentTarget).css({'background-color': hoverColor});
 
@@ -48,6 +55,9 @@ var ListView = React.createClass({
 
   }, //componentDidMount()
 
+  updateList() {
+    this.forceUpdate();
+  },
   render () {
     var component = this;
 
