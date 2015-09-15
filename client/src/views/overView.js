@@ -163,7 +163,7 @@ var overView = React.createClass({
   loadMore () {
     var queryIndex = this.state.currentRoute.queryIndex;
     var queries = this.state.currentRoute.wayPoints.slice(queryIndex, queryIndex+20);
-    this.getFourSquare(queries); //getFourSquare
+    this.getFourSquare(queries, queryIndex); //getFourSquare
     this.state.currentRoute.queryIndex+=20;
 
   },
@@ -192,7 +192,7 @@ var overView = React.createClass({
   //queries fourSquare api to get new results.
   //save results to the current route and updates the parent (mapView)
   //re-render results onto the page by updating state variable.
-  getFourSquare (wayPoints) {
+  getFourSquare (wayPoints, queryIndex) {
 
     // var index = currentRoute.queryIndex;
     // if(index<wayPoints.length){
@@ -227,12 +227,24 @@ var overView = React.createClass({
           var point = this; // waypoint used for query, bound to this for for callback
           var venue_wrappers = data.response.groups[0].items; //extract venues array from data
           Actions.addVenues(venue_wrappers, point);
+          //This is just to show the user something is loading
+          if(queryIndex === 1 && count ===  wayPoints.length-1) {
+            Actions.sortVenues();
+            Actions.updateList();
+          }
+
+          //This condition checks for if it is the last query
           if(count === 0 ){
             Actions.sortVenues();
+            Actions.updateList();
           }
         }.bind(point),
         error: function(error){
           count--;
+          if(count === 0 ){
+            Actions.sortVenues();
+            Actions.updateList();
+          }
           console.log("TEST -------> fourSquare error, error=", error);
         }
       }); //ajax()
