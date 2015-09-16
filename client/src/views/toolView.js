@@ -48,10 +48,10 @@ var ToolView = React.createClass({
           Price
           <span className="caret"></span></button>
           <ul className="dropdown-menu">
-            <li onClick={function(){Actions.priceFilter(1)}}> <a>Price: $</a></li>
-            <li onClick={function(){Actions.priceFilter(2)}}><a>Price: $$</a></li>
-            <li onClick={function(){Actions.priceFilter(3)}}><a>Price: $$$</a></li>
-            <li onClick={function(){Actions.openNowFilter()}}><a>Open</a></li>
+            <li onClick={function(){Actions.priceFilter(1);  Actions.updateList();}}> <a>Price: $</a></li>
+            <li onClick={function(){Actions.priceFilter(2); Actions.updateList();}}><a>Price: $$</a></li>
+            <li onClick={function(){Actions.priceFilter(3); Actions.updateList();}}><a>Price: $$$</a></li>
+            <li onClick={function(){Actions.openNowFilter(); Actions.updateList();}}><a>Open</a></li>
           </ul>
         </div>
         <div className="dropdown">
@@ -59,9 +59,9 @@ var ToolView = React.createClass({
           Rating
           <span className="caret"></span></button>
           <ul className="dropdown-menu">
-            <li onClick={function(){Actions.ratingFilter(7)}}> <a>7+ Rating</a></li>
-            <li onClick={function(){Actions.ratingFilter(8)}}><a>8+ Rating</a></li>
-            <li onClick={function(){Actions.ratingFilter(9)}}><a>9+ Rating</a></li>
+            <li onClick={function(){Actions.ratingFilter(7); Actions.updateList();}}> <a>7+ Rating</a></li>
+            <li onClick={function(){Actions.ratingFilter(8); Actions.updateList();}}><a>8+ Rating</a></li>
+            <li onClick={function(){Actions.ratingFilter(9); Actions.updateList();}}><a>9+ Rating</a></li>
           </ul>
         </div>
 
