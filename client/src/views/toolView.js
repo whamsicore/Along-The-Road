@@ -89,7 +89,7 @@ var ToolView = React.createClass({
         // </div>
   render () {
     return (
-      <div style={{"backgroundColor": 'pink'}}>
+      <div style={{"backgroundColor": 'grey'}}>
         <SelectBox
             label = "Set Filters"
             className = ''
@@ -101,6 +101,8 @@ var ToolView = React.createClass({
           <option value='price2'> $$ </option>
           <option value='price3'> $$$ </option>
         </SelectBox>
+
+        <input placeholder = "Keyword Search" className='filter-input form-control'/>
       </div>
     );
   } //render()

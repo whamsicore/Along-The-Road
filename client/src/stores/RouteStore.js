@@ -18,7 +18,9 @@ var venueFilters = {
   price1: false,
   price2: false,
   price3: false,
-  openNowFilter: false
+  openNowFilter: false,
+  categoryFilter: ''
+
 };
 
 
@@ -86,7 +88,7 @@ function getFilteredArr () {
   var filteredVenues = [];
   var allVenues = currentRoute.allVenues;
   // var {ratingFilter, priceFilter, price1, price2, price3, openNowFilter} = venueFilters;
-
+  var categoryFilter = venueFilters.categoryFilter;
   var price1 = filterArr.indexOf('price1')!==-1 ? true : false;
   var price2 = filterArr.indexOf('price2')!==-1 ? true : false;
   var price3 = filterArr.indexOf('price3')!==-1 ? true : false;
@@ -276,7 +278,7 @@ AppDispatcher.register(function(action) {
       break;
 
     case Constants.CATEGORY_FILTER:
-      _venueFilters.categoryFilter = action.categoryFilter;
+      venueFilters.categoryFilter = action.categoryFilter;
       currentRoute.filteredVenues = getFilteredArr();
       sortVenues();
       Store.emitChange();
