@@ -263,7 +263,7 @@ var overView = React.createClass({
         <div className = 'row' style={{'height': '100%', 'width': '100%'}}>
           <div className = 'col-sm-5 left-container'>
 
-            <div className = 'tool-bar-container' style={{"backgroundColor": "purple"}} >
+            <div className = 'tool-bar-container' style={{"backgroundColor": "#333"}} >
               <ToolView
                 loadMore = {this.loadMore}
                 /*venueFilters = {this.state.venueFilters}*/

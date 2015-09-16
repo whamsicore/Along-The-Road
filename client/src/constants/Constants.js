@@ -19,6 +19,6 @@ module.exports = keyMirror({
   // NEW FUNCTIONS
 	UPDATE_ROUTES: null,
 	UPDATE_LIST: null,
-	CATEGORY_FILTER: null
-  UPDATE_VENUE_FILTERS: null,
+	CATEGORY_FILTER: null,
+  UPDATE_VENUE_FILTERS: null
 });
