@@ -6,10 +6,10 @@ var deg2rad = function(deg) {
 // calculates the distance in km between two points based on their Latitude and Longitude
 var getDistanceBetweenPoints = function(point1, point2) {
   // great-circle distance calculation; code from Stack Overflow
-  var lat1 = point1.G;
-  var lon1 = point1.K;
-  var lat2 = point2.G;
-  var lon2 = point2.K;
+  var lat1 = point1.H;
+  var lon1 = point1.L;
+  var lat2 = point2.H;
+  var lon2 = point2.L;
   var R = 6371; // Radius of the earth in km
   var dLat = deg2rad(lat2-lat1);  // deg2rad below
   var dLon = deg2rad(lon2-lon1);
@@ -24,7 +24,7 @@ var getDistanceBetweenPoints = function(point1, point2) {
 };
 
 var getMiddlePoint = function(a, b) {
-  return new google.maps.LatLng((a.G+b.G)/2, (a.K+b.K)/2);
+  return new google.maps.LatLng((a.H+b.H)/2, (a.L+b.L)/2);
 };
 
 // turns a lat/long string into a google maps LatLong Object
@@ -80,7 +80,6 @@ var getSearchRadius = function(route){
 // SETUP PHASE (STEP 2): Obtain waypoints for each route
 // NOTE: syncronous function
 var getWayPoints = function(newRoute, radius) {
-
   var path = newRoute.path; // get path from target route
   // var map = this.state.map; // note: map is a state of this view
 
@@ -114,7 +113,6 @@ var getWayPoints = function(newRoute, radius) {
       lastWayPoint = point;
     }
   });
-
   return wayPoints;
 
 } //getWayPoints()

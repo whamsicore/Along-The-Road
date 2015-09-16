@@ -84,6 +84,12 @@ var Actions = {
     AppDispatcher.dispatch({
       actionType: Constants.UPDATE_LIST,
     });
+  },
+  categoryFilter: function(categoryFilter){
+    AppDispatcher.dispatch({
+      actionType: Constants.CATEGORY_FILTER,
+      categoryFilter: categoryFilter
+    })
   }
 
 };

@@ -14,7 +14,8 @@ var currentRoute = 0;
 var _venueFilters = {
   ratingFilter: 7,
   priceFilter: -1,
-  openNowFilter: false
+  openNowFilter: false,
+  categoryFilter: ""
 };
 
 
@@ -44,6 +45,7 @@ function addVenues(venue_wrappers, point){
 
     venue_wrappers.forEach(function(venue_wrapper, i){
       var venue = venue_wrapper.venue;
+
       venue.totalDistance = venue.location.distance + point.distance; // in meters
       //remove duplicate venues
       if (!allVenues[venue.id]) { // if venue does NOT exist already
@@ -78,11 +80,17 @@ function getFilteredArr () {
   var filteredVenues = [];
   var allVenues = currentRoute.allVenues;
   // console.log("$$$$$$$$$$$$ getFilteredArr &&&&&& allvenues = ", allVenues)
-  var {ratingFilter, priceFilter, openNowFilter} = _venueFilters;
+  var {ratingFilter, priceFilter, openNowFilter, categoryFilter} = _venueFilters;
 
   for(var id in allVenues){
     var venue = allVenues[id];
     var valid = true;
+    //Category Filter
+    if(categoryFilter !== "") {
+      if(venue.categories[0].shortName.slice(0,categoryFilter.length).toLowerCase() !== categoryFilter.toLowerCase()){
+        valid = false;
+      }
+    }
 
     //Ratings
     if(ratingFilter !==-1 ){
@@ -218,12 +226,19 @@ AppDispatcher.register(function(action) {
     case Constants.CLEAR_FILTER:
       _venueFilters.openNowFilter = false;
       _venueFilters.ratingFilter = 7 ;
+      _venueFilters.categoryFilter = ""
       _venueFilters.priceFilter = -1;
       currentRoute.filteredVenues = getFilteredArr();
       sortVenues();
       Store.emitChange();
       break;
     case Constants.SORT_VENUES:
+      sortVenues();
+      Store.emitChange();
+      break;
+    case Constants.CATEGORY_FILTER:
+      _venueFilters.categoryFilter = action.categoryFilter;
+      currentRoute.filteredVenues = getFilteredArr();
       sortVenues();
       Store.emitChange();
       break;
