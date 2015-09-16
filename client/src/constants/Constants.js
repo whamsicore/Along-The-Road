@@ -15,6 +15,14 @@ module.exports = keyMirror({
   	SELECT_ROUTE: null,
 	SELECT_VENUE: null,
 	ADD_WAYPOINTS: null, 
+<<<<<<< HEAD
+=======
+  // NEW FUNCTIONS
+  	UPDATE_ROUTES: null,
+  	UPDATE_LIST: null,
+  	CATEGORY_FILTER: null
+
+>>>>>>> (feat) Added filter by category
 
   // NEW FUNCTIONS
 	UPDATE_ROUTES: null,
