@@ -117,6 +117,7 @@ var overView = React.createClass({
 
     // func: Asynchronously gets routes from google
     directionsService.route(request, function (response, status) {
+      console.log(response);
       if (status == google.maps.DirectionsStatus.OK) { //.OK indicates the response contains a valid DirectionsResult.
         // log("$$$$$$$$$$$ Success routes:", response.routes);
         var newRoutes = []; //empty array for storing route polylines
@@ -197,6 +198,10 @@ var overView = React.createClass({
   //save results to the current route and updates the parent (mapView)
   //re-render results onto the page by updating state variable.
   getFourSquare (wayPoints, queryIndex) {
+<<<<<<< HEAD
+=======
+    console.log('foursquare', wayPoints)
+>>>>>>> (feat) Added filter by category
     // var index = currentRoute.queryIndex;
     // if(index<wayPoints.length){
 
@@ -212,7 +217,11 @@ var overView = React.createClass({
     // for(var i=index; i<max; i++){
     for(var i=0; i<wayPoints.length; i++){
       var point = wayPoints[i];
+<<<<<<< HEAD
       var ll = "&ll=" + point.lat()+"," + point.lng();
+=======
+      var ll = "&ll=" + point.H+"," + point.L;
+>>>>>>> (feat) Added filter by category
       var radius_url = "&radius=" + this.state.currentRoute.searchRadius * 1000;
 
       //These two properties ensure that the data is only displayed once all of the requests have returned

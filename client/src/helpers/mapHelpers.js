@@ -6,11 +6,18 @@ var deg2rad = function(deg) {
 // calculates the distance in km between two points based on their Latitude and Longitude
 var getDistanceBetweenPoints = function(point1, point2) {
   // great-circle distance calculation; code from Stack Overflow
+<<<<<<< HEAD
 
   var lat1 = point1.lat();
   var lon1 = point1.lng();
   var lat2 = point2.lat();
   var lon2 = point2.lng();
+=======
+  var lat1 = point1.H;
+  var lon1 = point1.L;
+  var lat2 = point2.H;
+  var lon2 = point2.L;
+>>>>>>> (feat) Added filter by category
   var R = 6371; // Radius of the earth in km
   var dLat = deg2rad(lat2-lat1);  // deg2rad below
   var dLon = deg2rad(lon2-lon1);
@@ -25,8 +32,12 @@ var getDistanceBetweenPoints = function(point1, point2) {
 };
 
 var getMiddlePoint = function(a, b) {
+<<<<<<< HEAD
   return new google.maps.LatLng((a.lng()+b.lat())/2, (a.lng()+b.lat())/2);
 
+=======
+  return new google.maps.LatLng((a.H+b.H)/2, (a.L+b.L)/2);
+>>>>>>> (feat) Added filter by category
 };
 
 // turns a lat/long string into a google maps LatLong Object

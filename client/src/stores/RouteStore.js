@@ -11,6 +11,7 @@ var CHANGE_EVENT = 'change';
 
 var routes = []; //Stores the last waypoint searched in for that route
 var currentRoute = 0;
+<<<<<<< HEAD
 
 var venueFilters = {
   ratingFilter: 7, //default to seven and above
@@ -21,6 +22,13 @@ var venueFilters = {
   openNowFilter: false,
   categoryFilter: ''
 
+=======
+var _venueFilters = {
+  ratingFilter: 7,
+  priceFilter: -1,
+  openNowFilter: false,
+  categoryFilter: ""
+>>>>>>> (feat) Added filter by category
 };
 
 
@@ -87,6 +95,7 @@ function setCurrentRoute (index) {
 function getFilteredArr () {
   var filteredVenues = [];
   var allVenues = currentRoute.allVenues;
+<<<<<<< HEAD
   // var {ratingFilter, priceFilter, price1, price2, price3, openNowFilter} = venueFilters;
   var categoryFilter = venueFilters.categoryFilter;
   var price1 = filterArr.indexOf('price1')!==-1 ? true : false;
@@ -95,12 +104,29 @@ function getFilteredArr () {
   var openNowFilter = filterArr.indexOf('openNowFilter')!==-1 ? true : false;
 
   console.log("$$$$$$$$$$$$ getFilteredArr &&&&&& price1 = "+price1)
+=======
+  // console.log("$$$$$$$$$$$$ getFilteredArr &&&&&& allvenues = ", allVenues)
+  var {ratingFilter, priceFilter, openNowFilter, categoryFilter} = _venueFilters;
+
+>>>>>>> (feat) Added filter by category
   for(var id in allVenues){
     var venue = allVenues[id];
     var valid = true;
     //Category Filter
     if(categoryFilter !== "") {
       if(venue.categories[0].shortName.slice(0,categoryFilter.length).toLowerCase() !== categoryFilter.toLowerCase()){
+<<<<<<< HEAD
+=======
+        valid = false;
+      }
+    }
+
+    //Ratings
+    if(ratingFilter !==-1 ){
+      if(!venue.rating){
+        valid = false;
+      } else if (venue.rating < ratingFilter){
+>>>>>>> (feat) Added filter by category
         valid = false;
       }
     }
@@ -273,6 +299,12 @@ AppDispatcher.register(function(action) {
       Store.emitChange();
       break;
     case Constants.SORT_VENUES:
+      sortVenues();
+      Store.emitChange();
+      break;
+    case Constants.CATEGORY_FILTER:
+      _venueFilters.categoryFilter = action.categoryFilter;
+      currentRoute.filteredVenues = getFilteredArr();
       sortVenues();
       Store.emitChange();
       break;
