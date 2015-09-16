@@ -40,14 +40,18 @@ var HomeView = React.createClass({
     var component = this;
 
     var setOrigin = function() {
-      var origin = this.getPlace().geometry.location.G + ',' + this.getPlace().geometry.location.K;;
+      console.log(this)
+      var origin = this.getPlace().geometry.location.H + ',' + this.getPlace().geometry.location.L;
+      console.log(origin);
       component.setState({
         origin
       });
     };
 
     var setDestination = function() {
-      var destination = this.getPlace().geometry.location.G + ',' + this.getPlace().geometry.location.K;
+      var destination = this.getPlace()
+      console.log("destination  ",destination)
+      destination = destination.geometry.location.H + ',' + this.getPlace().geometry.location.L;
       component.setState({
         destination
       });
@@ -98,7 +102,6 @@ var HomeView = React.createClass({
               label="Submit"
               className="submit_button"
               secondary={true}
-              // onClick={function(){Actions.clearData()}}
               linkButton="true"
               params={{
                 origin: this.state.origin,

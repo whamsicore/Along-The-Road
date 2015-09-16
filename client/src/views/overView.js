@@ -103,7 +103,6 @@ var overView = React.createClass({
   getRoutes (start, end, map) {
     var directionsService = new google.maps.DirectionsService();
     var component = this;
-
     /****** GET ROUTES *******/
     var request = {
       origin: start,
@@ -114,6 +113,7 @@ var overView = React.createClass({
     
     // func: Asynchronously gets routes from google
     directionsService.route(request, function (response, status) {
+      console.log(response);
       if (status == google.maps.DirectionsStatus.OK) { //.OK indicates the response contains a valid DirectionsResult.
         var newRoutes = []; //empty array for storing route polylines
         var colors = component.defaultOptions.routePalette;
@@ -193,7 +193,7 @@ var overView = React.createClass({
   //save results to the current route and updates the parent (mapView)
   //re-render results onto the page by updating state variable.
   getFourSquare (wayPoints, queryIndex) {
-
+    console.log('foursquare', wayPoints)
     // var index = currentRoute.queryIndex;
     // if(index<wayPoints.length){
       
@@ -209,7 +209,7 @@ var overView = React.createClass({
     // for(var i=index; i<max; i++){
     for(var i=0; i<wayPoints.length; i++){
       var point = wayPoints[i]; 
-      var ll = "&ll=" + point.G+"," + point.K;
+      var ll = "&ll=" + point.H+"," + point.L;
       var radius_url = "&radius=" + this.state.currentRoute.searchRadius * 1000;
 
       //These two properties ensure that the data is only displayed once all of the requests have returned
