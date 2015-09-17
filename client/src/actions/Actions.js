@@ -100,6 +100,12 @@ var Actions = {
       actionType: Constants.CATEGORY_FILTER,
       categoryFilter: categoryFilter
     })
+  },
+  searchVenues: function(searchValue) {
+    AppDispatcher.dispatch({
+      actionType: Constants.SEARCH_VENUES,
+      searchValue: searchValue
+    })
   }
 
 };

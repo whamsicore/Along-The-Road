@@ -21,7 +21,7 @@
     "react": "0.13.3",
     "react-router": "0.13.3",
     "react-select-box": "^2.0.1",
-    "react-tap-event-plugin": "0.1.7"
+    "react-tap-event-plugin": "^0.1.7"
   },
   "scripts": {
     "dev": "gulp dev",
