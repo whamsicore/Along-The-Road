@@ -11,7 +11,6 @@ var CHANGE_EVENT = 'change';
 
 var routes = []; //Stores the last waypoint searched in for that route
 var currentRoute = 0;
-<<<<<<< HEAD
 
 var venueFilters = {
   ratingFilter: 7, //default to seven and above
@@ -22,13 +21,7 @@ var venueFilters = {
   openNowFilter: false,
   categoryFilter: ''
 
-=======
-var _venueFilters = {
-  ratingFilter: 7,
-  priceFilter: -1,
-  openNowFilter: false,
-  categoryFilter: ""
->>>>>>> (feat) Added filter by category
+
 };
 
 
@@ -92,10 +85,32 @@ function setCurrentRoute (index) {
 
 }
 
+function searchVenues(searchValue) {
+  var filteredVenues = [];
+  var allVenues = getFilteredArr();
+  for(var id in allVenues) {
+    var valid = false;
+    var currentVenue = allVenues[id];
+    var exp = new RegExp(searchValue, "i");
+
+    if(currentVenue.name.search(exp)!== -1) {
+      valid = true;
+    }
+
+    if(currentVenue.categories[0].name.search(exp) !== -1) {
+      valid = true;
+    }
+    if(valid) {
+      filteredVenues.push(currentVenue);
+    }
+  }
+  console.log(filteredVenues)
+  return filteredVenues;
+}
+
 function getFilteredArr () {
   var filteredVenues = [];
   var allVenues = currentRoute.allVenues;
-<<<<<<< HEAD
   // var {ratingFilter, priceFilter, price1, price2, price3, openNowFilter} = venueFilters;
   var categoryFilter = venueFilters.categoryFilter;
   var price1 = filterArr.indexOf('price1')!==-1 ? true : false;
@@ -103,33 +118,26 @@ function getFilteredArr () {
   var price3 = filterArr.indexOf('price3')!==-1 ? true : false;
   var openNowFilter = filterArr.indexOf('openNowFilter')!==-1 ? true : false;
 
-  console.log("$$$$$$$$$$$$ getFilteredArr &&&&&& price1 = "+price1)
-=======
-  // console.log("$$$$$$$$$$$$ getFilteredArr &&&&&& allvenues = ", allVenues)
-  var {ratingFilter, priceFilter, openNowFilter, categoryFilter} = _venueFilters;
 
->>>>>>> (feat) Added filter by category
   for(var id in allVenues){
     var venue = allVenues[id];
     var valid = true;
     //Category Filter
     if(categoryFilter !== "") {
       if(venue.categories[0].shortName.slice(0,categoryFilter.length).toLowerCase() !== categoryFilter.toLowerCase()){
-<<<<<<< HEAD
-=======
+
         valid = false;
       }
     }
 
     //Ratings
-    if(ratingFilter !==-1 ){
-      if(!venue.rating){
-        valid = false;
-      } else if (venue.rating < ratingFilter){
->>>>>>> (feat) Added filter by category
-        valid = false;
-      }
-    }
+    // if(ratingFilter !==-1 ){
+    //   if(!venue.rating){
+    //     valid = false;
+    //   } else if (venue.rating < ratingFilter){
+    //     valid = false;
+    //   }
+    // }
 
     // /****** RATING ******/
     // if(ratingFilter !==-1 ){
@@ -315,7 +323,12 @@ AppDispatcher.register(function(action) {
       sortVenues();
       Store.emitChange();
       break;
-
+    case Constants.SEARCH_VENUES:
+      console.log(action.searchValue);
+      currentRoute.filteredVenues = searchVenues(action.searchValue);
+      sortVenues();
+      Store.emitChange();
+      break;
     // case Constants.UPDATE_VENUE_FILTERS:
     //   // updateFilters(action.venueFilters)
     //   currentRoute.filteredVenues = action.venueFilters;

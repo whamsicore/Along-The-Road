@@ -23652,14 +23652,14 @@
 	    var component = this;
 
 	    var setOrigin = function setOrigin() {
-	      var origin = this.getPlace().geometry.location.G + ',' + this.getPlace().geometry.location.K;;
+	      var origin = this.getPlace().geometry.location.lat() + ',' + this.getPlace().geometry.location.lng();
 	      component.setState({
 	        origin: origin
 	      });
 	    };
 
 	    var setDestination = function setDestination() {
-	      var destination = this.getPlace().geometry.location.G + ',' + this.getPlace().geometry.location.K;
+	      var destination = this.getPlace().geometry.location.lat() + ',' + this.getPlace().geometry.location.lng();
 	      component.setState({
 	        destination: destination
 	      });
@@ -23726,7 +23726,6 @@
 	            label: 'Submit',
 	            className: 'submit_button',
 	            secondary: true,
-	            // onClick={function(){Actions.clearData()}}
 	            linkButton: 'true',
 	            params: {
 	              origin: this.state.origin,
@@ -23825,7 +23824,17 @@
 	    });
 	  },
 
+	  updateVenueFilters: function updateVenueFilters(filterArr) {
+	    console.log("Actions ----> updateVenueFilters");
+
+	    AppDispatcher.dispatch({
+	      actionType: Constants.UPDATE_VENUE_FILTERS,
+	      filterArr: filterArr
+	    });
+	  },
+
 	  priceFilter: function priceFilter(tier) {
+	    console.log("Actions ----> priceFilter");
 	    AppDispatcher.dispatch({
 	      actionType: Constants.PRICE_FILTER,
 	      tier: tier
@@ -23859,7 +23868,7 @@
 	    });
 	  },
 	  selectVenue: function selectVenue(venue_id) {
-	    console.log("Actions ----> selectRoute");
+	    // console.log("Actions ----> selectVenue")
 	    AppDispatcher.dispatch({
 	      actionType: Constants.SELECT_VENUE,
 	      venue_id: venue_id
@@ -23874,6 +23883,12 @@
 	  updateList: function updateList() {
 	    AppDispatcher.dispatch({
 	      actionType: Constants.UPDATE_LIST
+	    });
+	  },
+	  categoryFilter: function categoryFilter(_categoryFilter) {
+	    AppDispatcher.dispatch({
+	      actionType: Constants.CATEGORY_FILTER,
+	      categoryFilter: _categoryFilter
 	    });
 	  }
 
@@ -24220,10 +24235,12 @@
 		SELECT_ROUTE: null,
 		SELECT_VENUE: null,
 		ADD_WAYPOINTS: null,
+
 		// NEW FUNCTIONS
 		UPDATE_ROUTES: null,
-		UPDATE_LIST: null
-
+		UPDATE_LIST: null,
+		CATEGORY_FILTER: null,
+		UPDATE_VENUE_FILTERS: null
 	});
 
 /***/ },
@@ -44948,8 +44965,9 @@
 	var Avatar = mui.Avatar;
 	var CardTitle = mui.CardTitle;
 
-	// var QueryStore = require('../stores/QueryStore');
-
+	/***************
+	****** FLUX *****
+	****************/
 	var Actions = __webpack_require__(197);
 	var RouteStore = __webpack_require__(371);
 
@@ -44964,11 +44982,11 @@
 	  getInitialState: function getInitialState() {
 	    return {
 	      routes: [],
-	      currentRoute: null };
+	      currentRoute: null, // current route in the form of a polyline object
+	      venueFilters: {} // current route in the form of a polyline object
+	    };
 	  },
 
-	  // current route in the form of a polyline object
-	  // searchRadius: this.defaultOptions.radius
 	  //default options to be used for this view, inclusind route options and radius of search
 	  defaultOptions: {
 	    polyline: { //configuration for inactive polylines
@@ -45019,14 +45037,16 @@
 	    RouteStore.addChangeListener((function () {
 	      var routes = RouteStore.getRoutes();
 	      var currentRoute = RouteStore.getCurrentRoute();
-	      // console.log("$$$$$$$$$$$ RouteStore returned. currentRoute = ", currentRoute);
+	      var filteredVenues = currentRoute.filteredVenues;
 
+	      // console.log("RouteStore ********** filteredVenues = ", filteredVenues);
 	      //The only place we are going to set state
 	      this.setState({
 	        routes: routes,
 	        currentRoute: currentRoute
 	      });
-	    }).bind(this)); //update routes
+	    }). // venueFilters
+	    bind(this)); //update routes
 
 	    /****** BEGIN APP INITIALIZATION *****/
 	    this.getRoutes(start, end, map);
@@ -45037,7 +45057,6 @@
 	  getRoutes: function getRoutes(start, end, map) {
 	    var directionsService = new google.maps.DirectionsService();
 	    var component = this;
-
 	    /****** GET ROUTES *******/
 	    var request = {
 	      origin: start,
@@ -45050,6 +45069,7 @@
 	    directionsService.route(request, function (response, status) {
 	      if (status == google.maps.DirectionsStatus.OK) {
 	        //.OK indicates the response contains a valid DirectionsResult.
+	        // log("$$$$$$$$$$$ Success routes:", response.routes);
 	        var newRoutes = []; //empty array for storing route polylines
 	        var colors = component.defaultOptions.routePalette;
 
@@ -45120,7 +45140,6 @@
 	  //save results to the current route and updates the parent (mapView)
 	  //re-render results onto the page by updating state variable.
 	  getFourSquare: function getFourSquare(wayPoints, queryIndex) {
-
 	    // var index = currentRoute.queryIndex;
 	    // if(index<wayPoints.length){
 
@@ -45136,7 +45155,7 @@
 	    // for(var i=index; i<max; i++){
 	    for (var i = 0; i < wayPoints.length; i++) {
 	      var point = wayPoints[i];
-	      var ll = "&ll=" + point.G + "," + point.K;
+	      var ll = "&ll=" + point.lat() + "," + point.lng();
 	      var radius_url = "&radius=" + this.state.currentRoute.searchRadius * 1000;
 
 	      //These two properties ensure that the data is only displayed once all of the requests have returned
@@ -45197,9 +45216,10 @@
 	          { className: 'col-sm-5 left-container' },
 	          React.createElement(
 	            'div',
-	            { className: 'tool-bar-container', style: { "backgroundColor": "purple" } },
+	            { className: 'tool-bar-container', style: { "backgroundColor": "#333" } },
 	            React.createElement(ToolView, {
 	              loadMore: this.loadMore
+	              /*venueFilters = {this.state.venueFilters}*/
 	            }),
 	            ' '
 	          ),
@@ -45499,10 +45519,11 @@
 	// calculates the distance in km between two points based on their Latitude and Longitude
 	var getDistanceBetweenPoints = function getDistanceBetweenPoints(point1, point2) {
 	  // great-circle distance calculation; code from Stack Overflow
-	  var lat1 = point1.G;
-	  var lon1 = point1.K;
-	  var lat2 = point2.G;
-	  var lon2 = point2.K;
+
+	  var lat1 = point1.lat();
+	  var lon1 = point1.lng();
+	  var lat2 = point2.lat();
+	  var lon2 = point2.lng();
 	  var R = 6371; // Radius of the earth in km
 	  var dLat = deg2rad(lat2 - lat1); // deg2rad below
 	  var dLon = deg2rad(lon2 - lon1);
@@ -45513,7 +45534,7 @@
 	};
 
 	var getMiddlePoint = function getMiddlePoint(a, b) {
-	  return new google.maps.LatLng((a.G + b.G) / 2, (a.K + b.K) / 2);
+	  return new google.maps.LatLng((a.lng() + b.lat()) / 2, (a.lng() + b.lat()) / 2);
 	};
 
 	// turns a lat/long string into a google maps LatLong Object
@@ -45567,7 +45588,6 @@
 	// SETUP PHASE (STEP 2): Obtain waypoints for each route
 	// NOTE: syncronous function
 	var getWayPoints = function getWayPoints(newRoute, radius) {
-
 	  var path = newRoute.path; // get path from target route
 	  // var map = this.state.map; // note: map is a state of this view
 
@@ -45601,7 +45621,6 @@
 	      lastWayPoint = point;
 	    }
 	  });
-
 	  return wayPoints;
 	}; //getWayPoints()
 
@@ -46134,8 +46153,9 @@
 	  },
 
 	  shouldComponentUpdate: function shouldComponentUpdate() {
-	    return false;
+	    // return false;
 	  },
+
 	  defaultOptions: {
 	    colors: {
 	      defaultColor: '#FFF',
@@ -46448,9 +46468,12 @@
 	'use strict';
 
 	var React = __webpack_require__(1);
-	var Actions = __webpack_require__(197);
 
-	var SelectBox = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../lib/react-select-box/lib/select-box\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	/**** FLUX ****/
+	var Actions = __webpack_require__(197);
+	var RouteStore = __webpack_require__(371);
+
+	var SelectBox = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../../lib/react-select-box/lib/select-box\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 
 	/***************
 	****** MUI *****
@@ -46469,18 +46492,29 @@
 	var ToolView = React.createClass({
 	  displayName: 'ToolView',
 
-	  // propTypes: {
+	  propTypes: {
+	    // venueFilters: React.PropTypes.object.isRequired
+	  },
 
-	  // },
 	  childContextTypes: { // MUI: init
 	    muiTheme: React.PropTypes.object //connect MUI
 	  },
+
 	  getChildContext: function getChildContext() {
 	    // MUI: set theme
 	    return {
 	      muiTheme: ThemeManager.getCurrentTheme() //set MUI theme to default
 	    };
 	  },
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      // venuefilters: []
+	      colors: [],
+	      filters: []
+	    };
+	  },
+
 	  // <div className = "container">
 	  //     {/*<button onClick={this.loadMore}>Load More</button>*/}
 	  //     <button onClick={this.props.loadMore}>Load More</button>
@@ -46495,142 +46529,66 @@
 	  //     {/*<button onClick={function(){Actions.clearData();}}>Clear Data</button>*/}
 
 	  // </div>
+	  updateFilters: function updateFilters(filters) {
+	    Actions.updateVenueFilters(filters);
+	    Actions.updateList();
+	    log("updateFilters, filters = ", filters);
 
+	    this.setState({ filters: filters });
+	  },
+
+	  // <<<<<<< HEAD
+	  // <div className="dropdown">
+	  //   <button className="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+	  //   Price
+	  //   <span className="caret"></span></button>
+	  //   <ul className="dropdown-menu">
+	  //     <li onClick={function(){Actions.priceFilter(1);  Actions.updateList();}}> <a>Price: $</a></li>
+	  //     <li onClick={function(){Actions.priceFilter(2); Actions.updateList();}}><a>Price: $$</a></li>
+	  //     <li onClick={function(){Actions.priceFilter(3); Actions.updateList();}}><a>Price: $$$</a></li>
+	  //     <li onClick={function(){Actions.openNowFilter(); Actions.updateList();}}><a>Open</a></li>
+	  //   </ul>
+	  // </div>
+	  // <div className="dropdown">
+	  //   <button className="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+	  //   Rating
+	  //   <span className="caret"></span></button>
+	  //   <ul className="dropdown-menu">
+	  //     <li onClick={function(){Actions.ratingFilter(7); Actions.updateList();}}> <a>7+ Rating</a></li>
+	  //     <li onClick={function(){Actions.ratingFilter(8); Actions.updateList();}}><a>8+ Rating</a></li>
+	  //     <li onClick={function(){Actions.ratingFilter(9); Actions.updateList();}}><a>9+ Rating</a></li>
+	  //   </ul>
+	  // </div>
 	  render: function render() {
 	    return React.createElement(
 	      'div',
-	      { style: { "backgroundColor": 'pink' } },
+	      { style: { "backgroundColor": 'grey' } },
 	      React.createElement(
 	        SelectBox,
 	        {
-	          label: 'Favorite Color',
-	          className: 'my-example-select-box',
-	          onChange: this.handleChange,
-	          value: this.state.color
+	          label: 'Set Filters',
+	          className: '',
+	          onChange: this.updateFilters,
+	          value: this.state.filters,
+	          multiple: true
 	        },
 	        React.createElement(
 	          'option',
-	          { key: 'red', value: 'red' },
-	          ' Red '
+	          { value: 'price1' },
+	          ' $ '
 	        ),
 	        React.createElement(
 	          'option',
-	          { key: 'blue', value: 'blue' },
-	          ' Blue '
+	          { value: 'price2' },
+	          ' $$ '
 	        ),
 	        React.createElement(
 	          'option',
-	          { key: 'green', value: 'green' },
-	          ' green '
+	          { value: 'price3' },
+	          ' $$$ '
 	        )
 	      ),
-	      React.createElement(
-	        'div',
-	        { className: 'dropdown' },
-	        React.createElement(
-	          'button',
-	          { className: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' },
-	          'Price',
-	          React.createElement('span', { className: 'caret' })
-	        ),
-	        React.createElement(
-	          'ul',
-	          { className: 'dropdown-menu' },
-	          React.createElement(
-	            'li',
-	            { onClick: function () {
-	                Actions.priceFilter(1);
-	              } },
-	            ' ',
-	            React.createElement(
-	              'a',
-	              null,
-	              'Price: $'
-	            )
-	          ),
-	          React.createElement(
-	            'li',
-	            { onClick: function () {
-	                Actions.priceFilter(2);
-	              } },
-	            React.createElement(
-	              'a',
-	              null,
-	              'Price: $$'
-	            )
-	          ),
-	          React.createElement(
-	            'li',
-	            { onClick: function () {
-	                Actions.priceFilter(3);
-	              } },
-	            React.createElement(
-	              'a',
-	              null,
-	              'Price: $$$'
-	            )
-	          ),
-	          React.createElement(
-	            'li',
-	            { onClick: function () {
-	                Actions.openNowFilter();
-	              } },
-	            React.createElement(
-	              'a',
-	              null,
-	              'Open'
-	            )
-	          )
-	        )
-	      ),
-	      React.createElement(
-	        'div',
-	        { className: 'dropdown' },
-	        React.createElement(
-	          'button',
-	          { className: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' },
-	          'Rating',
-	          React.createElement('span', { className: 'caret' })
-	        ),
-	        React.createElement(
-	          'ul',
-	          { className: 'dropdown-menu' },
-	          React.createElement(
-	            'li',
-	            { onClick: function () {
-	                Actions.ratingFilter(7);
-	              } },
-	            ' ',
-	            React.createElement(
-	              'a',
-	              null,
-	              '7+ Rating'
-	            )
-	          ),
-	          React.createElement(
-	            'li',
-	            { onClick: function () {
-	                Actions.ratingFilter(8);
-	              } },
-	            React.createElement(
-	              'a',
-	              null,
-	              '8+ Rating'
-	            )
-	          ),
-	          React.createElement(
-	            'li',
-	            { onClick: function () {
-	                Actions.ratingFilter(9);
-	              } },
-	            React.createElement(
-	              'a',
-	              null,
-	              '9+ Rating'
-	            )
-	          )
-	        )
-	      )
+	      React.createElement('input', { placeholder: 'Keyword Search', className: 'filter-input form-control' })
 	    );
 	  } //render()
 	}); // toolView
@@ -46657,11 +46615,20 @@
 
 	var routes = []; //Stores the last waypoint searched in for that route
 	var currentRoute = 0;
-	var _venueFilters = {
-	  ratingFilter: 7,
-	  priceFilter: -1,
-	  openNowFilter: false
+
+	var venueFilters = {
+	  ratingFilter: 7, //default to seven and above
+	  // priceFilter: -1,
+	  price1: false,
+	  price2: false,
+	  price3: false,
+	  openNowFilter: false,
+	  categoryFilter: ''
+
 	};
+
+	var filterArr = [];
+	// var venueFilters = {}
 
 	/********* OUR ACTION RESPONSE ***********/
 
@@ -46688,6 +46655,7 @@
 
 	  venue_wrappers.forEach(function (venue_wrapper, i) {
 	    var venue = venue_wrapper.venue;
+
 	    venue.totalDistance = venue.location.distance + point.distance; // in meters
 	    //remove duplicate venues
 	    if (!allVenues[venue.id]) {
@@ -46722,35 +46690,64 @@
 	function getFilteredArr() {
 	  var filteredVenues = [];
 	  var allVenues = currentRoute.allVenues;
-	  // console.log("$$$$$$$$$$$$ getFilteredArr &&&&&& allvenues = ", allVenues)
-	  var ratingFilter = _venueFilters.ratingFilter;
-	  var priceFilter = _venueFilters.priceFilter;
-	  var openNowFilter = _venueFilters.openNowFilter;
+	  // var {ratingFilter, priceFilter, price1, price2, price3, openNowFilter} = venueFilters;
+	  var categoryFilter = venueFilters.categoryFilter;
+	  var price1 = filterArr.indexOf('price1') !== -1 ? true : false;
+	  var price2 = filterArr.indexOf('price2') !== -1 ? true : false;
+	  var price3 = filterArr.indexOf('price3') !== -1 ? true : false;
+	  var openNowFilter = filterArr.indexOf('openNowFilter') !== -1 ? true : false;
 
+	  console.log("$$$$$$$$$$$$ getFilteredArr &&&&&& price1 = " + price1);
 	  for (var id in allVenues) {
 	    var venue = allVenues[id];
 	    var valid = true;
-
-	    //Ratings
-	    if (ratingFilter !== -1) {
-	      if (!venue.rating) {
-	        valid = false;
-	      } else if (venue.rating < ratingFilter) {
+	    //Category Filter
+	    if (categoryFilter !== "") {
+	      if (venue.categories[0].shortName.slice(0, categoryFilter.length).toLowerCase() !== categoryFilter.toLowerCase()) {
 	        valid = false;
 	      }
 	    }
 
-	    //Price
-	    if (priceFilter !== -1) {
+	    // /****** RATING ******/
+	    // if(ratingFilter !==-1 ){
+	    //   if(!venue.rating){
+	    //     valid = false;
+	    //   } else if (venue.rating < ratingFilter){
+	    //     valid = false;
+	    //   }
+	    // } //if(rating)
+
+	    /****** PRICE ******/
+	    // show all if all price filters are false
+	    if (price1 || price2 || price3) {
 	      if (!venue.price) {
+	        //if no price rating return false
 	        valid = false;
 	      } else if (!venue.price.tier) {
+	        //
 	        valid = false;
-	      } else if (!(venue.price.tier === priceFilter)) {
-	        valid = false;
-	      }
-	    }
+	      } else {
 
+	        if (venue.price.tier === 1 && !price1) {
+	          valid = false;
+	        } else if (venue.price.tier === 2 && !price2) {
+	          valid = false;
+	        } else if (venue.price.tier === 3 && !price3) {
+	          valid = false;
+	        } //if
+	      } //if
+	    } //if
+	    // if(priceFilter !== -1){
+	    //   if(!venue.price) { //if no price rating return false
+	    //     valid = false;
+	    //   } else if (!(venue.price.tier)){ //
+	    //     valid = false;
+	    //   } else if (!(venue.price.tier === priceFilter) ){
+	    //     valid = false;
+	    //   }
+	    // }
+
+	    /****** OPEN NOW ******/
 	    //Open now filter
 	    if (openNowFilter) {
 	      if (!venue.hours || !venue.hours.isOpen) {
@@ -46766,14 +46763,9 @@
 	  return filteredVenues;
 	} //getFilteredArr()
 
-	/*** LINUS ***/
-	// function setCurrentRoute (index) {
-	//   currentRoute = index;
-	// }
-
-	// function addWaypoints (waypoints) {
-	//   routeData.push({waypoints: waypoints, index: 1});
-	// }
+	var updateFilters = function updateFilters(newFilterArr) {
+	  filterArr = newFilterArr;
+	}; //updateFilters()
 
 	/*****************
 	******************
@@ -46840,17 +46832,26 @@
 	      Store.emitChange();
 	      break;
 
-	    case Constants.PRICE_FILTER:
-	      _venueFilters.priceFilter = action.tier;
+	    // case Constants.PRICE_FILTER:
+	    //   venueFilters.priceFilter = action.tier;
+	    //   currentRoute.filteredVenues = getFilteredArr();
+	    //   sortVenues();
+	    //   Store.emitChange();
+	    //   break;
+	    // case Constants.RATING_FILTER:
+	    //   venueFilters.ratingFilter = action.minRating;
+	    //   currentRoute.filteredVenues = getFilteredArr();
+	    //   sortVenues();
+	    //   Store.emitChange();
+	    //   break;
+
+	    case Constants.UPDATE_VENUE_FILTERS:
+	      log("inside RouteStore. newFilterArr =", action.filterArr);
+	      updateFilters(action.filterArr);
 	      currentRoute.filteredVenues = getFilteredArr();
-	      sortVenues();
+	      // currentRoute.filteredVenues = action.venueFilters;
 	      Store.emitChange();
-	      break;
-	    case Constants.RATING_FILTER:
-	      _venueFilters.ratingFilter = action.minRating;
-	      currentRoute.filteredVenues = getFilteredArr();
-	      sortVenues();
-	      Store.emitChange();
+
 	      break;
 
 	    case Constants.OPEN_NOW_FILTER:
@@ -46862,6 +46863,7 @@
 	    case Constants.CLEAR_FILTER:
 	      _venueFilters.openNowFilter = false;
 	      _venueFilters.ratingFilter = 7;
+	      _venueFilters.categoryFilter = "";
 	      _venueFilters.priceFilter = -1;
 	      currentRoute.filteredVenues = getFilteredArr();
 	      sortVenues();
@@ -46871,6 +46873,21 @@
 	      sortVenues();
 	      Store.emitChange();
 	      break;
+
+	    case Constants.CATEGORY_FILTER:
+	      venueFilters.categoryFilter = action.categoryFilter;
+	      currentRoute.filteredVenues = getFilteredArr();
+	      sortVenues();
+	      Store.emitChange();
+	      break;
+
+	    // case Constants.UPDATE_VENUE_FILTERS:
+	    //   // updateFilters(action.venueFilters)
+	    //   currentRoute.filteredVenues = action.venueFilters;
+	    //   sortVenues();
+	    //   Store.emitChange();
+
+	    //   break;
 
 	    // case Constants.CLEAR_DATA:
 	    //     routeData = [];
