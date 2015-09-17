@@ -39,7 +39,6 @@ AppDispatcher.register(function(action) {
   switch(action.actionType) {
 
     case Constants.UPDATE_LIST:
-    console.log('called')
       Store.emitChange();
       break;
 
