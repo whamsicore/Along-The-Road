@@ -18,6 +18,7 @@ var venueFilters = {
   price1: false,
   price2: false,
   price3: false,
+  price4: false,
   openNowFilter: false,
   categoryFilter: ''
 
@@ -55,6 +56,15 @@ function addVenues(venue_wrappers, point){
     venue_wrappers.forEach(function(venue_wrapper, i){
       var venue = venue_wrapper.venue;
 
+      /****** Add tip and reason to venue *******/
+      var tips = venue_wrapper.tips[0];
+      var likes = tips.likes ? tips.likes.count : 0;
+      venue.tip = {
+        reviewerName:tips.user.firstName,
+        reviewerMsg: tips.text,
+        likes: likes,
+      }
+      console.log("$$$$$$$$$ Venue.tip=", venue.tip);
       venue.totalDistance = venue.location.distance + point.distance; // in meters
       //remove duplicate venues
       if (!allVenues[venue.id]) { // if venue does NOT exist already
@@ -116,8 +126,9 @@ function getFilteredArr () {
   var price1 = filterArr.indexOf('price1')!==-1 ? true : false;
   var price2 = filterArr.indexOf('price2')!==-1 ? true : false;
   var price3 = filterArr.indexOf('price3')!==-1 ? true : false;
+  var price4 = filterArr.indexOf('price4')!==-1 ? true : false;
+  var rating9 = filterArr.indexOf('rating9')!==-1 ? true : false;
   var openNowFilter = filterArr.indexOf('openNowFilter')!==-1 ? true : false;
-
 
   for(var id in allVenues){
     var venue = allVenues[id];
@@ -140,13 +151,11 @@ function getFilteredArr () {
     // }
 
     // /****** RATING ******/
-    // if(ratingFilter !==-1 ){
-    //   if(!venue.rating){
-    //     valid = false;
-    //   } else if (venue.rating < ratingFilter){
-    //     valid = false;
-    //   }
-    // } //if(rating)
+    if(rating9){ //now only filtering high rating restaurants
+      if (venue.rating < 9){
+        valid = false;
+      }
+    } //if(rating)
 
 
     /****** PRICE ******/
@@ -164,22 +173,15 @@ function getFilteredArr () {
         }else if(venue.price.tier === 2  && !price2){
           valid = false;
 
-        }else if(venue.price.tier === 3  && !price3){
+        }else if((venue.price.tier === 3 || venue.price.tier === 4 ) && !price3){ //displays both $$$ and $$$$ if restaurant
+          valid = false;
+        }else if(venue.price.tier === 4  && !price4){
           valid = false;
         }//if
 
       }//if
 
     } //if
-    // if(priceFilter !== -1){
-    //   if(!venue.price) { //if no price rating return false
-    //     valid = false;
-    //   } else if (!(venue.price.tier)){ //
-    //     valid = false;
-    //   } else if (!(venue.price.tier === priceFilter) ){
-    //     valid = false;
-    //   }
-    // }
 
     /****** OPEN NOW ******/
     //Open now filter
