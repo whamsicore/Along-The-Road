@@ -17,7 +17,6 @@ var mui = require('material-ui');
 var ThemeManager = new mui.Styles.ThemeManager();
 var {Card, CardHeader, CardMedia, CardActions, CardText, Avatar, CardTitle} = mui;
 
-
 /***************
 ****** FLUX *****
 ****************/
@@ -281,7 +280,6 @@ var overView = React.createClass({
                   // currentRoute={this.state.currentRoute}
                   currentRoute = {this.state.currentRoute}
                   origin = {this.state.origin}
-
                 /> {/* ListView*/}
 
             </div> {/* list-container */}
@@ -304,8 +302,6 @@ var overView = React.createClass({
                 changeCurrentRoute={this.changeCurrentRoute}
               /> {/* RouteDetailView */}
             </div> {/* row */}
-
-
           </div> {/* col-sm-8 */}
 
         </div> {/* row */}
