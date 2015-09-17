@@ -51,7 +51,7 @@ var overView = React.createClass({
     _fourSquare: {
       fourSquare_url: "https://api.foursquare.com/v2/venues/explore?client_id=ELLZUH013LMEXWRWGBOSNBTXE3NV02IUUO3ZFPVFFSZYLA30&client_secret=U2EQ1N1J4EAG4XH4QO4HCZTGM3FCWDLXU2WJ0OPTD2Q3YUKF&v=20150902",
       foodCategory_url: "&categoryId=4d4b7105d754a06374d81259",
-      limit_url: "&limit=10",
+      limit_url: "&limit=50",
       photos_url: "&venuePhotos=1",
       category_url: "&section=food",
       distance_url: "&sortByDistance=0"  
@@ -117,6 +117,7 @@ var overView = React.createClass({
     
     // func: Asynchronously gets routes from google
     directionsService.route(request, function (response, status) {
+      console.log(response);
       if (status == google.maps.DirectionsStatus.OK) { //.OK indicates the response contains a valid DirectionsResult.
         // log("$$$$$$$$$$$ Success routes:", response.routes);
         var newRoutes = []; //empty array for storing route polylines
@@ -197,6 +198,7 @@ var overView = React.createClass({
   //save results to the current route and updates the parent (mapView)
   //re-render results onto the page by updating state variable.
   getFourSquare (wayPoints, queryIndex) {
+
     // var index = currentRoute.queryIndex;
     // if(index<wayPoints.length){
       
@@ -213,6 +215,7 @@ var overView = React.createClass({
     for(var i=0; i<wayPoints.length; i++){
       var point = wayPoints[i]; 
       var ll = "&ll=" + point.lat()+"," + point.lng();
+
       var radius_url = "&radius=" + this.state.currentRoute.searchRadius * 1000;
 
       //These two properties ensure that the data is only displayed once all of the requests have returned

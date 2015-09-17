@@ -41,6 +41,7 @@ var HomeView = React.createClass({
 
     var setOrigin = function() {
       var origin = this.getPlace().geometry.location.lat() + ',' + this.getPlace().geometry.location.lng();
+
       component.setState({
         origin
       });
@@ -48,6 +49,7 @@ var HomeView = React.createClass({
 
     var setDestination = function() {
       var destination = this.getPlace().geometry.location.lat() + ',' + this.getPlace().geometry.location.lng();
+
       component.setState({
         destination
       });

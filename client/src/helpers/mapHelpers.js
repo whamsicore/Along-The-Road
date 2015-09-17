@@ -11,6 +11,7 @@ var getDistanceBetweenPoints = function(point1, point2) {
   var lon1 = point1.lng();
   var lat2 = point2.lat();
   var lon2 = point2.lng();
+
   var R = 6371; // Radius of the earth in km
   var dLat = deg2rad(lat2-lat1);  // deg2rad below
   var dLon = deg2rad(lon2-lon1);

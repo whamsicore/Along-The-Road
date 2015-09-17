@@ -16,9 +16,11 @@ module.exports = keyMirror({
 	SELECT_VENUE: null,
 	ADD_WAYPOINTS: null, 
 
+
   // NEW FUNCTIONS
 	UPDATE_ROUTES: null,
 	UPDATE_LIST: null,
 	CATEGORY_FILTER: null,
-  UPDATE_VENUE_FILTERS: null
+  UPDATE_VENUE_FILTERS: null,
+  SEARCH_VENUES: null
 });

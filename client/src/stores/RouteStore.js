@@ -21,6 +21,7 @@ var venueFilters = {
   openNowFilter: false,
   categoryFilter: ''
 
+
 };
 
 
@@ -84,6 +85,29 @@ function setCurrentRoute (index) {
 
 }
 
+function searchVenues(searchValue) {
+  var filteredVenues = [];
+  var allVenues = getFilteredArr();
+  for(var id in allVenues) {
+    var valid = false;
+    var currentVenue = allVenues[id];
+    var exp = new RegExp(searchValue, "i");
+
+    if(currentVenue.name.search(exp)!== -1) {
+      valid = true;
+    }
+
+    if(currentVenue.categories[0].name.search(exp) !== -1) {
+      valid = true;
+    }
+    if(valid) {
+      filteredVenues.push(currentVenue);
+    }
+  }
+  console.log(filteredVenues)
+  return filteredVenues;
+}
+
 function getFilteredArr () {    
   var filteredVenues = [];
   var allVenues = currentRoute.allVenues;
@@ -94,16 +118,26 @@ function getFilteredArr () {
   var price3 = filterArr.indexOf('price3')!==-1 ? true : false;
   var openNowFilter = filterArr.indexOf('openNowFilter')!==-1 ? true : false;
 
-  console.log("$$$$$$$$$$$$ getFilteredArr &&&&&& price1 = "+price1)
+
   for(var id in allVenues){
     var venue = allVenues[id];
     var valid = true;
     //Category Filter
     if(categoryFilter !== "") {
       if(venue.categories[0].shortName.slice(0,categoryFilter.length).toLowerCase() !== categoryFilter.toLowerCase()){
+
         valid = false;
       }
     }
+
+    //Ratings
+    // if(ratingFilter !==-1 ){
+    //   if(!venue.rating){
+    //     valid = false;
+    //   } else if (venue.rating < ratingFilter){
+    //     valid = false;
+    //   }
+    // }
 
     // /****** RATING ******/
     // if(ratingFilter !==-1 ){
@@ -276,6 +310,12 @@ AppDispatcher.register(function(action) {
       sortVenues();
       Store.emitChange();
       break;
+    case Constants.CATEGORY_FILTER:
+      _venueFilters.categoryFilter = action.categoryFilter;
+      currentRoute.filteredVenues = getFilteredArr();
+      sortVenues();
+      Store.emitChange();
+      break;
 
     case Constants.CATEGORY_FILTER:
       venueFilters.categoryFilter = action.categoryFilter;
@@ -283,7 +323,12 @@ AppDispatcher.register(function(action) {
       sortVenues();
       Store.emitChange();
       break;
-
+    case Constants.SEARCH_VENUES:
+      console.log(action.searchValue);
+      currentRoute.filteredVenues = searchVenues(action.searchValue);
+      sortVenues();
+      Store.emitChange();
+      break;
     // case Constants.UPDATE_VENUE_FILTERS:
     //   // updateFilters(action.venueFilters)
     //   currentRoute.filteredVenues = action.venueFilters;

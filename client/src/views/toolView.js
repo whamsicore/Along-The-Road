@@ -8,7 +8,7 @@ var React = require('react');
 var Actions = require('../actions/Actions');
 var RouteStore = require('../stores/RouteStore');
 
-var SelectBox = require('../../lib/react-select-box/lib/select-box');
+var SelectBox = require('../../lib/react-select-box/lib/select-box.js');
 
 /***************
 ****** MUI *****
@@ -39,6 +39,13 @@ var ToolView = React.createClass({
       colors: [],
       filters: []
     }
+  },
+
+  componentDidMount() {
+    $("#searchBar").change(function(){
+      Actions.searchVenues($("#searchBar").val())
+      Actions.updateList();
+    });
   },
 
       // <div className = "container">
@@ -102,7 +109,7 @@ var ToolView = React.createClass({
           <option value='price3'> $$$ </option>
         </SelectBox>
 
-        <input placeholder = "Keyword Search" className='filter-input form-control'/>
+        <input id="searchBar" placeholder = "Keyword Search" className='filter-input form-control'/>
       </div>
     );
   } //render()
