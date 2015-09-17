@@ -8,7 +8,7 @@ var React = require('react');
 var Actions = require('../actions/Actions');
 var RouteStore = require('../stores/RouteStore');
 
-var SelectBox = require('../../lib/react-select-box/lib/select-box.js');
+var SelectBox = require('./react-select-box/select-box.js');
 
 /***************
 ****** MUI *****
@@ -106,7 +106,9 @@ var ToolView = React.createClass({
         >{/* SelectBox */}
           <option value='price1'> $ </option>
           <option value='price2'> $$ </option>
-          <option value='price3'> $$$ </option>
+          <option value='price3'> $$$+ </option>
+          <option value='rating9'> Ratings (9+) </option>
+          <option value='openNowFilter'> Open Now </option>
         </SelectBox>
 
         <input id="searchBar" placeholder = "Keyword Search" className='filter-input form-control'/>
