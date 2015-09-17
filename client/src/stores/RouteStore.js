@@ -11,7 +11,7 @@ var CHANGE_EVENT = 'change';
 
 var routes = []; //Stores the last waypoint searched in for that route
 var currentRoute = 0;
-
+var searchValue = '';
 var venueFilters = {
   ratingFilter: 7, //default to seven and above
   // priceFilter: -1,
@@ -21,8 +21,6 @@ var venueFilters = {
   price4: false,
   openNowFilter: false,
   categoryFilter: ''
-
-
 };
 
 
@@ -39,9 +37,10 @@ function initRoutes (newRoutes){
 } //initRoutes
 
 function sortVenues() {
-  currentRoute.filteredVenues.sort(function(a,b){
+  currentRoute.allVenuesArray.sort(function(a,b){
     return a.totalDistance - b.totalDistance;
   });
+  currentRoute.filteredVenues = currentRoute.allVenues;
 }
 function addVenues(venue_wrappers, point){
     //NOTE: point is used for calulating total distance, which is equal to distance of point to origin, plus distance of point to venue
@@ -51,7 +50,7 @@ function addVenues(venue_wrappers, point){
     // var prevResults = newRoute.results || {}; //results is a hash for quick checking
     var newResults = {};
     var newResultsArr = [];
-    var allVenues = currentRoute.allVenues;
+    var allVenues = currentRoute.allVenuesObj;
 
     venue_wrappers.forEach(function(venue_wrapper, i){
       var venue = venue_wrapper.venue;
@@ -81,10 +80,13 @@ function addVenues(venue_wrappers, point){
     //NOTE: allVenues has completed update
     /***** updated filteredVenues *****/
     for (var venue_id in allVenues) { //convert newResults object into array
-      newResultsArr.push(newResults[venue_id]); //push value into array
-    }
 
+      newResultsArr.push(allVenues[venue_id]); //push value into array
+    }
+    currentRoute.allVenuesArray = newResultsArr;
     currentRoute.filteredVenues = getFilteredArr(); //NOTE: get back a filtered and sorted array
+    // console.log("current", currentRoute);
+    currentRoute.marked = "true";
 } //addVenues()
 
 
@@ -95,32 +97,11 @@ function setCurrentRoute (index) {
 
 }
 
-function searchVenues(searchValue) {
-  var filteredVenues = [];
-  var allVenues = getFilteredArr();
-  for(var id in allVenues) {
-    var valid = false;
-    var currentVenue = allVenues[id];
-    var exp = new RegExp(searchValue, "i");
 
-    if(currentVenue.name.search(exp)!== -1) {
-      valid = true;
-    }
-
-    if(currentVenue.categories[0].name.search(exp) !== -1) {
-      valid = true;
-    }
-    if(valid) {
-      filteredVenues.push(currentVenue);
-    }
-  }
-  console.log(filteredVenues)
-  return filteredVenues;
-}
 
 function getFilteredArr () {
   var filteredVenues = [];
-  var allVenues = currentRoute.allVenues;
+  var allVenues = currentRoute.allVenuesArray;
   // var {ratingFilter, priceFilter, price1, price2, price3, openNowFilter} = venueFilters;
   var categoryFilter = venueFilters.categoryFilter;
   var price1 = filterArr.indexOf('price1')!==-1 ? true : false;
@@ -130,7 +111,7 @@ function getFilteredArr () {
   var rating9 = filterArr.indexOf('rating9')!==-1 ? true : false;
   var openNowFilter = filterArr.indexOf('openNowFilter')!==-1 ? true : false;
 
-  for(var id in allVenues){
+  for(var id = 0; id < allVenues.length; id ++) {
     var venue = allVenues[id];
     var valid = true;
     //Category Filter
@@ -191,13 +172,24 @@ function getFilteredArr () {
       }
     }
 
+    //Search Bar
+    if(searchValue.length !== 0){
+      var exp = new RegExp(searchValue, "i");
+
+      if(venue.name.search(exp)=== -1 && venue.categories[0].name.search(exp) === -1) {
+        valid = false;
+      }
+
+
+    }
+
     if(valid) {
         filteredVenues.push(venue);
     }
 
   } //for(allVenues)
-
-  return filteredVenues;
+  currentRoute.filteredVenues = filteredVenues;
+  // return filteredVenues;
 } //getFilteredArr()
 
 var updateFilters = function(newFilterArr){
@@ -263,6 +255,7 @@ AppDispatcher.register(function(action) {
 
     case Constants.ADD_VENUES:
       addVenues(action.results, action.point);
+      getFilteredArr();
       Store.emitChange();
       break;
 
@@ -287,16 +280,15 @@ AppDispatcher.register(function(action) {
     case Constants.UPDATE_VENUE_FILTERS:
       log("inside RouteStore. newFilterArr =", action.filterArr);
       updateFilters(action.filterArr)
-      currentRoute.filteredVenues = getFilteredArr();
-      // currentRoute.filteredVenues = action.venueFilters;
+      getFilteredArr();
+      // action.venueFilters;
       Store.emitChange();
 
       break;
 
     case Constants.OPEN_NOW_FILTER:
       _venueFilters.openNowFilter = !_venueFilters.openNowFilter;
-      currentRoute.filteredVenues = getFilteredArr();
-      sortVenues();
+      getFilteredArr();
       Store.emitChange();
       break;
     case Constants.CLEAR_FILTER:
@@ -304,36 +296,33 @@ AppDispatcher.register(function(action) {
       _venueFilters.ratingFilter = 7 ;
       _venueFilters.categoryFilter = ""
       _venueFilters.priceFilter = -1;
-      currentRoute.filteredVenues = getFilteredArr();
-      sortVenues();
+      getFilteredArr();
       Store.emitChange();
       break;
     case Constants.SORT_VENUES:
       sortVenues();
+      getFilteredArr();
       Store.emitChange();
       break;
     case Constants.CATEGORY_FILTER:
       _venueFilters.categoryFilter = action.categoryFilter;
-      currentRoute.filteredVenues = getFilteredArr();
-      sortVenues();
+      getFilteredArr();
       Store.emitChange();
       break;
 
     case Constants.CATEGORY_FILTER:
       venueFilters.categoryFilter = action.categoryFilter;
-      currentRoute.filteredVenues = getFilteredArr();
-      sortVenues();
+      getFilteredArr();
       Store.emitChange();
       break;
     case Constants.SEARCH_VENUES:
-      console.log(action.searchValue);
-      currentRoute.filteredVenues = searchVenues(action.searchValue);
-      sortVenues();
-      Store.emitChange();
-      break;
+        searchValue = action.searchValue;
+        getFilteredArr();
+        Store.emitChange();
+        break;
     // case Constants.UPDATE_VENUE_FILTERS:
     //   // updateFilters(action.venueFilters)
-    //   currentRoute.filteredVenues = action.venueFilters;
+    //   action.venueFilters;
     //   sortVenues();
     //   Store.emitChange();
 

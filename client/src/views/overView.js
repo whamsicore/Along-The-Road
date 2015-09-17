@@ -116,7 +116,6 @@ var overView = React.createClass({
 
     // func: Asynchronously gets routes from google
     directionsService.route(request, function (response, status) {
-      console.log(response);
       if (status == google.maps.DirectionsStatus.OK) { //.OK indicates the response contains a valid DirectionsResult.
         // log("$$$$$$$$$$$ Success routes:", response.routes);
         var newRoutes = []; //empty array for storing route polylines
@@ -141,8 +140,9 @@ var overView = React.createClass({
 
           // derived properties
           newRoute.index = i; //tracks position in routes array
-          newRoute.allVenues = {}; //all venues found
-          newRoute.filteredVenues = []; //processed (filtered OR sorted) venues to be displayed
+          newRoute.allVenuesObj = {}; //all venues found
+          newRoute.allVenuesArray = [];
+          newRoute.filteredVenues = newRoute.allVenuesArray; //processed (filtered OR sorted) venues to be displayed
           newRoute.queryIndex = 1; //where we begin with queries, defaults to 0
           newRoute.queryComplete = false; //whether all waypoints have been queried. Defaults to false
           var radius = MapHelpers.getSearchRadius(newRoute);
@@ -183,7 +183,7 @@ var overView = React.createClass({
     Actions.selectRoute(newRoute.index);
 
     /******** QUERY FOR VENUES *********/
-    if(Object.keys(newRoute.allVenues).length===0){
+    if(Object.keys(newRoute.allVenuesObj).length===0){
       this.loadMore();
     } //if
 

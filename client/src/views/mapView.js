@@ -48,7 +48,6 @@ var MapView = React.createClass({
     }else{ // currentRoute has changed
       this.clearMapMarkers();
     } //
-
     this.updateMapMarkers(newRoute.filteredVenues);
 
     return false;
@@ -94,35 +93,38 @@ var MapView = React.createClass({
   updateMapMarkers: function(newVenuesArr){
     // we are going to check markers array has already been printed
     // var newVenuesArr = this.props.currentRoute.filteredVenues;
-
     var map = window.map;
     var displayedMarkers = this.state.displayedMarkers; //array of
     var component = this;
-
+    // console.log(newVenuesArr);
     /**** remove unnecessary displayedMarkers ****/
+    var toKeep = {};
+    var toAdd = [];
+    for(var i = 0 ; i < newVenuesArr.length; i ++) {
+      var id = newVenuesArr[i].id;
+      if(displayedMarkers[id]){
+        toKeep[id] = true;
+      } else {
+        toAdd.push(newVenuesArr[i]);
+      }
+    }
+
     for(var venue_id in displayedMarkers){
-      var marker = displayedMarkers[venue_id];
 
-      var found = newVenuesArr.filter(function(venue){
-        return venue_id === venue.id;
-      });
+      if(!toKeep[venue_id]){
+        var marker = displayedMarkers[venue_id];
 
-      if(found.length===0){ //not found
         marker.setMap(null);
         delete displayedMarkers[venue_id]; //delete marker from displayed markers
-      } //if
-
+      }
     };
-
-
     /**** print un ****/
-    newVenuesArr.forEach(function(venue, index){
+    toAdd.forEach(function(venue, index){
 
       var {lng, lat} = venue.location;
 
       //create new marker only if marker has not been displayed
       if(!displayedMarkers[venue.id]){ //
-
         var image = '../../images/orange.png'
         if(venue.rating >= 7) image = '../../images/orange.png';
         if(venue.rating >= 8) image = '../../images/yellow.png';

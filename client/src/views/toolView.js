@@ -42,9 +42,12 @@ var ToolView = React.createClass({
   },
 
   componentDidMount() {
-    $("#searchBar").change(function(){
-      Actions.searchVenues($("#searchBar").val())
-      Actions.updateList();
+    $("#searchBar").keyup(function(e){
+      if(e.which == 13 || $("#searchBar").val().length === 0){
+        Actions.searchVenues($("#searchBar").val())
+        Actions.updateList();
+      }
+
     });
   },
 
@@ -66,7 +69,7 @@ var ToolView = React.createClass({
   updateFilters: function (filters) {
     Actions.updateVenueFilters(filters);
     Actions.updateList();
-    log("updateFilters, filters = ", filters);
+    // log("updateFilters, filters = ", filters);
 
     this.setState({ filters: filters });
 
