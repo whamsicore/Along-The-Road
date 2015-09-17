@@ -8,7 +8,7 @@ var React = require('react');
 var Actions = require('../actions/Actions');
 var RouteStore = require('../stores/RouteStore');
 
-var SelectBox = require('./react-select-box/lib/select-box.js');
+var SelectBox = require('./react-select-box/select-box.js');
 
 /***************
 ****** MUI *****
