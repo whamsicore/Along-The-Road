@@ -4,7 +4,6 @@ var AppDispatcher = require('../dispatcher/AppDispatcher');
 var EventEmitter = require('events').EventEmitter;
 var Constants = require('../constants/Constants');
 var assign = require('object-assign');
-
 var CHANGE_EVENT = 'change';
 
 /********* OUR STORE DATA ***********/
@@ -45,9 +44,6 @@ function sortVenues() {
 function addVenues(venue_wrappers, point){
     //NOTE: point is used for calulating total distance, which is equal to distance of point to origin, plus distance of point to venue
 
-
-    // count++;
-    // var prevResults = newRoute.results || {}; //results is a hash for quick checking
     var newResults = {};
     var newResultsArr = [];
     var allVenues = currentRoute.allVenuesObj;
@@ -56,18 +52,19 @@ function addVenues(venue_wrappers, point){
       var venue = venue_wrapper.venue;
 
       /****** Add tip and reason to venue *******/
-      var tips = venue_wrapper.tips[0];
-      var likes = tips.likes ? tips.likes.count : 0;
-      venue.tip = {
-        reviewerName:tips.user.firstName,
-        reviewerMsg: tips.text,
-        likes: likes,
+      if(venue_wrapper.tips){ // Protects against no tips
+        var tips = venue_wrapper.tips[0];
+        var likes = tips.likes ? tips.likes.count : 0;
+        venue.tip = {
+          reviewerName:tips.user.firstName,
+          reviewerMsg: tips.text,
+          likes: likes,
+        }
       }
-      console.log("$$$$$$$$$ Venue.tip=", venue.tip);
+      // console.log("$$$$$$$$$ Venue.tip=", venue.tip);
       venue.totalDistance = venue.location.distance + point.distance; // in meters
       //remove duplicate venues
       if (!allVenues[venue.id]) { // if venue does NOT exist already
-          // newResults[venue.id] = venue; //save into newResults
           allVenues[venue.id] = venue; //save to allVenues
       } else { // if venue is brand new, on
         // NOTE: only save if new result is closer to radii than the one from before; THEN: save the new result, get rid of previous; ELSE: don't save new venue
@@ -80,35 +77,30 @@ function addVenues(venue_wrappers, point){
     //NOTE: allVenues has completed update
     /***** updated filteredVenues *****/
     for (var venue_id in allVenues) { //convert newResults object into array
-
       newResultsArr.push(allVenues[venue_id]); //push value into array
     }
     currentRoute.allVenuesArray = newResultsArr;
     currentRoute.filteredVenues = getFilteredArr(); //NOTE: get back a filtered and sorted array
-    // console.log("current", currentRoute);
     currentRoute.marked = "true";
 } //addVenues()
-
 
 function setCurrentRoute (index) {
   //First save the old data
   //Then find current one and set data to that
   currentRoute = routes[index];
-
 }
-
 
 
 function getFilteredArr () {
   var filteredVenues = [];
   var allVenues = currentRoute.allVenuesArray;
-  // var {ratingFilter, priceFilter, price1, price2, price3, openNowFilter} = venueFilters;
   var categoryFilter = venueFilters.categoryFilter;
   var price1 = filterArr.indexOf('price1')!==-1 ? true : false;
   var price2 = filterArr.indexOf('price2')!==-1 ? true : false;
   var price3 = filterArr.indexOf('price3')!==-1 ? true : false;
   var price4 = filterArr.indexOf('price4')!==-1 ? true : false;
   var rating9 = filterArr.indexOf('rating9')!==-1 ? true : false;
+  var rating8 = filterArr.indexOf('rating8')!==-1 ? true : false;
   var openNowFilter = filterArr.indexOf('openNowFilter')!==-1 ? true : false;
 
   for(var id = 0; id < allVenues.length; id ++) {
@@ -122,22 +114,19 @@ function getFilteredArr () {
       }
     }
 
-    //Ratings
-    // if(ratingFilter !==-1 ){
-    //   if(!venue.rating){
-    //     valid = false;
-    //   } else if (venue.rating < ratingFilter){
-    //     valid = false;
-    //   }
-    // }
-
+    if(rating8){ //now only filtering high rating restaurants
+      if (venue.rating < 8){
+        if(!venue.rating) valid = false;
+        valid = false;
+      }
+    } //if(rating)
     // /****** RATING ******/
     if(rating9){ //now only filtering high rating restaurants
+      if(!venue.rating) valid = false;
       if (venue.rating < 9){
         valid = false;
       }
     } //if(rating)
-
 
     /****** PRICE ******/
     // show all if all price filters are false
@@ -147,21 +136,16 @@ function getFilteredArr () {
       } else if (!(venue.price.tier)){ //
         valid = false;
       } else{
-
         if(venue.price.tier === 1  && !price1){
           valid = false;
-
         }else if(venue.price.tier === 2  && !price2){
           valid = false;
-
         }else if((venue.price.tier === 3 || venue.price.tier === 4 ) && !price3){ //displays both $$$ and $$$$ if restaurant
           valid = false;
         }else if(venue.price.tier === 4  && !price4){
           valid = false;
         }//if
-
       }//if
-
     } //if
 
     /****** OPEN NOW ******/
@@ -179,8 +163,6 @@ function getFilteredArr () {
       if(venue.name.search(exp)=== -1 && venue.categories[0].name.search(exp) === -1) {
         valid = false;
       }
-
-
     }
 
     if(valid) {
@@ -189,7 +171,6 @@ function getFilteredArr () {
 
   } //for(allVenues)
   currentRoute.filteredVenues = filteredVenues;
-  // return filteredVenues;
 } //getFilteredArr()
 
 var updateFilters = function(newFilterArr){
@@ -214,30 +195,14 @@ var Store = assign({}, EventEmitter.prototype, {
     return currentRoute;
   },
 
-
-
-  /* Linus */
-  // getWaypoints: function(){
-  //   var temp = routeData[currentRoute].waypoints.slice(routeData[currentRoute].index, 20);
-  //   routeData[currentRoute].index+=20;
-  //   console.log(temp, routeData[currentRoute].index);
-  //   return temp;
-  // },
-
   emitChange: function() {
     this.emit(CHANGE_EVENT);
   },
 
-  /**
-   * @param {function} callback
-   */
   addChangeListener: function(callback) {
     this.on(CHANGE_EVENT, callback);
   },
 
-  /**
-   * @param {function} callback
-   */
   removeChangeListener: function(callback) {
     this.removeListener(CHANGE_EVENT, callback);
   }
@@ -252,40 +217,20 @@ AppDispatcher.register(function(action) {
       initRoutes(action.newRoutes);
       Store.emitChange();
       break;
-
     case Constants.ADD_VENUES:
       addVenues(action.results, action.point);
       getFilteredArr();
       Store.emitChange();
       break;
-
     case Constants.SELECT_ROUTE:
       setCurrentRoute(action.index);
       Store.emitChange();
       break;
-
-    // case Constants.PRICE_FILTER:
-    //   venueFilters.priceFilter = action.tier;
-    //   currentRoute.filteredVenues = getFilteredArr();
-    //   sortVenues();
-    //   Store.emitChange();
-    //   break;
-    // case Constants.RATING_FILTER:
-    //   venueFilters.ratingFilter = action.minRating;
-    //   currentRoute.filteredVenues = getFilteredArr();
-    //   sortVenues();
-    //   Store.emitChange();
-    //   break;
-
     case Constants.UPDATE_VENUE_FILTERS:
-      log("inside RouteStore. newFilterArr =", action.filterArr);
       updateFilters(action.filterArr)
       getFilteredArr();
-      // action.venueFilters;
       Store.emitChange();
-
       break;
-
     case Constants.OPEN_NOW_FILTER:
       _venueFilters.openNowFilter = !_venueFilters.openNowFilter;
       getFilteredArr();
@@ -309,33 +254,11 @@ AppDispatcher.register(function(action) {
       getFilteredArr();
       Store.emitChange();
       break;
-
-    case Constants.CATEGORY_FILTER:
-      venueFilters.categoryFilter = action.categoryFilter;
+    case Constants.SEARCH_VENUES:
+      searchValue = action.searchValue;
       getFilteredArr();
       Store.emitChange();
       break;
-    case Constants.SEARCH_VENUES:
-        searchValue = action.searchValue;
-        getFilteredArr();
-        Store.emitChange();
-        break;
-    // case Constants.UPDATE_VENUE_FILTERS:
-    //   // updateFilters(action.venueFilters)
-    //   action.venueFilters;
-    //   sortVenues();
-    //   Store.emitChange();
-
-    //   break;
-
-
-    // case Constants.CLEAR_DATA:
-    //     routeData = [];
-    //     currentRoute = 0;
-    //     break;
-    // case Constants.ADD_WAYPOINTS:
-    //     addWaypoints(action.wayPoints);
-    //     break;
 
     default:
       // no op

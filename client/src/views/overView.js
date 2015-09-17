@@ -198,19 +198,9 @@ var overView = React.createClass({
   //re-render results onto the page by updating state variable.
   getFourSquare (wayPoints, queryIndex) {
 
-    // var index = currentRoute.queryIndex;
-    // if(index<wayPoints.length){
 
-    // }
-    // var max = index+2;
-    // var results = {}; //test against duplicates
-    // var component = this;
-    // if(max>wayPoints.length){
-
-    // }
     var count = wayPoints.length;
 
-    // for(var i=index; i<max; i++){
     for(var i=0; i<wayPoints.length; i++){
       var point = wayPoints[i];
       var ll = "&ll=" + point.lat()+"," + point.lng();
@@ -219,8 +209,6 @@ var overView = React.createClass({
 
       //These two properties ensure that the data is only displayed once all of the requests have returned
       //It is important for the speed of the app and ensuring that everything works
-      // var sortingPoint = wayPoints.length%20-1;
-      // var count = 1;
 
       var {fourSquare_url, foodCategory_url, category_url, limit_url, photos_url, distance_url} = this.defaultOptions._fourSquare;
 

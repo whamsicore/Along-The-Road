@@ -19,17 +19,13 @@ var MapView = React.createClass({
     }
   }, //getInitialState()
   componentDidMount () {
-    // console.log("MapView ---> inside componentDidMount");
 
     MapMarkerStore.addChangeListener(this._onChange)
 
   },
 
   componentDidUpdate(prevProps, prevState) {
-    // console.log("MapView ---> inside componentDidUpdate ");
-    // if(prevProps.currentRoute)
-    // this.clearMapMarkers();
-    // this.updateMapMarkers();
+
   },
 
   shouldComponentUpdate(prevProps, prevState) {
@@ -37,10 +33,6 @@ var MapView = React.createClass({
     var newRoute = prevProps.currentRoute;
     if(prevRoute && newRoute){
 
-      // console.log("************** prevProps = ", prevProps);
-      // console.log("************** currentRoute = ", this.props.currentRoute);
-      // if(prevProps.currentRoute.index !== this.props.currentRoute.index){
-      // }
       if(prevRoute.index !== newRoute.index){
         console.log("************** New Route has been set");
         this.clearMapMarkers();
@@ -62,14 +54,12 @@ var MapView = React.createClass({
   openFourSquare: function (venue) {
     var url = "https://foursquare.com/v/"+escape(venue.name)+"/"+venue.id;
     return url;
-    // window.open(url);
   },
 
   openDirections: function(venue) {
     var origin = this.props.origin;
     var url = "https://www.google.com/maps/dir/" + origin+ "/" + venue.location.lat +"," +venue.location.lng
     return url;
-    // window.open(url);
   },
 
   changePoppedMarker (){
@@ -96,7 +86,6 @@ var MapView = React.createClass({
     var map = window.map;
     var displayedMarkers = this.state.displayedMarkers; //array of
     var component = this;
-    // console.log(newVenuesArr);
     /**** remove unnecessary displayedMarkers ****/
     var toKeep = {};
     var toAdd = [];

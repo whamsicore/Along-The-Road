@@ -7,7 +7,6 @@ var VenueView = require('./venueView');
 
 var Actions = require('../actions/Actions.js');
 var ListUpdateStore = require('../stores/ListUpdateStore');
-// var VenueStore = require('../stores/VenueStore');
 
 
 var ListView = React.createClass({
@@ -31,7 +30,6 @@ var ListView = React.createClass({
   },
 
   componentDidMount () {
-    // console.log("listView -----> componentDidMount()");
 
     /*******  INIT LISTVIEW UX ********/
     var {hoverColor, defaultColor} = this.defaultOptions.colors;
