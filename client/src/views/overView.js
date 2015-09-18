@@ -120,8 +120,13 @@ var overView = React.createClass({
       });
   }, 
 
-  // SETUP PHASE STEP 1: Obtain routes from Google Maps Api
-  // NOTE: asyncronous function
+
+  /* function: getRoutes
+   * --------------------------------
+   * This function finds the three fastest routes back by querying the google maps api
+   * It then creates an object with all the desired data from the query as well as 
+   * placeholders for data to later be added. 
+  */
   getRoutes (start, end, map) {
     var directionsService = new google.maps.DirectionsService();
     var component = this;
@@ -186,15 +191,27 @@ var overView = React.createClass({
 
   }, //getRoutes()
 
-  loadMore (newRoute) {
-    var queryIndex = newRoute.queryIndex;
-    var queryPoints = newRoute.wayPoints.slice(queryIndex, queryIndex+20);
-    this.getFourSquare(queryPoints, queryIndex); //getFourSquare
+
+
+  /* function: loadMore
+   * --------------------------------
+   * This function loads the next 20 queries on the currently selected route 
+   * It does this by invoking the getFourSquare function for the next 20 waypoints
+  */
+  loadMore () {
+    var queryIndex = this.state.currentRoute.queryIndex;
+    var queries = this.state.currentRoute.wayPoints.slice(queryIndex, queryIndex+20);
+    this.getFourSquare(queries, queryIndex); //getFourSquare
     this.state.currentRoute.queryIndex+=20;
 
   },
 
-  // Event: switch the route and update the active venues
+  /* function: changeCurrentRoute
+   * --------------------------------
+   * This function takes in the new route and updates it on the map as well as 
+   * triggering the action to select the route in the routeStore. It then 
+   * checks if the venues have been queried for that route and adds more if yes. 
+  */
   changeCurrentRoute (newRoute) {
     /******** UPDATE POLYLINES *********/
     this.state.currentRoute.setOptions(this.defaultOptions.polyline); //hide old route
@@ -277,7 +294,7 @@ var overView = React.createClass({
               /> {/* ToolView */}
             </div>
 
-            <div
+            <div id ="list"
               className = 'list-container'
             > {/* div.list-container */}
                 <ListView

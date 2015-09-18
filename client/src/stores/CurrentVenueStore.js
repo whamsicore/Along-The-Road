@@ -1,15 +1,31 @@
-/* Saves query information about each route: going to refactor back to overView state -> routes */
-
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var EventEmitter = require('events').EventEmitter;
 var Constants = require('../constants/Constants');
 var assign = require('object-assign');
 
 var CHANGE_EVENT = 'change';
-var routeData = []; //Stores the last waypoint searched in for that route
-var currentRoute = 0;
+
+var prevVenue = ''; // NOTE: only 1 venue can be active at any time
+var activeVenue = ''; // NOTE: only 1 venue can be active at any time
+
+/* function: setActiveVenue
+ * --------------------------
+ * This function takes in a venue id to sets the active venue to that
+ * venue id. It uses the active venue to update the selected map marker
+*/
+function setActiveVenue(venue_id){
+  prevVenue = activeVenue;
+  activeVenue = venue_id;
+}
 
 var Store = assign({}, EventEmitter.prototype, {
+  getActiveVenue: function(){
+    return activeVenue;
+  },
+
+  getPrevVenue: function(){
+    return prevVenue;
+  },
 
   emitChange: function() {
     this.emit(CHANGE_EVENT);
@@ -27,17 +43,13 @@ var Store = assign({}, EventEmitter.prototype, {
 // Register callback to handle all updates
 AppDispatcher.register(function(action) {
   var text;
-
   switch(action.actionType) {
-
-    case Constants.UPDATE_LIST:
+    case Constants.SELECT_MAPMARKER:
+      setActiveVenue(action.venue_id);
       Store.emitChange();
       break;
 
-
-
     default:
-      // no op
   }
 });
 

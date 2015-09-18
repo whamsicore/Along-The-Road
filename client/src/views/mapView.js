@@ -3,6 +3,8 @@
 var React = require('react');
 var MapHelper = require('../helpers/mapHelpers');
 var MapMarkerStore = require('../stores/MapMarkerStore');
+var Actions = require('../actions/Actions.js');
+
 var MapView = React.createClass({
 
   propTypes: {
@@ -21,7 +23,8 @@ var MapView = React.createClass({
   }, //getInitialState()
   componentDidMount () {
     MapMarkerStore.addChangeListener(this._onChange)
-  
+
+
   },
 
   shouldComponentUpdate(prevProps, prevState) {
@@ -133,6 +136,8 @@ var MapView = React.createClass({
           position: position,
           icon: image
         });
+
+        $(marker).attr('class', venue.id);
         if(venue.photos.groups[0]){
           var venueImage = venue.photos.groups[0].items[0].prefix+"110x110"+ venue.photos.groups[0].items[0].suffix;
         }
@@ -146,6 +151,7 @@ var MapView = React.createClass({
         });
 
         marker.infowindow = infowindow;
+        marker.id = venue.id;
 
         var markerIsActive = false;
 
@@ -169,19 +175,19 @@ var MapView = React.createClass({
             markerIsActive = false; 
             infowindow.close(); 
 
-
           }else if(!markerIsActive){ //activate this marker
             markerIsActive = true; 
             if(window.activeInfoWindow){
               window.activeInfoWindow.close(); //close previous
             }
+            console.log(marker.id);
+            Actions.selectMapMarker(marker.id);
             window.activeInfoWindow = infowindow; //update current;  
           } //if
         }); //mouseout
 
         google.maps.event.addListener(marker, 'dblclick', function() {
           MapHelper.openFourSquare(venue); //load new page
-          
         });
 
         //show map marker

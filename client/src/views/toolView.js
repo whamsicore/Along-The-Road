@@ -35,33 +35,39 @@ var ToolView = React.createClass({
 
   getInitialState (){
     return {
-      // venuefilters: []
       colors: [],
       filters: []
     }
   },
 
+  /* function: componentDidMount 
+   * ---------------------------
+   * This function sets an event listener on the searchbar. It checks for if
+   * the searchbar is empty and then clears the search filter or otherwise
+   * waits for the enter key to be hit to apply it through the searchVenues
+   * and updatList actions. 
+   */
   componentDidMount() {
     $("#searchBar").keyup(function(e){
       if(e.which == 13 || $("#searchBar").val().length === 0){
         Actions.searchVenues($("#searchBar").val())
         Actions.updateList();
       }
-
     });
   },
 
-
-      // </div>
+  /* function: updateFilters
+   * --------------------------------
+   * This function takes in the filters array and calls the actions
+   * updateVenueFilters that applies them to the allVenuesArray in the store
+   * and then displays it on the map and then updates the list with updateList
+  */
   updateFilters: function (filters) {
     Actions.updateVenueFilters(filters);
     Actions.updateList();
-    // log("updateFilters, filters = ", filters);
 
     this.setState({ filters: filters });
-
   },
-
 
   render () {
     return (

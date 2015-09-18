@@ -1,5 +1,3 @@
-/* The only store we are going to use, contains information of all routes, attached waypoints, venues, filtered venues, etc... */
-
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var EventEmitter = require('events').EventEmitter;
 var Constants = require('../constants/Constants');
@@ -13,7 +11,6 @@ var currentRoute = 0;
 var searchValue = '';
 var venueFilters = {
   ratingFilter: 7, //default to seven and above
-  // priceFilter: -1,
   price1: false,
   price2: false,
   price3: false,
@@ -22,25 +19,37 @@ var venueFilters = {
   categoryFilter: ''
 };
 
-
 var filterArr = [];
-// var venueFilters = {}
 
-/********* OUR ACTION RESPONSE ***********/
-
-/*** PAYTON ***/
+/* function: initRoutes
+ * ---------------------
+ * This function initiates the routes for the store. It defaults the currentRoute
+ * to routes[0] 
+*/
 function initRoutes (newRoutes){
-  // console.log("RouteStore inside initRoutes. routes = ", newRoutes)
   routes = newRoutes; 
   currentRoute = routes[0]; //set default currentRoute to first result
 } //initRoutes
 
+
+/* function: sortVenues
+ * -------------------------
+ * This function sorts the allVenueArray so that the venues do not need to be 
+ * sorted more than once after being loaded.
+*/
 function sortVenues() {
   currentRoute.allVenuesArray.sort(function(a,b){
     return a.totalDistance - b.totalDistance;
   });
   currentRoute.filteredVenues = currentRoute.allVenues;
 }
+
+/* function: addVenues
+ * -------------------------
+ * This function takes in the venues object returned from the foursquare request.
+ * It then filters out the desired venue data and adds it to the allVenuesObject
+ * which is ultimately used to convert it to the allVenuesArray
+*/
 function addVenues(venue_wrappers, point){
     //NOTE: point is used for calulating total distance, which is equal to distance of point to origin, plus distance of point to venue
 
@@ -60,8 +69,7 @@ function addVenues(venue_wrappers, point){
           reviewerMsg: tips.text,
           likes: likes,
         }
-      } //if
-
+      }
       venue.totalDistance = venue.location.distance + point.distance; // in meters
       //remove duplicate venues 
       if (!allVenues[venue.id]) { // if venue does NOT exist already 
@@ -90,7 +98,12 @@ function setCurrentRoute (index) {
   currentRoute = routes[index];
 }
 
-
+/* function: getFilteredArr
+ * -------------------------
+ * This function applies the filters to the allVenuesArray to create the filteredVenues
+ * array that is used on the map. The filtered array is then stored on the route object and is
+ * used by the map and list views. 
+*/
 function getFilteredArr () {    
   var filteredVenues = [];
   var allVenues = currentRoute.allVenuesArray;
@@ -106,6 +119,8 @@ function getFilteredArr () {
   for(var id = 0; id < allVenues.length; id ++) {
     var venue = allVenues[id];
     var valid = true;
+    if(undefined ===venue.rating) valid = false;
+
     //Category Filter
     if(categoryFilter !== "") {
       if(venue.categories[0].shortName.slice(0,categoryFilter.length).toLowerCase() !== categoryFilter.toLowerCase()){
@@ -120,20 +135,18 @@ function getFilteredArr () {
         valid = false;
       }
     } //if(rating)
-    // /****** RATING ******/
+    // Ratings Filter
     if(rating9){ //now only filtering high rating restaurants
-      if(!venue.rating) valid = false;
       if (venue.rating < 9){
         valid = false;
       }
     } //if(rating)
 
-    /****** PRICE ******/
-    // show all if all price filters are false
+    //Price Filter
     if(price1 || price2 || price3){
       if(!venue.price) { //if no price rating return false
         valid = false;
-      } else if (!(venue.price.tier)){ //
+      } else if (!(venue.price.tier)){
         valid = false;
       } else{
         if(venue.price.tier === 1  && !price1){
@@ -148,7 +161,6 @@ function getFilteredArr () {
       }//if
     } //if
 
-    /****** OPEN NOW ******/
     //Open now filter
     if(openNowFilter){
       if(!venue.hours || !venue.hours.isOpen){
@@ -258,7 +270,6 @@ AppDispatcher.register(function(action) {
       break;
   
     default:
-      // no op
   }
 });
 
