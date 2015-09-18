@@ -27,7 +27,7 @@ gulp.task('compress', function() {
 gulp.task('watch', function() {
   livereload.listen();
 
-  gulp.watch('client/src/**/*.js', ['build'])
+  gulp.watch('client/src/**/*.js', ['build', 'compress'])
   // gulp.watch('client/src/**/*.js', ['build', 'compress'])
 });
 

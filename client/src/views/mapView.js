@@ -21,7 +21,11 @@ var MapView = React.createClass({
   }, //getInitialState()
   componentDidMount () {
     MapMarkerStore.addChangeListener(this._onChange)
-  
+
+    $('#map').on('click', function(event){
+      console.log(event.target);
+      console.log('clicked')
+    });
   },
 
   shouldComponentUpdate(prevProps, prevState) {
@@ -133,6 +137,8 @@ var MapView = React.createClass({
           position: position,
           icon: image
         });
+
+        $(marker).attr('class', venue.id);
         if(venue.photos.groups[0]){
           var venueImage = venue.photos.groups[0].items[0].prefix+"110x110"+ venue.photos.groups[0].items[0].suffix;
         }

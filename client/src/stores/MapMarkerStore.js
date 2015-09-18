@@ -1,4 +1,3 @@
-
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var EventEmitter = require('events').EventEmitter;
 var Constants = require('../constants/Constants');
@@ -9,11 +8,15 @@ var CHANGE_EVENT = 'change';
 var prevVenue = ''; // NOTE: only 1 venue can be active at any time
 var activeVenue = ''; // NOTE: only 1 venue can be active at any time
 
+/* function: setActiveVenue
+ * --------------------------
+ * This function takes in a venue id to sets the active venue to that
+ * venue id. It uses the active venue to update the selected map marker
+*/
 function setActiveVenue(venue_id){
   prevVenue = activeVenue;
   activeVenue = venue_id;
 }
-
 
 var Store = assign({}, EventEmitter.prototype, {
   getActiveVenue: function(){
@@ -45,7 +48,6 @@ AppDispatcher.register(function(action) {
     case Constants.SELECT_VENUE:
       setActiveVenue(action.venue_id);
       Store.emitChange();
-
       break;
 
     default:
