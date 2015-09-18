@@ -294,7 +294,7 @@ var overView = React.createClass({
               /> {/* ToolView */}
             </div>
 
-            <div
+            <div id ="list"
               className = 'list-container'
             > {/* div.list-container */}
                 <ListView

@@ -7,6 +7,8 @@ var VenueView = require('./venueView');
 
 var Actions = require('../actions/Actions.js');
 var ListUpdateStore = require('../stores/ListUpdateStore');
+var CurrentVenueStore = require('../stores/CurrentVenueStore');
+var MapMarkerStore  = require('../stores/MapMarkerStore');
 
 
 var ListView = React.createClass({
@@ -34,6 +36,7 @@ var ListView = React.createClass({
     /*******  INIT LISTVIEW UX ********/
     var {hoverColor, defaultColor} = this.defaultOptions.colors;
     ListUpdateStore.addChangeListener(this.updateList);
+    CurrentVenueStore.addChangeListener(this.scrollToVenue);
 
     $(document).on('mouseenter', '.card', function(e) {
       $(e.currentTarget).css({'background-color': hoverColor});
@@ -79,13 +82,29 @@ var ListView = React.createClass({
   updateList() {
     this.forceUpdate();
   },
+
+  scrollToVenue () {
+    var venues = this.props.currentRoute.filteredVenues;
+    var activeVenueId = CurrentVenueStore.getActiveVenue();
+
+    var venueId = "#" + activeVenueId.toString();
+    var container = $('#list'),
+        scrollTo = $(venueId);
+      console.log(venueId)
+    // container.scrollTop(
+    //     scrollTo.offset().top - container.offset().top + container.scrollTop()
+    // );
+    container.animate({
+      scrollTop: scrollTo.offset().top - container.offset().top + container.scrollTop()-60
+    });
+   },
   render () {
     var component = this;
 
     if(this.props.currentRoute){
       var listDetails = this.props.currentRoute.filteredVenues.map(function(venue) {
         return (
-          <VenueView key={venue.id} venue={venue} origin={component.props.origin}/>
+          <VenueView  key={venue.id} venue={venue} origin={component.props.origin} id={venue.id.toString()}/>
         )
       });
 
@@ -94,7 +113,7 @@ var ListView = React.createClass({
     }
 
     return (
-      <div> {listDetails} </div>
+      <div > {listDetails} </div>
     );
 
   } //render()

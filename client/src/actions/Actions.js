@@ -74,6 +74,12 @@ var Actions = {
       actionType: Constants.SEARCH_VENUES,
       searchValue: searchValue
     })
+  },
+  selectMapMarker: function(venue_id) {
+    AppDispatcher.dispatch({
+      actionType: Constants.SELECT_MAPMARKER,
+      venue_id: venue_id
+    })
   }
 
 };

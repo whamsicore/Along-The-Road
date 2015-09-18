@@ -12,5 +12,6 @@ module.exports = keyMirror({
 	UPDATE_LIST: null,
 	CATEGORY_FILTER: null,
 	UPDATE_VENUE_FILTERS: null,
-	SEARCH_VENUES: null
+	SEARCH_VENUES: null,
+	SELECT_MAPMARKER: null
 });

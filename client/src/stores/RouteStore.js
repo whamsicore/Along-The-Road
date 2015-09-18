@@ -69,12 +69,7 @@ function addVenues(venue_wrappers, point){
           reviewerMsg: tips.text,
           likes: likes,
         }
-<<<<<<< HEAD
-      } //if
-
-=======
       }
->>>>>>> (refactor) Added comments and cleaned up views
       venue.totalDistance = venue.location.distance + point.distance; // in meters
       //remove duplicate venues
       if (!allVenues[venue.id]) { // if venue does NOT exist already
