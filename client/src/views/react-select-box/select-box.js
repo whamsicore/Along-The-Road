@@ -336,8 +336,8 @@ module.exports = React.createClass({displayName: 'exports',
           className: 'react-select-box-off-screen'
         },
         this.options().map(this.renderOption)
-      ),
-      this.renderCloseButton()
+      )
+      // this.renderCloseButton() //remove the close button
     )
   },
 

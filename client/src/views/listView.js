@@ -52,6 +52,23 @@ var ListView = React.createClass({
       Actions.selectVenue("");
     });
 
+    // deactivate marker when mouse leave the list-container
+    $(document).on('mouseleave', '.react-select-box-options', function(e) {
+      // log('currentTarget = ', e.currentTarget)
+      $(e.currentTarget).addClass("react-select-box-hidden");
+    });
+
+    // deactivate marker when mouse leave the list-container
+    // $(document).on('click', '.react-select-box-options', function(e) {
+    //   log('Fuck itii&&&&&&&&&&&&&&&&')
+    //   $(e.currentTarget).toggleClass("react-select-box-hidden");
+    // });
+
+    $(document).on('mouseenter', '.react-select-box', function(e) {
+      // log('currentTarget = ', e.currentTarget)
+      $(".react-select-box-options").removeClass("react-select-box-hidden");
+    });
+
   }, //componentDidMount()
 
   updateList() {
