@@ -237,10 +237,7 @@ AppDispatcher.register(function(action) {
       Store.emitChange();
       break;
     case Constants.CLEAR_FILTER:
-      _venueFilters.openNowFilter = false; 
-      _venueFilters.ratingFilter = 7 ; 
-      _venueFilters.categoryFilter = ""
-      _venueFilters.priceFilter = -1; 
+      filterArr = [];
       getFilteredArr(); 
       Store.emitChange();
       break;

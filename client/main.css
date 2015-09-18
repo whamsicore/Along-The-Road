@@ -86,12 +86,13 @@ then you get 114 height on the title
   height:100%;
 }
 .content{
-  background-image: url("https://static.pexels.com/photos/5256/city-cars-road-houses.jpg");
+  background-image: url("img/city-cars-road-houses.jpg");
   background-position: 50% 50%;
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
   height: 80%;
+  position:relative;
 }
 
 /**********************
@@ -154,6 +155,11 @@ then you get 114 height on the title
 
 .left-container{
   /*overflow: scroll;*/
+  position:absolute;
+  left:0;
+  top:0;
+  width: 460px;
+  z-index: 99;
 }
 
 .tool-bar-container{
@@ -163,11 +169,13 @@ then you get 114 height on the title
   left:0;
   top:0;
   z-index: 999;
+  margin:0;
 }
 
 .right-container{
   position:relative;
-  padding-left:15px;
+  padding-left:490px;
+  width:100%;
 }
 
 .list-container{
@@ -202,7 +210,7 @@ then you get 114 height on the title
   position: absolute;
   background-color: white;
   top: 30px;
-  left: 30px;
+  left: 525px;
   background-color: #fff;
   z-index: 999;
   opacity: .7;
@@ -261,11 +269,6 @@ then you get 114 height on the title
 ***********************
 ***********************/
 
-.tool-bar-container{
-  margin:0;
-  padding-left:10px;
-  background-color: white;
-}
 
 .dropdown{
   /*margin-left:28px;*/

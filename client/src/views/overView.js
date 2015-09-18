@@ -89,8 +89,26 @@ var overView = React.createClass({
     map.fitBounds(bounds);
 
     /****** FLUX:  ******/
-    RouteStore.addChangeListener(function(){
+    RouteStore.addChangeListener(this.onStoreChange); //update routes
 
+
+
+    /****** BEGIN APP INITIALIZATION *****/ 
+    this.getRoutes(start, end, map);
+
+  }, //componentDidMount()
+
+  componentWillUnmount (){
+    //reset filters
+    Actions.clearFilter();
+
+    //remove store listeners
+    RouteStore.removeChangeListener(this.onStoreChange);
+  },
+
+  onStoreChange (){
+      
+      // console.log("RouteStore addChangeListener() **********************");
       var routes = RouteStore.getRoutes();
       var currentRoute = RouteStore.getCurrentRoute();
       var filteredVenues = currentRoute.filteredVenues;
@@ -100,15 +118,7 @@ var overView = React.createClass({
         routes, 
         currentRoute,
       });
-
-    }.bind(this)); //update routes
-
-
-
-    /****** BEGIN APP INITIALIZATION *****/ 
-    this.getRoutes(start, end, map);
-
-  }, //componentDidMount()
+  }, 
 
   // SETUP PHASE STEP 1: Obtain routes from Google Maps Api
   // NOTE: asyncronous function
