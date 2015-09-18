@@ -70,6 +70,12 @@ var ListView = React.createClass({
 
   },
 
+  /* function: updateList
+   * ---------------------
+   * This function is invoked when the listUpdateStore emits a change. It
+   * forces the component to update to handle issues of constant rerendering
+   * that slowed down the program.
+  */
   updateList() {
     this.forceUpdate();
   },

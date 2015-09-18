@@ -6,27 +6,19 @@ var Constants = require('../constants/Constants');
 var assign = require('object-assign');
 
 var CHANGE_EVENT = 'change';
-
 var routeData = []; //Stores the last waypoint searched in for that route
 var currentRoute = 0;
 
 var Store = assign({}, EventEmitter.prototype, {
 
-
   emitChange: function() {
     this.emit(CHANGE_EVENT);
   },
-
-
-
 
   addChangeListener: function(callback) {
     this.on(CHANGE_EVENT, callback);
   },
 
-  /**
-   * @param {function} callback
-   */
   removeChangeListener: function(callback) {
     this.removeListener(CHANGE_EVENT, callback);
   }
