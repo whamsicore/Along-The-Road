@@ -13,7 +13,7 @@ var ListView = React.createClass({
 
 
   propTypes: {
-    currentRoute: React.PropTypes.object.isRequired
+    currentRoute: React.PropTypes.object
   },
 
   shouldComponentUpdate () {
@@ -52,6 +52,23 @@ var ListView = React.createClass({
       Actions.selectVenue("");
     });
 
+    // deactivate marker when mouse leave the list-container
+    $(document).on('mouseleave', '.react-select-box-options', function(e) {
+      // log('currentTarget = ', e.currentTarget)
+      $(e.currentTarget).addClass("react-select-box-hidden");
+    });
+
+    // deactivate marker when mouse leave the list-container
+    // $(document).on('click', '.react-select-box-options', function(e) {
+    //   log('Fuck itii&&&&&&&&&&&&&&&&')
+    //   $(e.currentTarget).toggleClass("react-select-box-hidden");
+    // });
+
+    $(document).on('mouseenter', '.react-select-box', function(e) {
+      // log('currentTarget = ', e.currentTarget)
+      $(".react-select-box-options").removeClass("react-select-box-hidden");
+    });
+
   }, //componentDidMount()
 
   updateList() {
@@ -59,21 +76,23 @@ var ListView = React.createClass({
   },
   render () {
     var component = this;
-
+    
     if(this.props.currentRoute){
-      var listDetails = this.props.currentRoute.filteredVenues.map(function(venue, index) {
+      if(this.props.currentRoute.filteredVenues.length>0){
+        var listDetails = this.props.currentRoute.filteredVenues.map(function(venue) {
+          return (
+            <VenueView venue={venue} origin={component.props.origin}/>
+          )
+        });
+        
         return (
-          <VenueView venue={venue} origin={component.props.origin}/>
-        )
-      });
-      
-      return (
-        <div> {listDetails} </div>
-      );
+          <div> {listDetails} </div>
+        );
 
+      } //if
     }else{
       return null;
-    } //if
+    }
 
   } //render()
 });

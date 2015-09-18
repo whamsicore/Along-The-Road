@@ -8,7 +8,7 @@ var React = require('react');
 var mui = require('material-ui');
 var ThemeManager = new mui.Styles.ThemeManager();
 var {Paper, Menu, MenuItem, List, ListItem} = mui;
-
+var Actions = require('../actions/Actions')
 
 var RouteDetailView = React.createClass({
   childContextTypes: { // MUI: init
@@ -23,7 +23,7 @@ var RouteDetailView = React.createClass({
     routes: React.PropTypes.array.isRequired,
     changeCurrentRoute: React.PropTypes.func.isRequired
   },
-
+  
   render () {
     var component = this;
     var routes = this.props.routes; 
@@ -32,7 +32,10 @@ var RouteDetailView = React.createClass({
       return (
           <ListItem
             primaryText={colorCodedRouteInfo}
-            onClick={function(){component.props.changeCurrentRoute(routes[index])}}
+            onClick={function(){
+              Actions.selectRoute(index);
+              component.props.changeCurrentRoute(routes[index])
+            }}
             key={index}
             className='list-item'>
           </ListItem>

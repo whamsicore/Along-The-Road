@@ -6,7 +6,8 @@ var MapMarkerStore = require('../stores/MapMarkerStore');
 var MapView = React.createClass({
 
   propTypes: {
-
+    currentRoute: React.PropTypes.object,
+    origin: React.PropTypes.string
   },
 
   defaultOptions: {
@@ -19,22 +20,19 @@ var MapView = React.createClass({
     }
   }, //getInitialState()
   componentDidMount () {
-    
     MapMarkerStore.addChangeListener(this._onChange)
-
-  },
-
-  componentDidUpdate(prevProps, prevState) {
-
+  
   },
 
   shouldComponentUpdate(prevProps, prevState) {
+
+    //clear map markers only if the route is being changed
+
     var prevRoute = this.props.currentRoute;
     var newRoute = prevProps.currentRoute;
     if(prevRoute && newRoute){
 
       if(prevRoute.index !== newRoute.index){
-        console.log("************** New Route has been set");
         this.clearMapMarkers();
       }
     }else{ // currentRoute has changed
