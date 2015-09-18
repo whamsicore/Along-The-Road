@@ -65,7 +65,7 @@ var ToolView = React.createClass({
 
   render () {
     return (
-      <div style={{"backgroundColor": 'grey'}}>
+      <div style={{"backgroundColor": '#555'}}>
         <SelectBox
             label = "Set Filters"
             className = ''

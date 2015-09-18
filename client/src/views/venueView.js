@@ -38,7 +38,6 @@ var VenueView = React.createClass({
     var venue = this.props.venue;
     var origin = this.props.origin;
     var url = "https://www.google.com/maps/dir/" + origin+ "/" + venue.location.lat +"," +venue.location.lng
-    // console.log(url);
     window.open(url);
   }
   ,
@@ -89,8 +88,6 @@ var VenueView = React.createClass({
     return (
       <Card className="card"
           id = {id}
-/*        onClick={function(e){console.log("Card clicked ele=", e.target);}}*/
-/*        onMouseOver={function(e){$(e.target).css({'background-color': 'pink'})}}*/
       >{/*Card*/}
         <div className="col-xs-2 avatar" >
           {avatar}

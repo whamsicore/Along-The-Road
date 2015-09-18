@@ -51,7 +51,6 @@ function addVenues(venue_wrappers, point){
     venue_wrappers.forEach(function(venue_wrapper, i){
       var venue = venue_wrapper.venue;
       
-      // console.log("$$$$$$$$$ Venue_wrapper=", venue_wrapper);
       /****** Add tip and reason to venue *******/
       if(venue_wrapper.tips){
         var tips = venue_wrapper.tips[0];
@@ -63,7 +62,6 @@ function addVenues(venue_wrappers, point){
         }
       } //if
 
-      // console.log("$$$$$$$$$ Venue.tip=", venue.tip);
       venue.totalDistance = venue.location.distance + point.distance; // in meters
       //remove duplicate venues 
       if (!allVenues[venue.id]) { // if venue does NOT exist already 
