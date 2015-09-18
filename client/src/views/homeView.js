@@ -30,6 +30,7 @@ var HomeView = React.createClass({
 
   // Componenet lifecycle method that get's called after the first render
   componentDidMount () {
+
     // allows access of the props inside setOrigin and setDestination
     var component = this;
 
@@ -54,6 +55,15 @@ var HomeView = React.createClass({
 
     var destinationAutoComplete = new google.maps.places.Autocomplete(document.getElementById('destination'));
     destinationAutoComplete.addListener('place_changed', setDestination);
+
+    $('#destination').keydown(function(event){ 
+        var keyCode = (event.keyCode ? event.keyCode : event.which);   
+        if (keyCode === 13) {
+            console.log('button clicked');
+            $('.submit_button').trigger('click');
+            // $('#startSearch').trigger('click');
+        }
+    });
   },
 
   render () {
@@ -64,6 +74,13 @@ var HomeView = React.createClass({
       centerMode: true,
       draggable: true,
     };
+
+    var component = this; 
+
+    var goToOverView = function(){
+      console.log("$$$$$$$$$$ Clicked");
+      window.reactRouter.transitionTo('overview', {origin:component.state.origin, destination:component.state.destination});
+    }
 
     return (
       <div className='container-fluid'>
@@ -88,12 +105,13 @@ var HomeView = React.createClass({
               label="Submit"
               className="submit_button"
               secondary={true}
-              linkButton="true"
+              onClick={goToOverView}
+              /*linkButton="true"
               params={{
                 origin: this.state.origin,
                 destination: this.state.destination
               }}
-              containerElement={<Link to="overview"/>}
+              containerElement={<Link to="overview"/>}*/
               style={{
                 'width':'180px',
                 'borderRadius': '5px'
