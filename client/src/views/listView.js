@@ -46,6 +46,7 @@ var ListView = React.createClass({
       Actions.selectVenue(venue_id);
     });
 
+    /********* LIST VIEW ***********/
     $(document).on('mouseleave', '.card', function(e) {
       $(e.currentTarget).css({'background-color': defaultColor})
     });
@@ -55,14 +56,20 @@ var ListView = React.createClass({
       Actions.selectVenue("");
     });
 
+    /********* FILTER BOX ***********/
+
     // deactivate marker when mouse leave the list-container
-    $(document).on('mouseleave', '.react-select-box-options', function(e) {
+    $(document).on('mouseleave', '.react-select-box-container', function(e) {
       // log('currentTarget = ', e.currentTarget)
-      $(e.currentTarget).addClass("react-select-box-hidden");
+      $(".react-select-box-options").addClass("react-select-box-hidden");
+    });
+
+    $(document).on('click', '.react-select-box1', function(e) {
+      log('SEXY')
+      $(".react-select-box-options").toggleClass("react-select-box-hidden");
     });
 
     $(document).on('mouseenter', '.react-select-box', function(e) {
-      // log('currentTarget = ', e.currentTarget)
       $(".react-select-box-options").removeClass("react-select-box-hidden");
     });
 
@@ -88,14 +95,14 @@ var ListView = React.createClass({
     var activeVenueId = CurrentVenueStore.getActiveVenue();
     
     var venueId = "#" + activeVenueId.toString();
-    var container = $('#list'),
+    var container = $('.list-sub-container'),
         scrollTo = $(venueId);
       console.log(venueId)
     // container.scrollTop(
     //     scrollTo.offset().top - container.offset().top + container.scrollTop()
     // );
     container.animate({
-      scrollTop: scrollTo.offset().top - container.offset().top + container.scrollTop()-60
+      scrollTop: scrollTo.offset().top - container.offset().top + container.scrollTop()
     });
    },
   render () {
@@ -113,7 +120,7 @@ var ListView = React.createClass({
     }
     
     return (
-      <div > {listDetails} </div>
+      <div className='list-sub-container'> {listDetails} </div>
     ); 
 
   } //render()

@@ -9,16 +9,18 @@ var CHANGE_EVENT = 'change';
 var routes = []; //Stores the last waypoint searched in for that route
 var currentRoute = 0;
 var searchValue = '';
-var venueFilters = {
-  ratingFilter: 7, //default to seven and above
-  price1: false,
-  price2: false,
-  price3: false,
-  price4: false,
-  openNowFilter: false,
-  categoryFilter: ''
-};
 
+// var venueFilters = {
+//   ratingFilter: 7, //default to seven and above
+//   // priceFilter: -1,
+//   price1: false,
+//   price2: false,
+//   price3: false,
+//   price4: false,
+//   openNowFilter: false,
+// };
+
+var categoryFilter = "";
 var filterArr = [];
 
 /* function: initRoutes
@@ -107,7 +109,6 @@ function setCurrentRoute (index) {
 function getFilteredArr () {    
   var filteredVenues = [];
   var allVenues = currentRoute.allVenuesArray;
-  var categoryFilter = venueFilters.categoryFilter;
   var price1 = filterArr.indexOf('price1')!==-1 ? true : false;
   var price2 = filterArr.indexOf('price2')!==-1 ? true : false;
   var price3 = filterArr.indexOf('price3')!==-1 ? true : false;
@@ -250,6 +251,7 @@ AppDispatcher.register(function(action) {
       break;
     case Constants.CLEAR_FILTER:
       filterArr = [];
+      categoryFilter = "";
       getFilteredArr(); 
       Store.emitChange();
       break;
@@ -259,7 +261,7 @@ AppDispatcher.register(function(action) {
       Store.emitChange();
       break;
     case Constants.CATEGORY_FILTER:
-      _venueFilters.categoryFilter = action.categoryFilter;
+      categoryFilter = action.categoryFilter;
       getFilteredArr();
       Store.emitChange();
       break;

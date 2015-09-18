@@ -1,9 +1,12 @@
 *,
 *::before,
 *::after {
-  -webkit-box-sizing: inherit;
+  /*-webkit-box-sizing: inherit;
   -moz-box-sizing: inherit;
-  box-sizing: inherit;
+  box-sizing: inherit;*/
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  box-sizing: border-box; 
 }
 
 /**********************
@@ -181,9 +184,14 @@ then you get 114 height on the title
 .list-container{
   height:100%;
   width:100%;
+  overflow: hidden;
+  padding-top:60px;
+}
+
+.list-sub-container{
+  height:100%;
   overflow:scroll;
   overflow-y: scroll;
-  padding-top:60px;
 }
 
 #map-container {
@@ -209,7 +217,7 @@ then you get 114 height on the title
 .load-more-container{
   position: absolute;
   background-color: white;
-  top: 30px;
+  bottom: 30px;
   left: 525px;
   background-color: #fff;
   z-index: 999;
@@ -281,16 +289,22 @@ then you get 114 height on the title
 }
 
 .filter-input{
+  width:310px;
+  height:40px;
+
   padding: 15px;
+  margin-left: 15px;
   display: inline-block;
   border-radius: 30px;
-  height:45px;
-  width: 190px;
+
   text-align: center;
   line-height: 16px;
   font-size: 12px;
   font-weight: bold;
   color: #7B8E9B;
+
+  position:absolute;
+  top:10px;
 }
 /**********************
 ***********************
@@ -298,12 +312,18 @@ then you get 114 height on the title
 ***********************
 ***********************/
   .react-select-box-container{
-    width: 140px;
-    margin: 7px 30px;
+    width: 100px;
+    margin: 0;
+
+    border-radius: 8px;
+    position: absolute;
+    top:8px;
+    right:20px;
+    padding: 0;
   }
 
   .react-select-box-options{
-
+    width:142px;
   }
 
 
