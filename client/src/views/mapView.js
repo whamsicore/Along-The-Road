@@ -6,8 +6,8 @@ var MapMarkerStore = require('../stores/MapMarkerStore');
 var MapView = React.createClass({
 
   propTypes: {
-    currentRoute: React.PropTypes.object.isRequired,
-    origin: React.PropTypes.object.isRequired
+    currentRoute: React.PropTypes.object,
+    origin: React.PropTypes.string
   },
 
   defaultOptions: {

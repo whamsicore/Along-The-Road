@@ -13,7 +13,7 @@ var ListView = React.createClass({
 
 
   propTypes: {
-    currentRoute: React.PropTypes.object.isRequired
+    currentRoute: React.PropTypes.object
   },
 
   shouldComponentUpdate () {
@@ -76,21 +76,23 @@ var ListView = React.createClass({
   },
   render () {
     var component = this;
-
+    
     if(this.props.currentRoute){
-      var listDetails = this.props.currentRoute.filteredVenues.map(function(venue, index) {
+      if(this.props.currentRoute.filteredVenues.length>0){
+        var listDetails = this.props.currentRoute.filteredVenues.map(function(venue) {
+          return (
+            <VenueView venue={venue} origin={component.props.origin}/>
+          )
+        });
+        
         return (
-          <VenueView venue={venue} origin={component.props.origin}/>
-        )
-      });
-      
-      return (
-        <div> {listDetails} </div>
-      );
+          <div> {listDetails} </div>
+        );
 
+      } //if
     }else{
       return null;
-    } //if
+    }
 
   } //render()
 });
