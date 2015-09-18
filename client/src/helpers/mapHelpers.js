@@ -48,10 +48,10 @@ var initializeMap = function(center) {
     center,
     styles: mapStyles,
     mapTypeControl: false,
-    zoomControl: true,
-    zoomControlOptions: {
-        position: google.maps.ControlPosition.LEFT_BOTTOM
-    },
+    zoomControl: false,
+    // zoomControlOptions: {
+    //     position: google.maps.ControlPosition.LEFT_BOTTOM
+    // },
     streetViewControl: false
   };
   return new google.maps.Map(document.getElementById('map'), mapOptions);

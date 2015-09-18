@@ -58,12 +58,6 @@ var ListView = React.createClass({
       $(e.currentTarget).addClass("react-select-box-hidden");
     });
 
-    // deactivate marker when mouse leave the list-container
-    // $(document).on('click', '.react-select-box-options', function(e) {
-    //   log('Fuck itii&&&&&&&&&&&&&&&&')
-    //   $(e.currentTarget).toggleClass("react-select-box-hidden");
-    // });
-
     $(document).on('mouseenter', '.react-select-box', function(e) {
       // log('currentTarget = ', e.currentTarget)
       $(".react-select-box-options").removeClass("react-select-box-hidden");
@@ -76,23 +70,21 @@ var ListView = React.createClass({
   },
   render () {
     var component = this;
-    
-    if(this.props.currentRoute){
-      if(this.props.currentRoute.filteredVenues.length>0){
-        var listDetails = this.props.currentRoute.filteredVenues.map(function(venue) {
-          return (
-            <VenueView venue={venue} origin={component.props.origin}/>
-          )
-        });
-        
-        return (
-          <div> {listDetails} </div>
-        );
 
-      } //if
+    if(this.props.currentRoute){
+      var listDetails = this.props.currentRoute.filteredVenues.map(function(venue) {
+        return (
+          <VenueView venue={venue} origin={component.props.origin}/>
+        )
+      });
+      
     }else{
-      return null;
+      var listDetails = null;
     }
+    
+    return (
+      <div> {listDetails} </div>
+    ); 
 
   } //render()
 });

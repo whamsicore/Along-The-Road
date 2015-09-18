@@ -15,7 +15,8 @@ var MapHelpers = require('../helpers/mapHelpers');
 ****************/
 var mui = require('material-ui');
 var ThemeManager = new mui.Styles.ThemeManager();
-var {Card, CardHeader, CardMedia, CardActions, CardText, Avatar, CardTitle} = mui;
+var {RaisedButton} = mui;
+// var {RaisedButton, Paper} = mui;
 
 /***************
 ****** FLUX *****
@@ -24,6 +25,15 @@ var Actions = require('../actions/Actions.js');
 var RouteStore = require('../stores/RouteStore');
 
 var overView = React.createClass({
+  childContextTypes: { // MUI: init
+    muiTheme: React.PropTypes.object //connect MUI
+  },
+  getChildContext () { // MUI: set theme
+    return {
+      muiTheme: ThemeManager.getCurrentTheme() //set MUI theme to default
+    };
+  },
+
   // adds access to the router context. the getCurrentParams method can then be used to get the properties from the route
   contextTypes: {
     router: React.PropTypes.func
@@ -252,7 +262,7 @@ var overView = React.createClass({
 
             <div className = 'tool-bar-container' style={{"backgroundColor": "#333"}} >
               <ToolView
-                loadMore = {this.loadMore}
+                /*loadMore = {this.loadMore}*/
                 /*venueFilters = {this.state.venueFilters}*/
               /> {/* ToolView */}
             </div>
@@ -284,6 +294,19 @@ var overView = React.createClass({
                 routes={this.state.routes}
                 changeCurrentRoute={this.changeCurrentRoute}
               /> {/* RouteDetailView */}
+            </div> {/* row */}
+
+            <div className='row load-more-container'>
+              <RaisedButton
+                label="Load More"
+                className="submit_button"
+                secondary={true}
+                onClick={function(){that.loadMore(that.state.currentRoute)}}
+                style={{
+                  'width':'140px',
+                  'borderRadius': '5px'
+                }}
+              /> {/* RaisedButton */}
             </div> {/* row */}
           </div> {/* col-sm-8 */}
 
