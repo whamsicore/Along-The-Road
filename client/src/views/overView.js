@@ -233,8 +233,12 @@ var overView = React.createClass({
 
     var count = wayPoints.length;
 
+    if(wayPoints.length === 20) {
+      $('#loadMore').show();
+    }
+
     if(wayPoints.length !== 20) {
-      $('#loadMore').remove();
+      $('#loadMore').hide(200);
     }
 
     for(var i=0; i<wayPoints.length; i++){
@@ -308,7 +312,7 @@ var overView = React.createClass({
 
           </div> {/* col-sm-4 */}
 
-          <div className='col-sm-7 right-container'>
+          <div id="right-container" className='col-sm-7 right-container'>
             <div className='row map-container'>
               <MapView
                 currentRoute={this.state.currentRoute}
