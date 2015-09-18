@@ -117,6 +117,16 @@ var MapView = React.createClass({
         if(venue.rating >= 8) image = '../../images/yellow.png';
         if(venue.rating >= 9) image = '../../images/green.png';
 
+
+        var priceStr = "N/A";
+        if(venue.price){
+          if(venue.price.tier===1) priceStr ="$";
+          if(venue.price.tier===2) priceStr ="$$";
+          if(venue.price.tier===3) priceStr ="$$$";
+          if(venue.price.tier===4) priceStr ="$$$$";
+
+        }
+
         var position = new google.maps.LatLng(lat, lng);
 
         var marker = new google.maps.Marker({
@@ -130,7 +140,7 @@ var MapView = React.createClass({
         // NOTE: we can also add rating color to decorate marker
         var infowindow = new google.maps.InfoWindow({
           content: '<img border="0" align="Left" src='+ venueImage+ '  style="width: 80px; height: 80px">' + "<strong>" +
-          venue.name + "</strong>"+ "<br/> Rating: "+venue.rating +  "<br/>" +
+          venue.name + "</strong>"+ "<br/> Rating: "+venue.rating +  "<br/>" + "Price: "+ priceStr +  "<br/>" +
           "<a href="+ component.openDirections(venue) + " target='_blank'><div float='right'>Directions</div></a>" + "<br/>" +
           "<a href=" + component.openFourSquare(venue) + " target='_blank'><div float='right'>Details</div></a>"
         });
