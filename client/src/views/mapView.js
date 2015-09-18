@@ -3,6 +3,8 @@
 var React = require('react');
 var MapHelper = require('../helpers/mapHelpers');
 var MapMarkerStore = require('../stores/MapMarkerStore');
+var Actions = require('../actions/Actions.js');
+
 var MapView = React.createClass({
 
   propTypes: {
@@ -22,10 +24,7 @@ var MapView = React.createClass({
   componentDidMount () {
     MapMarkerStore.addChangeListener(this._onChange)
 
-    $('#map').on('click', function(event){
-      console.log(event.target);
-      console.log('clicked')
-    });
+
   },
 
   shouldComponentUpdate(prevProps, prevState) {
@@ -152,6 +151,7 @@ var MapView = React.createClass({
         });
 
         marker.infowindow = infowindow;
+        marker.id = venue.id;
 
         var markerIsActive = false;
 
@@ -175,19 +175,19 @@ var MapView = React.createClass({
             markerIsActive = false; 
             infowindow.close(); 
 
-
           }else if(!markerIsActive){ //activate this marker
             markerIsActive = true; 
             if(window.activeInfoWindow){
               window.activeInfoWindow.close(); //close previous
             }
+            console.log(marker.id);
+            Actions.selectMapMarker(marker.id);
             window.activeInfoWindow = infowindow; //update current;  
           } //if
         }); //mouseout
 
         google.maps.event.addListener(marker, 'dblclick', function() {
           MapHelper.openFourSquare(venue); //load new page
-          
         });
 
         //show map marker
