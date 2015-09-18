@@ -51,8 +51,9 @@ function addVenues(venue_wrappers, point){
     venue_wrappers.forEach(function(venue_wrapper, i){
       var venue = venue_wrapper.venue;
 
+      // console.log("$$$$$$$$$ Venue_wrapper=", venue_wrapper);
       /****** Add tip and reason to venue *******/
-      if(venue_wrapper.tips){ // Protects against no tips
+      if(venue_wrapper.tips){
         var tips = venue_wrapper.tips[0];
         var likes = tips.likes ? tips.likes.count : 0;
         venue.tip = {
@@ -60,7 +61,8 @@ function addVenues(venue_wrappers, point){
           reviewerMsg: tips.text,
           likes: likes,
         }
-      }
+      } //if
+
       // console.log("$$$$$$$$$ Venue.tip=", venue.tip);
       venue.totalDistance = venue.location.distance + point.distance; // in meters
       //remove duplicate venues

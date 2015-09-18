@@ -80,17 +80,19 @@ var overView = React.createClass({
 
     /****** FLUX:  ******/
     RouteStore.addChangeListener(function(){
+
       var routes = RouteStore.getRoutes();
       var currentRoute = RouteStore.getCurrentRoute();
       var filteredVenues = currentRoute.filteredVenues;
 
-      // console.log("RouteStore ********** filteredVenues = ", filteredVenues);
+      console.log("OverView ********** before stateChanged. newRoute = ", currentRoute);
       //The only place we are going to set state
       this.setState({
         routes,
         currentRoute,
-        // venueFilters
       });
+
+      console.log("OverView ********** stateChanged. currentRoute = ", this.state.currentRoute);
 
     }.bind(this)); //update routes
 
@@ -148,7 +150,10 @@ var overView = React.createClass({
           var radius = MapHelpers.getSearchRadius(newRoute);
           newRoute.searchRadius = radius;
           newRoute.wayPoints = MapHelpers.getWayPoints(newRoute, radius); //syncronously get waypoints for select googleRoute
-          newRoute.addListener('click', component.changeCurrentRoute.bind(component, newRoute));
+          newRoute.addListener('click', function(){
+            Actions.selectRoute(newRoute.index);
+            component.changeCurrentRoute(newRoute)
+          });
 
           newRoutes.push(newRoute); // save routes in array
 
@@ -165,23 +170,25 @@ var overView = React.createClass({
   }, //getRoutes()
 
   loadMore () {
+    console.log("overView -> loadMore-----> newRoute=", this.state.currentRoute);
+
     var queryIndex = this.state.currentRoute.queryIndex;
-    var queries = this.state.currentRoute.wayPoints.slice(queryIndex, queryIndex+20);
-    this.getFourSquare(queries, queryIndex); //getFourSquare
+    var queryPoints = this.state.currentRoute.wayPoints.slice(queryIndex, queryIndex+20);
+    console.log("overView -> loadMore() wayPoints=", this.state.currentRoute.wayPoints);
+    this.getFourSquare(queryPoints, queryIndex); //getFourSquare
     this.state.currentRoute.queryIndex+=20;
 
   },
 
   // Event: switch the route and update the active venues
   changeCurrentRoute (newRoute) {
-    // console.log("overView ------> changeCurrentRoute() newRoute=", newRoute);
+    console.log("overView -> changeCurrentRoute-----> newRoute=", newRoute);
 
     /******** UPDATE POLYLINES *********/
     this.state.currentRoute.setOptions(this.defaultOptions.polyline); //hide old route
     newRoute.setOptions({zIndex: 2, strokeOpacity: 1}); //show currentRoute
 
-    Actions.selectRoute(newRoute.index);
-
+    // console.log("overView -> changeCurrentRoute() ################# currentRoute=", this.state.currentRoute);
     /******** QUERY FOR VENUES *********/
     if(Object.keys(newRoute.allVenuesObj).length===0){
       this.loadMore();
@@ -197,7 +204,6 @@ var overView = React.createClass({
   //save results to the current route and updates the parent (mapView)
   //re-render results onto the page by updating state variable.
   getFourSquare (wayPoints, queryIndex) {
-
 
     var count = wayPoints.length;
 
@@ -278,7 +284,6 @@ var overView = React.createClass({
             <div className='row map-container'>
               <MapView
                 currentRoute={this.state.currentRoute}
-                id="map"
                 origin = {this.state.origin}
 
               /> {/* MapView */}

@@ -46,7 +46,8 @@ var initializeMap = function(center) {
   var mapOptions = {
     zoom: 10,
     center,
-    styles: mapStyles
+    styles: mapStyles,
+    mapTypeControl: false
   };
   return new google.maps.Map(document.getElementById('map'), mapOptions);
 } //initializeMap()

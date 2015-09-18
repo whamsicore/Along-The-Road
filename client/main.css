@@ -144,6 +144,9 @@ then you get 114 height on the title
 ***********************
 ***********************/
 
+#map{
+  cursor: pointer;
+}
 .left-container, .right-container{
   height:inherit;
   padding:0px;
@@ -280,6 +283,9 @@ then you get 114 height on the title
     margin: 7px 30px;
   }
 
+  .react-select-box-options{
+
+  }
 
 
 /**********************
