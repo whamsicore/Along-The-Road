@@ -59,8 +59,11 @@ var HomeView = React.createClass({
     $('#destination').keydown(function(event){
         var keyCode = (event.keyCode ? event.keyCode : event.which);
         if (keyCode === 13) {
-            console.log('button clicked');
-            $('.submit_button').trigger('click');
+            if($(this).val()){
+              $('.submit_button').trigger('click');
+            }
+            // console.log('button clicked this.text=', $(this).text());
+            // if(this.text)
             // $('#startSearch').trigger('click');
         }
     });
@@ -78,7 +81,6 @@ var HomeView = React.createClass({
     var component = this;
 
     var goToOverView = function(){
-      console.log("$$$$$$$$$$ Clicked");
       window.reactRouter.transitionTo('overview', {origin:component.state.origin, destination:component.state.destination});
     }
 

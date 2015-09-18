@@ -44,7 +44,7 @@ var Actions = {
     });
   },
   selectRoute: function(index) {
-    console.log("Actions ----> selectRoute, index ="+index)
+    // console.log("Actions ----> selectRoute, index ="+index)
     AppDispatcher.dispatch({
       actionType: Constants.SELECT_ROUTE,
       index: index
