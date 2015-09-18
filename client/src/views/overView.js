@@ -60,7 +60,7 @@ var overView = React.createClass({
     _fourSquare: {
       fourSquare_url: "https://api.foursquare.com/v2/venues/explore?client_id=ELLZUH013LMEXWRWGBOSNBTXE3NV02IUUO3ZFPVFFSZYLA30&client_secret=U2EQ1N1J4EAG4XH4QO4HCZTGM3FCWDLXU2WJ0OPTD2Q3YUKF&v=20150902",
       foodCategory_url: "&categoryId=4d4b7105d754a06374d81259",
-      limit_url: "&limit=50",
+      limit_url: "&limit=20", // how many venues to return per waypoint
       photos_url: "&venuePhotos=1",
       category_url: "&section=food",
       distance_url: "&sortByDistance=0"
@@ -90,8 +90,6 @@ var overView = React.createClass({
 
     /****** FLUX:  ******/
     RouteStore.addChangeListener(this.onStoreChange); //update routes
-
-
 
     /****** BEGIN APP INITIALIZATION *****/
     this.getRoutes(start, end, map);

@@ -52,7 +52,9 @@ var ToolView = React.createClass({
       if(e.which == 13 || $("#searchBar").val().length === 0){
         Actions.searchVenues($("#searchBar").val())
         Actions.updateList();
-      }
+
+      } // if
+
     });
   },
 
@@ -72,9 +74,11 @@ var ToolView = React.createClass({
   render () {
     return (
       <div style={{"backgroundColor": '#555'}}>
+        <input id="searchBar" placeholder = "Keyword Search" className='filter-input form-control'/>
+
         <SelectBox
-            label = "Set Filters"
-            className = ''
+            label = "Filters"
+            className = 'form-control'
             onChange = {this.updateFilters}
             value = {this.state.filters}
             multiple = {true}
@@ -87,7 +91,6 @@ var ToolView = React.createClass({
           <option value='openNowFilter'> Open Now </option>
         </SelectBox>
 
-        <input id="searchBar" placeholder = "Keyword Search" className='filter-input form-control'/>
       </div>
     );
   } //render()

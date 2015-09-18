@@ -278,7 +278,7 @@ module.exports = React.createClass({displayName: 'exports',
             id: this.state.id,
             ref: 'button',
             className: 'react-select-box',
-            onClick: this.toggleOpenClose,
+            //onClick: this.toggleOpenClose,
             onBlur: this.handleBlur,
             tabIndex: '0',
             'aria-hidden': true
