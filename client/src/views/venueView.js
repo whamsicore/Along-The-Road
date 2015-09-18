@@ -79,10 +79,8 @@ var VenueView = React.createClass({
 
 
     var categoryText = categoryList ? categoryList.join("/") : "N/A";
-    // var priceText = price && price.message ? msgToDollarSigns[price.message] : "N/A";
     var priceText = price && price.tier ? tierToDollarSigns[price.tier] : "N/A";
     var ratingText = rating ? rating + '/10' : "N/A";
-    //var distanceText = Math.round(location.distance/1000*.621*10)/10 + " mi. off the road";
     var totalDistanceText = Math.round(totalDistance/1000*.621*10)/10 + " mi";
 
     return (

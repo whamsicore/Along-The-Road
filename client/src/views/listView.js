@@ -65,6 +65,11 @@ var ListView = React.createClass({
 
   }, //componentDidMount()
 
+  componentWillUnmount (){
+    ListUpdateStore.removeChangeListener(this.updateList);
+
+  },
+
   updateList() {
     this.forceUpdate();
   },
@@ -74,7 +79,7 @@ var ListView = React.createClass({
     if(this.props.currentRoute){
       var listDetails = this.props.currentRoute.filteredVenues.map(function(venue) {
         return (
-          <VenueView venue={venue} origin={component.props.origin}/>
+          <VenueView key={venue.id} venue={venue} origin={component.props.origin}/>
         )
       });
       
