@@ -116,7 +116,6 @@ var overView = React.createClass({
     
     // func: Asynchronously gets routes from google
     directionsService.route(request, function (response, status) {
-      console.log(response);
       if (status == google.maps.DirectionsStatus.OK) { //.OK indicates the response contains a valid DirectionsResult.
         // log("$$$$$$$$$$$ Success routes:", response.routes);
         var newRoutes = []; //empty array for storing route polylines
@@ -141,8 +140,9 @@ var overView = React.createClass({
 
           // derived properties
           newRoute.index = i; //tracks position in routes array
-          newRoute.allVenues = {}; //all venues found 
-          newRoute.filteredVenues = []; //processed (filtered OR sorted) venues to be displayed
+          newRoute.allVenuesObj = {}; //all venues found 
+          newRoute.allVenuesArray = [];
+          newRoute.filteredVenues = newRoute.allVenuesArray; //processed (filtered OR sorted) venues to be displayed
           newRoute.queryIndex = 1; //where we begin with queries, defaults to 0
           newRoute.queryComplete = false; //whether all waypoints have been queried. Defaults to false
           var radius = MapHelpers.getSearchRadius(newRoute);
@@ -183,7 +183,7 @@ var overView = React.createClass({
     Actions.selectRoute(newRoute.index);
 
     /******** QUERY FOR VENUES *********/
-    if(Object.keys(newRoute.allVenues).length===0){
+    if(Object.keys(newRoute.allVenuesObj).length===0){
       this.loadMore();
     } //if
 
@@ -198,19 +198,9 @@ var overView = React.createClass({
   //re-render results onto the page by updating state variable.
   getFourSquare (wayPoints, queryIndex) {
 
-    // var index = currentRoute.queryIndex;
-    // if(index<wayPoints.length){
-      
-    // }
-    // var max = index+2; 
-    // var results = {}; //test against duplicates
-    // var component = this;
-    // if(max>wayPoints.length){
 
-    // }
     var count = wayPoints.length;
     
-    // for(var i=index; i<max; i++){
     for(var i=0; i<wayPoints.length; i++){
       var point = wayPoints[i]; 
       var ll = "&ll=" + point.lat()+"," + point.lng();
@@ -219,8 +209,6 @@ var overView = React.createClass({
 
       //These two properties ensure that the data is only displayed once all of the requests have returned
       //It is important for the speed of the app and ensuring that everything works
-      // var sortingPoint = wayPoints.length%20-1;
-      // var count = 1;
 
       var {fourSquare_url, foodCategory_url, category_url, limit_url, photos_url, distance_url} = this.defaultOptions._fourSquare;
 

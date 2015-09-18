@@ -3,7 +3,6 @@ var Constants = require('../constants/Constants');
 
 var Actions = {
 
-  // What does this do?
   initRoutes: function(newRoutes) { //get all routes and save to RouteStore
     AppDispatcher.dispatch({
       actionType: Constants.INIT_ROUTES,
@@ -11,13 +10,7 @@ var Actions = {
     });    
   }, 
 
-  /********* LEGACY ********/
 
-  query: function() {
-    AppDispatcher.dispatch({
-      actionType: Constants.QUERY_WAYPOINTS,
-    });
-  },
 
   addVenues: function(results, point){
     // console.log("Actions ----> addVenues")
@@ -35,30 +28,9 @@ var Actions = {
   },
 
   updateVenueFilters: function(filterArr){
-    console.log("Actions ----> updateVenueFilters")
-
     AppDispatcher.dispatch({
       actionType: Constants.UPDATE_VENUE_FILTERS,
       filterArr
-    });
-  },
-
-  priceFilter: function(tier){
-    console.log("Actions ----> priceFilter")
-    AppDispatcher.dispatch({
-      actionType: Constants.PRICE_FILTER,
-      tier: tier
-    });
-  },
-  ratingFilter: function(minRating) {
-    AppDispatcher.dispatch({
-      actionType: Constants.RATING_FILTER,
-      minRating: minRating
-    })
-  },
-  clearData: function() {
-    AppDispatcher.dispatch({
-      actionType: Constants.CLEAR_DATA
     });
   },
   openNowFilter: function() {
@@ -95,12 +67,7 @@ var Actions = {
       actionType: Constants.UPDATE_LIST,
     });
   },
-  categoryFilter: function(categoryFilter){
-    AppDispatcher.dispatch({
-      actionType: Constants.CATEGORY_FILTER,
-      categoryFilter: categoryFilter
-    })
-  },
+
   searchVenues: function(searchValue) {
     AppDispatcher.dispatch({
       actionType: Constants.SEARCH_VENUES,

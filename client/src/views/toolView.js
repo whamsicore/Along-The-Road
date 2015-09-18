@@ -42,58 +42,27 @@ var ToolView = React.createClass({
   },
 
   componentDidMount() {
-    $("#searchBar").change(function(){
-      Actions.searchVenues($("#searchBar").val())
-      Actions.updateList();
+    $("#searchBar").keyup(function(e){
+      if(e.which == 13 || $("#searchBar").val().length === 0){
+        Actions.searchVenues($("#searchBar").val())
+        Actions.updateList();
+      }
+
     });
   },
-
-      // <div className = "container">
-      //     {/*<button onClick={this.loadMore}>Load More</button>*/}
-      //     <button onClick={this.props.loadMore}>Load More</button>
-      //     <button onClick={function(){Actions.priceFilter(1)}}>$</button>
-      //     <button onClick={function(){Actions.priceFilter(2)}}>$$</button>
-      //     <button onClick={function(){Actions.priceFilter(3)}}>$$$</button>
-      //     <button onClick={function(){Actions.ratingFilter(7)}}>7+</button>
-      //     <button onClick={function(){Actions.ratingFilter(8)}}>8+</button>
-      //     <button onClick={function(){Actions.ratingFilter(9)}}>9+</button>
-      //     <button onClick={function(){Actions.clearFilter();}}>Clear Filters</button>
-      //     <button onClick={function(){Actions.openNowFilter();}}>Open Now</button>
-      //     {/*<button onClick={function(){Actions.clearData();}}>Clear Data</button>*/}
 
 
       // </div>
   updateFilters: function (filters) {
     Actions.updateVenueFilters(filters);
     Actions.updateList();
-    log("updateFilters, filters = ", filters);
+    // log("updateFilters, filters = ", filters);
 
     this.setState({ filters: filters });
 
   },
 
-// <<<<<<< HEAD
-        // <div className="dropdown">
-        //   <button className="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
-        //   Price
-        //   <span className="caret"></span></button>
-        //   <ul className="dropdown-menu">
-        //     <li onClick={function(){Actions.priceFilter(1);  Actions.updateList();}}> <a>Price: $</a></li>
-        //     <li onClick={function(){Actions.priceFilter(2); Actions.updateList();}}><a>Price: $$</a></li>
-        //     <li onClick={function(){Actions.priceFilter(3); Actions.updateList();}}><a>Price: $$$</a></li>
-        //     <li onClick={function(){Actions.openNowFilter(); Actions.updateList();}}><a>Open</a></li>
-        //   </ul>
-        // </div>
-        // <div className="dropdown">
-        //   <button className="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
-        //   Rating
-        //   <span className="caret"></span></button>
-        //   <ul className="dropdown-menu">
-        //     <li onClick={function(){Actions.ratingFilter(7); Actions.updateList();}}> <a>7+ Rating</a></li>
-        //     <li onClick={function(){Actions.ratingFilter(8); Actions.updateList();}}><a>8+ Rating</a></li>
-        //     <li onClick={function(){Actions.ratingFilter(9); Actions.updateList();}}><a>9+ Rating</a></li>
-        //   </ul>
-        // </div>
+
   render () {
     return (
       <div style={{"backgroundColor": 'grey'}}>
@@ -107,6 +76,7 @@ var ToolView = React.createClass({
           <option value='price1'> $ </option>
           <option value='price2'> $$ </option>
           <option value='price3'> $$$+ </option>
+          <option value='rating8'> Ratings (8+) </option>
           <option value='rating9'> Ratings (9+) </option>
           <option value='openNowFilter'> Open Now </option>
         </SelectBox>

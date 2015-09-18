@@ -38,7 +38,7 @@ var VenueView = React.createClass({
     var venue = this.props.venue;
     var origin = this.props.origin;
     var url = "https://www.google.com/maps/dir/" + origin+ "/" + venue.location.lat +"," +venue.location.lng
-    console.log(url);
+    // console.log(url);
     window.open(url);
   }
   ,

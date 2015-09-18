@@ -1,20 +1,15 @@
 /*
 This component is the home view. It allows the user to input his/her travel route
 */
-
 var React = require('react');
-
 var Router = require('react-router');
 var Actions = require('../actions/Actions.js');
-
-
 var Link = Router.Link;
 
 // Import MUI components (material-ui)
 var mui = require('material-ui');
 var ThemeManager = new mui.Styles.ThemeManager();
 var {RaisedButton, Paper} = mui;
-
 
 var HomeView = React.createClass({
 
@@ -33,7 +28,6 @@ var HomeView = React.createClass({
     }
   },
 
-
   // Componenet lifecycle method that get's called after the first render
   componentDidMount () {
     // allows access of the props inside setOrigin and setDestination
@@ -41,7 +35,6 @@ var HomeView = React.createClass({
 
     var setOrigin = function() {
       var origin = this.getPlace().geometry.location.lat() + ',' + this.getPlace().geometry.location.lng();
-
       component.setState({
         origin
       });
@@ -63,17 +56,12 @@ var HomeView = React.createClass({
     destinationAutoComplete.addListener('place_changed', setDestination);
   },
 
-
   render () {
     var slider_options = {
       dots: true,
-      // infinite: true,
       speed: 500,
-      // slidesToShow: 1,
-      // slidesToScroll: 1,
       arrows: true,
       centerMode: true,
-      // autoplay: true,
       draggable: true,
     };
 
@@ -129,8 +117,7 @@ var HomeView = React.createClass({
               </div> {/* col */}
             </div> {/* row */}
         </Paper> {/* jumbotron */}
-
-      </div>
+     </div>
     )
   }
 })
