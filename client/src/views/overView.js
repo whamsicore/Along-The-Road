@@ -85,14 +85,11 @@ var overView = React.createClass({
       var currentRoute = RouteStore.getCurrentRoute();
       var filteredVenues = currentRoute.filteredVenues;
 
-      console.log("OverView ********** before stateChanged. newRoute = ", currentRoute);
       //The only place we are going to set state
       this.setState({
         routes,
         currentRoute,
       });
-
-      console.log("OverView ********** stateChanged. currentRoute = ", this.state.currentRoute);
 
     }.bind(this)); //update routes
 
@@ -169,12 +166,9 @@ var overView = React.createClass({
 
   }, //getRoutes()
 
-  loadMore () {
-    console.log("overView -> loadMore-----> newRoute=", this.state.currentRoute);
-
-    var queryIndex = this.state.currentRoute.queryIndex;
-    var queryPoints = this.state.currentRoute.wayPoints.slice(queryIndex, queryIndex+20);
-    console.log("overView -> loadMore() wayPoints=", this.state.currentRoute.wayPoints);
+  loadMore (newRoute) {
+    var queryIndex = newRoute.queryIndex;
+    var queryPoints = newRoute.wayPoints.slice(queryIndex, queryIndex+20);
     this.getFourSquare(queryPoints, queryIndex); //getFourSquare
     this.state.currentRoute.queryIndex+=20;
 
@@ -182,16 +176,13 @@ var overView = React.createClass({
 
   // Event: switch the route and update the active venues
   changeCurrentRoute (newRoute) {
-    console.log("overView -> changeCurrentRoute-----> newRoute=", newRoute);
-
     /******** UPDATE POLYLINES *********/
     this.state.currentRoute.setOptions(this.defaultOptions.polyline); //hide old route
     newRoute.setOptions({zIndex: 2, strokeOpacity: 1}); //show currentRoute
 
-    // console.log("overView -> changeCurrentRoute() ################# currentRoute=", this.state.currentRoute);
     /******** QUERY FOR VENUES *********/
     if(Object.keys(newRoute.allVenuesObj).length===0){
-      this.loadMore();
+      this.loadMore(newRoute);
     } //if
 
 
@@ -268,7 +259,6 @@ var overView = React.createClass({
 
             <div
               className = 'list-container'
-              /*onScroll={function(){console.log("TEST $$$$$$$$$ onScroll()")}}*/
             > {/* div.list-container */}
                 <ListView
                   // currentRoute={this.state.currentRoute}

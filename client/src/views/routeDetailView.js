@@ -33,7 +33,6 @@ var RouteDetailView = React.createClass({
           <ListItem
             primaryText={colorCodedRouteInfo}
             onClick={function(){
-              // console.log('here&&&&&&&&&&&&&&', routes[index]);
               Actions.selectRoute(index);
               component.props.changeCurrentRoute(routes[index])
             }}
