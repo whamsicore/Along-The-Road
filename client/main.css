@@ -89,14 +89,11 @@ then you get 114 height on the title
   height:100%;
 }
 .content{
-<<<<<<< HEAD
   background-image: url("img/city-cars-road-houses.jpg");
   background-position: 50% 50%;
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
-=======
->>>>>>> (feat) Add price and open now filters -- markers must be updated
   height: 80%;
   position:relative;
 }
@@ -106,14 +103,6 @@ then you get 114 height on the title
 ******* HomeView ******
 ***********************
 ***********************/
-
-.home-view-content{
-  background-image: url("/img/forest.jpeg");
-  background-position: 50% 50%;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: cover;
-}
 
 /********
 ** Homeview: Custom forms for homepage
@@ -169,21 +158,11 @@ then you get 114 height on the title
 
 .left-container{
   /*overflow: scroll;*/
-<<<<<<< HEAD
   position:absolute;
   left:0;
   top:0;
   width: 460px;
   z-index: 99;
-=======
-}
-.list-container{
-  height:100%;
-  width:100%;
-  overflow:scroll;
-  z-index: 999;
-  overflow-y: scroll;
->>>>>>> (feat) Add price and open now filters -- markers must be updated
 }
 
 .tool-bar-container{
@@ -298,7 +277,6 @@ then you get 114 height on the title
 ***********************
 ***********************/
 
-<<<<<<< HEAD
 
 .dropdown{
   /*margin-left:28px;*/
@@ -328,18 +306,6 @@ then you get 114 height on the title
   position:absolute;
   top:10px;
 }
-=======
-/*.tool-bar-container{
-  margin:0;
-  padding-left:10px;
-  background-color: white;
-}
-
-.drop-down{
-  margin-left:28px;
-  padding-top: 10px;
-}*/
->>>>>>> (feat) Add price and open now filters -- markers must be updated
 /**********************
 ***********************
 ******* ListView *******
@@ -356,33 +322,9 @@ then you get 114 height on the title
     padding: 0;
   }
 
-<<<<<<< HEAD
   .react-select-box-options{
     width:142px;
   }
-=======
-.filters {
-  text-align: right;
-}
-
-.filter {
-  display: inline-block;
-  padding: 2px 5px;
-}
-
-.price-filter button {
-  width: 50px;
-}
-
-.btn:focus,.btn:active {
-   outline: none !important;
-   background-color: blue !important; /*not working yet*/
-}
-
-.btn.active {
-  background-color: LightCoral;
-}
->>>>>>> (feat) Add price and open now filters -- markers must be updated
 
 
 /**********************
@@ -426,6 +368,3 @@ then you get 114 height on the title
   color: red;
 }
 
-.clickable:hover {
-  cursor: pointer;
-}
