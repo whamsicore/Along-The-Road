@@ -38,6 +38,7 @@ var ListView = React.createClass({
     ListUpdateStore.addChangeListener(this.updateList);
     CurrentVenueStore.addChangeListener(this.scrollToVenue);
 
+    /********* LIST VIEW ***********/
     $(document).on('mouseenter', '.card', function(e) {
       $(e.currentTarget).css({'background-color': hoverColor});
 
@@ -46,7 +47,6 @@ var ListView = React.createClass({
       Actions.selectVenue(venue_id);
     });
 
-    /********* LIST VIEW ***********/
     $(document).on('mouseleave', '.card', function(e) {
       $(e.currentTarget).css({'background-color': defaultColor})
     });
@@ -77,7 +77,7 @@ var ListView = React.createClass({
 
   componentWillUnmount (){
     ListUpdateStore.removeChangeListener(this.updateList);
-
+    $(document).off();
   },
 
   /* function: updateList
@@ -87,6 +87,7 @@ var ListView = React.createClass({
    * that slowed down the program.
   */
   updateList() {
+    console.log("$$$$$$$$ updateList");
     this.forceUpdate();
   },
 

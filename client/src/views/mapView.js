@@ -116,9 +116,9 @@ var MapView = React.createClass({
       //create new marker only if marker has not been displayed
       if(!displayedMarkers[venue.id]){ //
         var image = '../../images/orange.png'
-        if(venue.rating >= 7) image = '../../images/orange.png';
+        if(venue.rating >= 7) image = '../../images/green.png';
         if(venue.rating >= 8) image = '../../images/yellow.png';
-        if(venue.rating >= 9) image = '../../images/green.png';
+        if(venue.rating >= 9) image = '../../images/orange.png';
 
 
         var priceStr = "N/A";
@@ -143,12 +143,42 @@ var MapView = React.createClass({
         }
         // create custom infowindow
         // NOTE: we can also add rating color to decorate marker
+        // var content = "<div className='col-xs-7'> \
+        //   <span className='title'> {name} </span> \
+        //   <span className='category'>" + categoryText + "</span> \
+        //   <span className='tip'> "+tip.reviewerMsg+ " </span> \
+        //   <span className='address'>" + location.formattedAddress[0] ? location.formattedAddress[0] : null + "</span> \
+        //   <span className="+ (hours && hours.status && hours.status.toLowerCase().includes('open') ? 'open' : 'closed' +
+        //     ">"+hours && hours.status ? hours.status : null +"</span> \
+        // </div> \
+        // <div className='col-xs-3 detail-info'> \
+        //   <span className='rating'>"+ '\uD83C\uDFC6' + ratingText + "</span> \
+        //   <span className='distance'>" + totalDistanceText +" </span> \
+        //   <span className='price'>" + priceText + " </span> \
+        //   <a href=" + component.openDirections(venue) + " target='_blank'><div float='right'>Directions</div></a><br/> \
+        //   <a href=" + component.openFourSquare(venue) + " target='_blank'><div float='right'>Details</div></a> \
+        // </div>";
+
+
         var infowindow = new google.maps.InfoWindow({
-          content: '<img border="0" align="Left" src='+ venueImage+ '  style="width: 80px; height: 80px">' + "<strong>" +
-          venue.name + "</strong>"+ "<br/> Rating: "+venue.rating +  "<br/>" + "Price: "+ priceStr +  "<br/>" +
-          "<a href="+ component.openDirections(venue) + " target='_blank'><div float='right'>Directions</div></a>" + "<br/>" +
-          "<a href=" + component.openFourSquare(venue) + " target='_blank'><div float='right'>Details</div></a>"
+          content: '\
+            <div class = "info-window"> \
+              <div class="img-box"> \
+                <img border="0" align="Left" src='+ venueImage+ '  style="width: 130px; height: 130px"/> \
+              </div> \
+              <div class="info-box"> \
+                <div class="name">' + venue.name + "</div>"+
+                '<div> Rating: ' +venue.rating +  '</div>' +
+                '<div> Price: ' + priceStr +  '</div>' +
+                '<div> <a href=' + component.openDirections(venue) + ' target="_blank"> Directions </a> </div>' +
+                '<div> <a href=' + component.openFourSquare(venue) + ' target="_blank"> More Info </a> </div>' +
+             '</div> \
+            </div> '
+
         });
+        // var infowindow = new google.maps.InfoWindow({
+        //   content
+        // });
 
         marker.infowindow = infowindow;
         marker.id = venue.id;
@@ -187,7 +217,8 @@ var MapView = React.createClass({
         }); //mouseout
 
         google.maps.event.addListener(marker, 'dblclick', function() {
-          MapHelper.openFourSquare(venue); //load new page
+          // console.log(venue.point);
+          // MapHelper.openFourSquare(venue); //load new page
         });
 
         //show map marker

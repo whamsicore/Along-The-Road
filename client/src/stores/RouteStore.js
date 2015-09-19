@@ -72,6 +72,8 @@ function addVenues(venue_wrappers, point){
           likes: likes,
         }
       }
+
+      venue.point = point; //save for later use
       venue.totalDistance = venue.location.distance + point.distance; // in meters
       //remove duplicate venues
       if (!allVenues[venue.id]) { // if venue does NOT exist already
@@ -236,6 +238,7 @@ AppDispatcher.register(function(action) {
       Store.emitChange();
       break;
     case Constants.SELECT_ROUTE:
+      // getFilteredArr();
       setCurrentRoute(action.index);
       Store.emitChange();
       break;

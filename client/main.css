@@ -15,6 +15,9 @@
 ***********************
 ***********************/
 
+a{
+  color: turqoise;
+}
 html {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -27,6 +30,7 @@ html, body{
 
 body {
   overflow-x: hidden;
+  position:relative;
 }
 
 .map-container{
@@ -37,6 +41,7 @@ body {
 .container-fluid{
   margin:0;
   padding:0;
+  position: relative;
 }
 
 .row{
@@ -45,7 +50,7 @@ body {
 
 .app-store, .logo {
   max-width: 100%;
-  height: auto;
+  height: 65px;
 }
 /**********************
 ***********************
@@ -55,8 +60,12 @@ body {
 
 #title{
   background-color: #40E0D0; /*turquoise*/
-  position: relative;
-  height: 20%;
+  position: absolute;
+  top:0;
+  left:0;
+  height: 120px;
+  z-index: 99;
+  width:100%;
 }
 
 /*
@@ -81,12 +90,23 @@ then you get 114 height on the title
   font-size:55px;
 }
 
+.subtitle{
+  /*font-weight: bold;*/
+  font-size: 32px;
+  width:400px;
+  color: white;
+  margin: 0 auto;
+  margin-bottom:11px;
+  text-shadow: -2px 0 turquoise, 0 2px turquoise, 2px 0 turquoise, 0 -2px turquoise;
+}
+
 .centered{
   text-align: center;
 }
 
 #app, .app{
   height:100%;
+  position:relative;
 }
 .content{
   background-image: url("img/city-cars-road-houses.jpg");
@@ -94,7 +114,8 @@ then you get 114 height on the title
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
-  height: 80%;
+  padding-top:120px;
+  height: 100%;
   position:relative;
 }
 
@@ -107,6 +128,10 @@ then you get 114 height on the title
 /********
 ** Homeview: Custom forms for homepage
 ********/
+.input-container{
+  padding-top: 90px;
+}
+
 .input-group{
   display: inline-block;
   width: 380px;
@@ -241,7 +266,7 @@ then you get 114 height on the title
   height: 38px;
 }
 
-.infobox-wrapper {
+/*.infobox-wrapper {
     display:none;
 }
 
@@ -259,6 +284,39 @@ then you get 114 height on the title
     text-shadow:0 -1px #000000;
     -webkit-box-shadow: 0 0  8px #000;
     box-shadow: 0 0 8px #000;
+}*/
+.info-window{
+  padding-left:0;
+  font-size: 14px;
+  display:block;
+  width: 260px;
+}
+
+.info-window img{
+  margin:3px;
+  border: 5px solid turquoise;
+}
+
+.info-box div.name{
+  font-size: 18px;
+  font-weight: bold;
+}
+
+ .img-box, .info-box{
+  margin:0;
+  padding:5px;
+  float:left;
+}
+
+.img-box{
+  display: inline;
+  width: 140px;
+  /*padding-left: 10px;*/
+}
+.info-box{
+  padding: 8px;
+  width: 110px;
+
 }
 
 
@@ -289,7 +347,7 @@ then you get 114 height on the title
 }
 
 .filter-input{
-  width:310px;
+  width:270px;
   height:40px;
 
   padding: 15px;
@@ -312,7 +370,7 @@ then you get 114 height on the title
 ***********************
 ***********************/
   .react-select-box-container{
-    width: 100px;
+    width: 140px;
     margin: 0;
 
     border-radius: 8px;
@@ -346,9 +404,9 @@ then you get 114 height on the title
 .card span {
   display: block;
 }
-.card:hover{
+/*.card:hover{
   cursor:pointer;
-}
+}*/
 
 .title {
   font-size: 18px;
@@ -362,6 +420,10 @@ then you get 114 height on the title
 .category {
   font-style: italic;
   color: SlateGray;
+}
+
+.tip {
+   font-style: italic;
 }
 
 .closed {

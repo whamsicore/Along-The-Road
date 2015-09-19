@@ -83,10 +83,7 @@ var overView = React.createClass({
     MapHelpers.initializeMarkers(start, end, map);
 
     /****** ZOOM ******/
-    var bounds = new google.maps.LatLngBounds();
-    bounds.extend(start);
-    bounds.extend(end);
-    map.fitBounds(bounds);
+    MapHelpers.updateZoom([start, end], map);
 
     /****** FLUX:  ******/
     RouteStore.addChangeListener(this.onStoreChange); //update routes
@@ -170,8 +167,9 @@ var overView = React.createClass({
           var radius = MapHelpers.getSearchRadius(newRoute);
           newRoute.searchRadius = radius;
           newRoute.wayPoints = MapHelpers.getWayPoints(newRoute, radius); //syncronously get waypoints for select googleRoute
+
           newRoute.addListener('click', function(){
-            Actions.selectRoute(newRoute.index);
+
             component.changeCurrentRoute(newRoute)
           });
 
@@ -196,11 +194,12 @@ var overView = React.createClass({
    * This function loads the next 20 queries on the currently selected route
    * It does this by invoking the getFourSquare function for the next 20 waypoints
   */
-  loadMore () {
-    var queryIndex = this.state.currentRoute.queryIndex;
-    var queries = this.state.currentRoute.wayPoints.slice(queryIndex, queryIndex+20);
+  loadMore (newRoute) {
+    var loadSize = 15;
+    var queryIndex = newRoute.queryIndex;
+    var queries = newRoute.wayPoints.slice(queryIndex, queryIndex+loadSize);
     this.getFourSquare(queries, queryIndex); //getFourSquare
-    this.state.currentRoute.queryIndex+=20;
+    newRoute.queryIndex+=loadSize;
 
   },
 
@@ -214,6 +213,10 @@ var overView = React.createClass({
     /******** UPDATE POLYLINES *********/
     this.state.currentRoute.setOptions(this.defaultOptions.polyline); //hide old route
     newRoute.setOptions({zIndex: 2, strokeOpacity: 1}); //show currentRoute
+
+    Actions.selectRoute(newRoute.index);
+    Actions.sortVenues();
+    Actions.updateList();
 
     /******** QUERY FOR VENUES *********/
     if(Object.keys(newRoute.allVenuesObj).length===0){
@@ -240,6 +243,7 @@ var overView = React.createClass({
     if(wayPoints.length !== 20) {
       $('#loadMore').hide(200);
     }
+    // MapHelpers.updateZoom(wayPoints, window.map)
 
     for(var i=0; i<wayPoints.length; i++){
       var point = wayPoints[i];
@@ -278,7 +282,7 @@ var overView = React.createClass({
             Actions.sortVenues();
             Actions.updateList();
           }
-          console.log("TEST -------> fourSquare error, error=", error);
+          console.log("FourSquare API: ", error);
         }
       }); //ajax()
     }; //for()

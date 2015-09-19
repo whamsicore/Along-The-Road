@@ -43,7 +43,8 @@ var VenueView = React.createClass({
   ,
 
   render () {
-    var {featuredPhotos, name, contact, hours, categories, location, menu, price, rating, ratingColor, stats, url, totalDistance, id} = this.props.venue;
+    var {featuredPhotos, tip, name, contact, hours, categories, location, menu, price, rating, ratingColor, stats, url, totalDistance, id} = this.props.venue;
+
     if (categories) {
       var categoryList = categories.map(function(category, index) {
         return category.shortName;
@@ -74,11 +75,10 @@ var VenueView = React.createClass({
       3: "$$$",
       4: "$$$$"
     };
-
-
-
-
-
+    var address = '';
+    // if(location.formattedAddress[0]){
+    //   var address = location.formattedAddress[0].length>
+    // } ?  : null;
     var categoryText = categoryList ? categoryList.join("/") : "N/A";
     var priceText = price && price.tier ? tierToDollarSigns[price.tier] : "N/A";
     var ratingText = rating ? rating + '/10' : "N/A";
@@ -94,14 +94,19 @@ var VenueView = React.createClass({
         <div className="col-xs-7">
           <span className="title"> {name} </span>
           <span className="category"> {categoryText} </span>
-          <span className="address" onClick={this.openDirections}>{location.formattedAddress[0] ? location.formattedAddress[0] : null} </span>
+          <span className="address"
+            /*onClick={this.openDirections}*/
+          >{address}
+          </span>
+          <span className="tip"> {'"'+tip.reviewerMsg+'"'} </span>
           <span className={hours && hours.status && hours.status.toLowerCase().includes('open') ? 'open' : 'closed'}> {hours && hours.status ? hours.status : null} </span>
         </div>
         <div className="col-xs-3 detail-info">
           <span className="rating"> {"\uD83C\uDFC6 " + ratingText} </span>
           <span className="distance"> {totalDistanceText} </span>
           <span className="price"> {priceText} </span>
-          <span onClick={this.openFourSquare}><strong>Foursquare</strong></span>
+          <a><span onClick={this.openFourSquare}>More Info</span></a>
+          <a><span onClick={this.openDirections}>Directions</span></a>
 
         </div>
       </Card>

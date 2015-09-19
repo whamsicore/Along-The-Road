@@ -51,7 +51,7 @@ var Actions = {
     });
   },
   selectVenue: function(venue_id) {
-    // console.log("Actions ----> selectVenue")
+    console.log("Actions ----> selectVenue")
     AppDispatcher.dispatch({
       actionType: Constants.SELECT_VENUE,
       venue_id: venue_id

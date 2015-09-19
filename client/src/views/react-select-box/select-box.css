@@ -8,7 +8,7 @@
   box-shadow: 0 0 2px rgba(0, 0, 0, .3);
 }
 .react-select-box {
-  padding: 15px 0;
+  padding: 13px 0;
   display: inline-block;
   cursor: pointer;
   border: none;
@@ -27,7 +27,7 @@
   z-index: 1;
   position: absolute;
   height: 20px;
-  top: 15px;
+  top: 11px;
   right: 34px;
   border-left: 1px solid #CBD2D7;
 }
@@ -36,7 +36,7 @@
   content: ' ';
   position: absolute;
   z-index: 1;
-  top: 23px;
+  top: 19px;
   right: 13px;
   border-top: 6px solid #7B8E9B;
   border-left: 5px solid transparent;
@@ -60,7 +60,8 @@
 }
 
 .react-select-box-empty .react-select-box-label {
-  color: #7B8E9B;
+  /*color: #7B8E9B;*/
+  color: #555;
 }
 
 .react-select-box-click-outside-layer {
@@ -74,7 +75,7 @@
 
 .react-select-box-clear {
   position: absolute;
-  top: 15px;
+  top: 11px;
   right: 0;
   width: 35px;
   height: 20px;
