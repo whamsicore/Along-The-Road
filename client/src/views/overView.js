@@ -23,6 +23,7 @@ var {RaisedButton} = mui;
 ****************/
 var Actions = require('../actions/Actions.js');
 var RouteStore = require('../stores/RouteStore');
+var QueriesPerLoad = 15;
 
 var overView = React.createClass({
   childContextTypes: { // MUI: init
@@ -195,7 +196,7 @@ var overView = React.createClass({
    * It does this by invoking the getFourSquare function for the next 20 waypoints
   */
   loadMore (newRoute) {
-    var loadSize = 15;
+    var loadSize = QueriesPerLoad;
     var queryIndex = newRoute.queryIndex;
     var queries = newRoute.wayPoints.slice(queryIndex, queryIndex+loadSize);
     this.getFourSquare(queries, queryIndex); //getFourSquare
@@ -236,11 +237,11 @@ var overView = React.createClass({
 
     var count = wayPoints.length;
 
-    if(wayPoints.length === 20) {
+    if(wayPoints.length === QueriesPerLoad) {
       $('#loadMore').show();
     }
 
-    if(wayPoints.length !== 20) {
+    if(wayPoints.length !== QueriesPerLoad) {
       $('#loadMore').hide(200);
     }
     // MapHelpers.updateZoom(wayPoints, window.map)
