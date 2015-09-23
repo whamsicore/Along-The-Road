@@ -236,7 +236,6 @@ var overView = React.createClass({
   getFourSquare (wayPoints, queryIndex) {
 
     var count = wayPoints.length;
-
     if(wayPoints.length === QueriesPerLoad) {
       $('#loadMore').show();
     }
