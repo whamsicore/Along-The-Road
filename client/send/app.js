@@ -88,7 +88,7 @@
 	              Link,
 	              { to: 'home' },
 	              ' ',
-	              React.createElement('img', { className: 'logo', src: './img/logo(thick).gif', href: 'home' })
+	              React.createElement('img', { className: 'logo', src: './img/logo.gif', href: 'home' })
 	            )
 	          )
 	        )
@@ -315,9 +315,7 @@
 	        currentQueue = queue;
 	        queue = [];
 	        while (++queueIndex < len) {
-	            if (currentQueue) {
-	                currentQueue[queueIndex].run();
-	            }
+	            currentQueue[queueIndex].run();
 	        }
 	        queueIndex = -1;
 	        len = queue.length;
@@ -369,6 +367,7 @@
 	    throw new Error('process.binding is not supported');
 	};
 
+	// TODO(shtylman)
 	process.cwd = function () { return '/' };
 	process.chdir = function (dir) {
 	    throw new Error('process.chdir is not supported');
@@ -23708,7 +23707,7 @@
 	        React.createElement(
 	          'div',
 	          { className: 'subtitle' },
-	          ' Where are you headed? '
+	          ' Explore restaurants along the way '
 	        ),
 	        React.createElement(
 	          'div',
@@ -23739,7 +23738,7 @@
 	          'div',
 	          { className: 'col-sm-12' },
 	          React.createElement(RaisedButton, {
-	            label: 'Submit',
+	            label: 'GO!',
 	            className: 'submit_button',
 	            secondary: true,
 	            onClick: goToOverView,
@@ -23772,7 +23771,7 @@
 	            React.createElement(
 	              'h2',
 	              null,
-	              ' Get The App (coming soon...) '
+	              ' Get The App'
 	            )
 	          ),
 	          ' '
@@ -23784,7 +23783,11 @@
 	          React.createElement(
 	            'div',
 	            { className: 'col-sm-12 text-center' },
-	            React.createElement('img', { className: 'app-store', src: '../img/app-store-logo.png' })
+	            React.createElement(
+	              'a',
+	              { href: 'http://foodenroute.strikingly.com' },
+	              React.createElement('img', { className: 'app-store', src: 'http://res.cloudinary.com/hrscywv4p/image/upload/c_limit,f_auto,h_3000,q_90,w_1200/v1/627066/coming-soon1_icy2uw_jbueob.png' })
+	            )
 	          ),
 	          ' '
 	        ),

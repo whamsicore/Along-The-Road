@@ -51,6 +51,7 @@ body {
 .app-store, .logo {
   max-width: 100%;
   height: 65px;
+  margin: 10px;
 }
 /**********************
 ***********************
@@ -59,7 +60,7 @@ body {
 ***********************/
 
 #title{
-  background-color: #40E0D0; /*turquoise*/
+  background-color: MediumAquaMarine; /*turquoise*/
   position: absolute;
   top:0;
   left:0;
@@ -93,11 +94,12 @@ then you get 114 height on the title
 .subtitle{
   /*font-weight: bold;*/
   font-size: 32px;
-  width:400px;
   color: white;
   margin: 0 auto;
   margin-bottom:11px;
-  text-shadow: -2px 0 turquoise, 0 2px turquoise, 2px 0 turquoise, 0 -2px turquoise;
+  padding-bottom: 15px;
+  text-shadow: 2px 2px 3px black;
+  font-weight: 100;
 }
 
 .centered{
@@ -109,7 +111,7 @@ then you get 114 height on the title
   position:relative;
 }
 .content{
-  background-image: url("img/city-cars-road-houses.jpg");
+  background-image: url("img/food.jpg");
   background-position: 50% 50%;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -129,7 +131,7 @@ then you get 114 height on the title
 ** Homeview: Custom forms for homepage
 ********/
 .input-container{
-  padding-top: 90px;
+  padding-top: 40px;
 }
 
 .input-group{
@@ -161,7 +163,7 @@ then you get 114 height on the title
 ** Homeview: Custom bottom
 ********/
 .app-info{
-  padding:30px 50px;
+  padding:10px 50px 30px 50px;
   margin:0 10% 50px;
   background-color:rgba(256, 256, 256, 0.5);
 }

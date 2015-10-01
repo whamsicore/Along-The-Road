@@ -87,7 +87,7 @@ var HomeView = React.createClass({
     return (
       <div className='container-fluid'>
         <div className = 'row centered input-container'>
-          <div className='subtitle'> Where are you headed? </div>
+          <div className='subtitle'> Explore restaurants along the way </div>
           <div className="input-group">
             <input className="start-location form-control" id="origin" placeholder="Starting Location" />
           </div> {/*input-group*/}
@@ -104,7 +104,7 @@ var HomeView = React.createClass({
         <div className = 'row centered'>
           <div className = 'col-sm-12' >
             <RaisedButton
-              label="Submit"
+              label="GO!"
               className="submit_button"
               secondary={true}
               onClick={goToOverView}
@@ -127,13 +127,15 @@ var HomeView = React.createClass({
         <Paper className="app-info" style={{'backgroundColor':"rgba(256, 256, 256, 0.7)", 'borderRadius':'10px'}}>
             <div className = 'row centered'>
               <div className = 'col-sm-12'>
-                <h2> Get The App (coming soon...) </h2>
+                <h2> Get the App</h2>
               </div> {/* col */}
             </div> {/* row */}
 
             <div className = 'row'>
               <div className = 'col-sm-12 text-center'>
-                <img className="app-store" src="../img/app-store-logo.png"/>
+                <a href="http://foodenroute.strikingly.com">
+                  <img className="app-store" src="http://res.cloudinary.com/hrscywv4p/image/upload/c_limit,f_auto,h_3000,q_90,w_1200/v1/627066/coming-soon1_icy2uw_jbueob.png"/>
+                </a>
               </div> {/* col */}
             </div> {/* row */}
         </Paper> {/* jumbotron */}

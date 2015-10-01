@@ -24,7 +24,7 @@ var App = React.createClass({
           <div>
             <h1>
               <Link to='home'> {/* Clicking logo will now lead back to homeView */}
-                <img className="logo" src="./img/logo(thick).gif" href="home"/>
+                <img className="logo" src="./img/logo.gif" href="home"/>
               </Link>
             </h1>
           </div>
