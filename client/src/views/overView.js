@@ -292,7 +292,7 @@ var overView = React.createClass({
   render () {
     var that = this;
     return (
-      <div className = 'container-fluid' style = {{'height': '100%'}} >
+      <div className = 'container-fluid background-white' style = {{'height': '100%'}} >
         <div className = 'row' style={{'height': '100%', 'width': '100%'}}>
           <div className = 'col-sm-5 left-container'>
 

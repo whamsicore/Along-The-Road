@@ -121,6 +121,9 @@ then you get 114 height on the title
   position:relative;
 }
 
+.background-white{
+  background-image: url("img/background-white.png");
+}
 /**********************
 ***********************
 ******* HomeView ******
@@ -235,7 +238,7 @@ then you get 114 height on the title
   position: absolute;
   background-color: white;
   bottom: 20px;
-  right: 20px;
+  right: 60px;
   background-color: #fff;
   z-index: 999;
   opacity: .7;
@@ -296,7 +299,8 @@ then you get 114 height on the title
 
 .info-window img{
   margin:3px;
-  border: 5px solid turquoise;
+  border-radius: 50%;
+  border: 1px SlateGray;
 }
 
 .info-box div.name{
@@ -361,10 +365,10 @@ then you get 114 height on the title
   line-height: 16px;
   font-size: 12px;
   font-weight: bold;
-  color: #7B8E9B;
+  color: #555;
 
   position:absolute;
-  top:10px;
+  top:11px;
 }
 /**********************
 ***********************

@@ -82,7 +82,7 @@ var ToolView = React.createClass({
             onChange = {this.updateFilters}
             value = {this.state.filters}
             multiple = {true}
-        >{/* SelectBox */}
+        >
           <option value='price1'> $ </option>
           <option value='price2'> $$ </option>
           <option value='price3'> $$$+ </option>
