@@ -166,8 +166,9 @@ then you get 114 height on the title
 ** Homeview: Custom bottom
 ********/
 .app-info{
+  width: 400px;
   padding:10px 50px 30px 50px;
-  margin:0 10% 50px;
+  margin:0 auto;
   background-color:rgba(256, 256, 256, 0.5);
 }
 
