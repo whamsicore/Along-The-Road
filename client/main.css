@@ -388,7 +388,7 @@ then you get 114 height on the title
   }
 
   .react-select-box-options{
-    width:142px;
+    width:139px;
   }
 
 
@@ -414,6 +414,9 @@ then you get 114 height on the title
 /*.card:hover{
   cursor:pointer;
 }*/
+.card a{
+  cursor:pointer;
+}
 
 .title {
   font-size: 18px;

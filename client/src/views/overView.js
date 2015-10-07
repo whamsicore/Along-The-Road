@@ -189,12 +189,12 @@ var overView = React.createClass({
   }, //getRoutes()
 
 
-
-  /* function: loadMore
-   * --------------------------------
+  /**
    * This function loads the next 20 queries on the currently selected route
-   * It does this by invoking the getFourSquare function for the next 20 waypoints
-  */
+   *    It does this by invoking the getFourSquare function for the next 20 waypoints
+   * @param  {[Route Object]}
+   * @return {[nothing]}
+   */
   loadMore (newRoute) {
     var loadSize = QueriesPerLoad;
     var queryIndex = newRoute.queryIndex;
@@ -203,6 +203,7 @@ var overView = React.createClass({
     newRoute.queryIndex+=loadSize;
 
   },
+
 
   /* function: changeCurrentRoute
    * --------------------------------
@@ -228,11 +229,17 @@ var overView = React.createClass({
   }, // changeCurrentRoute()
 
 
-  // SETUP PHASE (STEP 3): Obtain waypoints for each route
-  // NOTE: asyncronous function
-  //queries fourSquare api to get new results.
-  //save results to the current route and updates the parent (mapView)
-  //re-render results onto the page by updating state variable.
+
+  /**
+   * SETUP PHASE (STEP 3): Obtain waypoints for each route
+   * NOTE: asyncronous function
+   * queries fourSquare api to get new results.
+   * save results to the current route and updates the parent (mapView)
+   * re-render results onto the page by updating state variable.
+   *
+   * @param  {[type]}
+   * @return {[type]}
+   */
   getFourSquare (wayPoints, queryIndex) {
 
     var count = wayPoints.length;
@@ -243,7 +250,8 @@ var overView = React.createClass({
     if(wayPoints.length !== QueriesPerLoad) {
       $('#loadMore').hide(200);
     }
-    // MapHelpers.updateZoom(wayPoints, window.map)
+
+
 
     for(var i=0; i<wayPoints.length; i++){
       var point = wayPoints[i];
@@ -298,8 +306,6 @@ var overView = React.createClass({
 
             <div className = 'tool-bar-container' style={{"backgroundColor": "#333"}} >
               <ToolView
-                /*loadMore = {this.loadMore}*/
-                /*venueFilters = {this.state.venueFilters}*/
               /> {/* ToolView */}
             </div>
 
