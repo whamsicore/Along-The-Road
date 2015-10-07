@@ -1,0 +1,14 @@
+{
+  "name": "Along-The-Road",
+  "version": "0.0.1",
+  "homepage": "https://github.com/whamsicore/Along-The-Road",
+  "authors": [
+    "Payton Lee <whamsicore@gmail.com>"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap-material-design": "~0.3.0",
+    "bootstrap": "~3.3.5",
+    "react-select-box": "~0.1.0"
+  }
+}
